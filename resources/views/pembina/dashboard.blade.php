@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
     <title>Dashboard Pembina — Elevenxkul</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -54,7 +55,6 @@
         </form>
     </aside>
 
-    {{-- ================= MAIN CONTENT ================= --}}
     <main class="flex-1 min-w-0 flex flex-col gap-5">
 
         {{-- Notifikasi sukses --}}
@@ -89,7 +89,6 @@
             </div>
         </div>
 
-        {{-- ================= FEATURE CARDS (sesuai use case) ================= --}}
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
 
             <button type="button" data-tab-btn="absensi"
@@ -135,7 +134,6 @@
             </button>
         </div>
 
-        {{-- ================= OVERVIEW ================= --}}
         <div data-tab-panel="overview" class="tab-panel grid grid-cols-1 lg:grid-cols-[1.5fr_1fr] gap-4 items-start">
             <div class="bg-white rounded-3xl p-6 shadow-[0_10px_30px_-18px_rgba(46,43,85,0.35)]">
                 <div class="flex items-center justify-between mb-3">
@@ -193,13 +191,19 @@
             </div>
         </div>
 
-        {{-- ================= ABSENSI PESERTA ================= --}}
         <div data-tab-panel="absensi" class="tab-panel hidden bg-white rounded-3xl p-6 shadow-[0_10px_30px_-18px_rgba(46,43,85,0.35)]">
-            <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
                 <h3 class="font-bold text-base">
                     Absensi Peserta @if($sesiTerbaru) — {{ $sesiTerbaru->nama_sesi }} @endif
                 </h3>
-                <span class="text-xs font-bold text-lavender">{{ $hadirCount }}/{{ $pesertaAbsensi->count() }} hadir</span>
+                <div class="flex items-center gap-3">
+                    <span class="text-xs font-bold text-lavender">{{ $hadirCount }}/{{ $pesertaAbsensi->count() }} hadir</span>
+                    <a href="{{ route('pembina.absensi.create') }}"
+                       class="inline-flex items-center gap-1.5 bg-lavender hover:bg-[#8385f0] text-white font-bold text-xs px-3.5 py-2 rounded-xl">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        Tambah Absensi
+                    </a>
+                </div>
             </div>
             <table class="w-full text-sm border-collapse">
                 <thead>
@@ -208,6 +212,7 @@
                         <th class="text-left py-2 px-2 border-b border-[#EFEFF7]">Kelas</th>
                         <th class="text-left py-2 px-2 border-b border-[#EFEFF7]">Jam Masuk</th>
                         <th class="text-left py-2 px-2 border-b border-[#EFEFF7]">Status</th>
+                        <th class="text-left py-2 px-2 border-b border-[#EFEFF7]">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -235,19 +240,43 @@
                                 @endphp
                                 <span class="text-[11px] font-bold px-2.5 py-1 rounded-full {{ $statusClass }}">{{ $a->status }}</span>
                             </td>
+                            <td class="py-2.5 px-2">
+                                <div class="flex gap-2">
+                                    <a href="{{ route('pembina.absensi.edit', $a) }}"
+                                       class="w-[30px] h-[30px] rounded-lg bg-sky text-[#1E6FA8] flex items-center justify-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                                    </a>
+                                    <form id="delete-absensi-{{ $a->id }}" method="POST" action="{{ route('pembina.absensi.destroy', $a) }}" class="hidden">
+                                        @csrf
+                                        @method('DELETE')
+                                    </form>
+                                    <button type="button"
+                                            data-delete-form="delete-absensi-{{ $a->id }}"
+                                            data-delete-message="Hapus data absensi {{ $a->peserta->nama }} pada sesi ini? Tindakan ini tidak bisa dibatalkan."
+                                            class="w-[30px] h-[30px] rounded-lg bg-red-100 text-red-500 flex items-center justify-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+                                    </button>
+                                </div>
+                            </td>
                         </tr>
                     @empty
-                        <tr><td colspan="4" class="py-6 text-center text-inksoft text-sm">Belum ada data absensi peserta.</td></tr>
+                        <tr><td colspan="5" class="py-6 text-center text-inksoft text-sm">Belum ada data absensi peserta.</td></tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
 
-        {{-- ================= VALIDASI ABSENSI PELATIH ================= --}}
         <div data-tab-panel="validasi" class="tab-panel hidden bg-white rounded-3xl p-6 shadow-[0_10px_30px_-18px_rgba(46,43,85,0.35)]">
-            <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
                 <h3 class="font-bold text-base">Validasi Absensi Pelatih</h3>
-                <span class="text-xs font-bold text-lavender">{{ $pendingValidasi }} menunggu tindakan</span>
+                <div class="flex items-center gap-3">
+                    <span class="text-xs font-bold text-lavender">{{ $pendingValidasi }} menunggu tindakan</span>
+                    <a href="{{ route('pembina.validasi.create') }}"
+                       class="inline-flex items-center gap-1.5 bg-lavender hover:bg-[#8385f0] text-white font-bold text-xs px-3.5 py-2 rounded-xl">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        Tambah Laporan
+                    </a>
+                </div>
             </div>
             <table class="w-full text-sm border-collapse">
                 <thead>
@@ -283,12 +312,12 @@
                                 <span class="text-[11px] font-bold px-2.5 py-1 rounded-full {{ $vClass }}">{{ $v->status }}</span>
                             </td>
                             <td class="py-2.5 px-2">
-                                <div class="flex gap-2">
+                                <div class="flex gap-2 flex-wrap">
                                     <form method="POST" action="{{ route('pembina.validasi.setujui', $v) }}">
                                         @csrf
                                         <button type="submit"
                                                 class="w-[30px] h-[30px] rounded-lg bg-mint text-[#1F7A3D] flex items-center justify-center disabled:opacity-30"
-                                                {{ $v->status !== 'Menunggu' ? 'disabled' : '' }}>
+                                                {{ $v->status !== 'Menunggu' ? 'disabled' : '' }} title="Setujui">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
                                         </button>
                                     </form>
@@ -296,10 +325,24 @@
                                         @csrf
                                         <button type="submit"
                                                 class="w-[30px] h-[30px] rounded-lg bg-red-100 text-red-500 flex items-center justify-center disabled:opacity-30"
-                                                {{ $v->status !== 'Menunggu' ? 'disabled' : '' }}>
+                                                {{ $v->status !== 'Menunggu' ? 'disabled' : '' }} title="Tolak">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                                         </button>
                                     </form>
+                                    <a href="{{ route('pembina.validasi.edit', $v) }}" title="Edit"
+                                       class="w-[30px] h-[30px] rounded-lg bg-sky text-[#1E6FA8] flex items-center justify-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                                    </a>
+                                    <form id="delete-validasi-{{ $v->id }}" method="POST" action="{{ route('pembina.validasi.destroy', $v) }}" class="hidden">
+                                        @csrf
+                                        @method('DELETE')
+                                    </form>
+                                    <button type="button" title="Hapus"
+                                            data-delete-form="delete-validasi-{{ $v->id }}"
+                                            data-delete-message="Hapus laporan absensi pelatih {{ $v->pelatih->nama }} ini? Tindakan ini tidak bisa dibatalkan."
+                                            class="w-[30px] h-[30px] rounded-lg bg-red-100 text-red-500 flex items-center justify-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+                                    </button>
                                 </div>
                             </td>
                         </tr>
@@ -310,7 +353,6 @@
             </table>
         </div>
 
-        {{-- ================= BERI NILAI PESERTA ================= --}}
         <div data-tab-panel="nilai" class="tab-panel hidden bg-white rounded-3xl p-6 shadow-[0_10px_30px_-18px_rgba(46,43,85,0.35)]">
             <div class="flex items-center justify-between mb-3">
                 <h3 class="font-bold text-base">Beri Nilai Peserta</h3>
@@ -361,13 +403,111 @@
                     @endforelse
                 </tbody>
             </table>
+
+            <div class="mt-7 pt-6 border-t border-[#EFEFF7]">
+                <h4 class="font-bold text-sm mb-3">Riwayat Nilai</h4>
+                <table class="w-full text-sm border-collapse">
+                    <thead>
+                        <tr class="text-inksoft text-[11px] uppercase tracking-wide">
+                            <th class="text-left py-2 px-2 border-b border-[#EFEFF7]">Peserta</th>
+                            <th class="text-left py-2 px-2 border-b border-[#EFEFF7]">Kategori</th>
+                            <th class="text-left py-2 px-2 border-b border-[#EFEFF7]">Sesi</th>
+                            <th class="text-left py-2 px-2 border-b border-[#EFEFF7]">Nilai</th>
+                            <th class="text-left py-2 px-2 border-b border-[#EFEFF7]">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($riwayatNilai as $n)
+                            <tr class="border-b border-[#F5F5FA] last:border-none">
+                                <td class="py-2.5 px-2 font-semibold">{{ $n->peserta->nama ?? '-' }}</td>
+                                <td class="py-2.5 px-2 text-inksoft">{{ $n->kategori }}</td>
+                                <td class="py-2.5 px-2 text-inksoft">{{ $n->sesi->nama_sesi ?? '-' }}</td>
+                                <td class="py-2.5 px-2">
+                                    <span class="text-[11px] font-bold px-2.5 py-1 rounded-full bg-periwinkle/30 text-[#3F41B0]">{{ $n->nilai ?? '—' }}</span>
+                                </td>
+                                <td class="py-2.5 px-2">
+                                    <div class="flex gap-2">
+                                        <a href="{{ route('pembina.nilai.edit', $n) }}" title="Edit"
+                                           class="w-[30px] h-[30px] rounded-lg bg-sky text-[#1E6FA8] flex items-center justify-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                                        </a>
+                                        <form id="delete-nilai-{{ $n->id }}" method="POST" action="{{ route('pembina.nilai.destroy', $n) }}" class="hidden">
+                                            @csrf
+                                            @method('DELETE')
+                                        </form>
+                                        <button type="button" title="Hapus"
+                                                data-delete-form="delete-nilai-{{ $n->id }}"
+                                                data-delete-message="Hapus nilai {{ $n->kategori }} milik {{ $n->peserta->nama ?? '' }} ini? Tindakan ini tidak bisa dibatalkan."
+                                                class="w-[30px] h-[30px] rounded-lg bg-red-100 text-red-500 flex items-center justify-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr><td colspan="5" class="py-6 text-center text-inksoft text-sm">Belum ada riwayat nilai.</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
 
     </main>
 </div>
 
+<div id="delete-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-[#2E2B55]/40 backdrop-blur-sm px-4">
+    <div class="bg-white rounded-3xl p-6 w-full max-w-sm shadow-[0_20px_50px_-20px_rgba(46,43,85,0.45)]">
+        <div class="w-12 h-12 rounded-2xl bg-red-100 text-red-500 flex items-center justify-center mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+        </div>
+        <h3 class="font-display text-lg font-semibold mb-1">Hapus data ini?</h3>
+        <p id="delete-modal-text" class="text-sm text-inksoft mb-5">Tindakan ini tidak bisa dibatalkan.</p>
+        <div class="flex gap-3">
+            <button type="button" id="delete-modal-cancel"
+                    class="flex-1 py-2.5 rounded-xl border border-[#E7E7F4] font-semibold text-sm text-inksoft hover:bg-bgsoft">Batal</button>
+            <button type="button" id="delete-modal-confirm"
+                    class="flex-1 py-2.5 rounded-xl bg-red-500 hover:bg-red-600 text-white font-semibold text-sm">Ya, Hapus</button>
+        </div>
+    </div>
+</div>
+
 <script>
-    // Tab switching sederhana (tanpa dependency JS tambahan)
+    (function () {
+        const modal = document.getElementById('delete-modal');
+        const modalText = document.getElementById('delete-modal-text');
+        const cancelBtn = document.getElementById('delete-modal-cancel');
+        const confirmBtn = document.getElementById('delete-modal-confirm');
+        let formToDelete = null;
+
+        function openModal(form, message) {
+            formToDelete = form;
+            modalText.textContent = message || 'Tindakan ini tidak bisa dibatalkan.';
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeModal() {
+            formToDelete = null;
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        document.querySelectorAll('[data-delete-form]').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                const form = document.getElementById(btn.dataset.deleteForm);
+                if (form) openModal(form, btn.dataset.deleteMessage);
+            });
+        });
+
+        cancelBtn.addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal();
+        });
+        confirmBtn.addEventListener('click', () => {
+            if (formToDelete) formToDelete.submit();
+        });
+    })();
+
     const tabButtons = document.querySelectorAll('[data-tab-btn]');
     const tabPanels = document.querySelectorAll('[data-tab-panel]');
 
@@ -387,7 +527,6 @@
         btn.addEventListener('click', () => activateTab(btn.dataset.tabBtn));
     });
 
-    // Buka tab sesuai query string ?tab=... (dikirim balik oleh controller setelah aksi)
     const initialTab = @json($activeTab);
     activateTab(['overview', 'absensi', 'validasi', 'nilai'].includes(initialTab) ? initialTab : 'overview');
 </script>

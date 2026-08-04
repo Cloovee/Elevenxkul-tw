@@ -9,7 +9,6 @@ use App\Models\Peserta;
 use App\Models\Sesi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Auth;
 
 class PembinaDashboardController extends Controller
 {
@@ -40,10 +39,15 @@ class PembinaDashboardController extends Controller
 
         $pendingValidasi = $validasiPelatih->where('status', 'Menunggu')->count();
 
-        // Daftar peserta untuk form penilaian (nilai kategori "Teknik" bulan berjalan)
+        // Daftar peserta untuk form penilaian cepat (nilai terakhir per peserta)
         $daftarNilai = Peserta::with(['nilai' => function ($q) {
             $q->latest()->limit(1);
         }])->get();
+
+        // Riwayat lengkap nilai peserta untuk keperluan edit / hapus (CRUD)
+        $riwayatNilai = NilaiPeserta::with(['peserta', 'sesi'])
+            ->latest()
+            ->get();
 
         $nilaiTerisi = NilaiPeserta::whereNotNull('nilai')
             ->whereMonth('created_at', now()->month)
@@ -76,64 +80,9 @@ class PembinaDashboardController extends Controller
             'validasiPelatih' => $validasiPelatih,
             'pendingValidasi' => $pendingValidasi,
             'daftarNilai' => $daftarNilai,
+            'riwayatNilai' => $riwayatNilai,
             'nilaiTerisi' => $nilaiTerisi,
             'trend' => $trend,
         ]);
-    }
-
-    /**
-     * Use case: memvalidasi absensi pelatih -> setujui.
-     */
-    public function setujuiValidasi(AbsensiPelatih $absensiPelatih)
-    {
-        $absensiPelatih->update([
-            'status' => 'Divalidasi',
-            'divalidasi_oleh' => Auth::id(),
-            'divalidasi_pada' => now(),
-        ]);
-
-        return redirect()
-            ->route('pembina.dashboard', ['tab' => 'validasi'])
-            ->with('success', 'Absensi pelatih berhasil divalidasi.');
-    }
-
-    /**
-     * Use case: memvalidasi absensi pelatih -> tolak.
-     */
-    public function tolakValidasi(AbsensiPelatih $absensiPelatih)
-    {
-        $absensiPelatih->update([
-            'status' => 'Ditolak',
-            'divalidasi_oleh' => Auth::id(),
-            'divalidasi_pada' => now(),
-        ]);
-
-        return redirect()
-            ->route('pembina.dashboard', ['tab' => 'validasi'])
-            ->with('success', 'Absensi pelatih ditolak.');
-    }
-
-    /**
-     * Use case: memberi nilai peserta.
-     */
-    public function simpanNilai(Request $request, Peserta $peserta)
-    {
-        $validated = $request->validate([
-            'kategori' => ['required', 'string', 'max:100'],
-            'nilai' => ['required', 'integer', 'min:0', 'max:100'],
-            'sesi_id' => ['nullable', 'exists:sesis,id'],
-        ]);
-
-        NilaiPeserta::create([
-            'peserta_id' => $peserta->id,
-            'sesi_id' => $validated['sesi_id'] ?? null,
-            'kategori' => $validated['kategori'],
-            'nilai' => $validated['nilai'],
-            'diberikan_oleh' => Auth::id(),
-        ]);
-
-        return redirect()
-            ->route('pembina.dashboard', ['tab' => 'nilai'])
-            ->with('success', 'Nilai peserta berhasil disimpan.');
     }
 }
