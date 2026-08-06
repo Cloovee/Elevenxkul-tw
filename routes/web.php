@@ -5,11 +5,13 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\DashAdminController;
 use App\Http\Controllers\Admin\EkskulController;
 
+// 1. Arahkan route utama '/' langsung ke halaman login
 Route::get('/', function () {
-    return redirect('/admin/dashboard');
+    return redirect()->route('login');
 });
 
-Route::prefix('admin')->name('admin.')->group(function () {
+// 2. Pasang middleware 'auth' pada grup admin agar tidak bisa diakses tanpa login
+Route::prefix('admin')->middleware('auth')->name('admin.')->group(function () {
     Route::get('/dashboard', [DashAdminController::class, 'index'])->name('dashboard');
     Route::resource('ekskul', EkskulController::class);
 });

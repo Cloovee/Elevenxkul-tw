@@ -1,3 +1,8 @@
+@import "tailwindcss";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@theme {
+  --color-periwinkle: #7c7cff;
+}
