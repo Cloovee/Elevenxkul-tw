@@ -12,8 +12,8 @@ class DashAdminController extends Controller
 {
     public function index()
     {
-        $totalEkskul = Ekskul::count();
-        $recentEkskuls = Ekskul::latest()->take(5)->get();
+        // $totalEkskul = Ekskul::count();
+        // $recentEkskuls = Ekskul::latest()->take(5)->get();
         // $totalSiswa = Siswa::count();
         // $totalPembina = Pembina::count();
         // $totalPelatih = Pelatih::count();
