@@ -2,9 +2,16 @@
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\DashAdminController;
+use App\Http\Controllers\Admin\EkskulController;
 
 Route::get('/', function () {
     return redirect('/login');
+});
+
+Route::prefix('admin')->middleware('auth')->name('admin.')->group(function () {
+    Route::get('/dashboard', [DashAdminController::class, 'index'])->name('dashboard');
+    Route::resource('ekskul', EkskulController::class);
 });
 
 Route::get('/dashboard', function () {
