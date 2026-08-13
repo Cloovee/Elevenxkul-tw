@@ -4,9 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\NilaiPeserta;
 use App\Models\Peserta;
-use App\Models\Sesi;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class NilaiPesertaController extends Controller
 {
@@ -16,17 +14,18 @@ class NilaiPesertaController extends Controller
     public function store(Request $request, Peserta $peserta)
     {
         $validated = $request->validate([
-            'kategori' => ['required', 'string', 'max:100'],
-            'nilai' => ['required', 'integer', 'min:0', 'max:100'],
-            'sesi_id' => ['nullable', 'exists:sesis,id'],
+            'semester' => ['required', 'in:1,2'],
+            'tahun_ajaran' => ['required', 'string', 'max:20'],
+            'nilai' => ['required', 'numeric', 'min:0', 'max:100'],
+            'catatan_pembina' => ['nullable', 'string'],
         ]);
 
         NilaiPeserta::create([
-            'peserta_id' => $peserta->id,
-            'sesi_id' => $validated['sesi_id'] ?? null,
-            'kategori' => $validated['kategori'],
+            'id_anggota' => $peserta->id_anggota,
+            'semester' => $validated['semester'],
+            'tahun_ajaran' => $validated['tahun_ajaran'],
             'nilai' => $validated['nilai'],
-            'diberikan_oleh' => Auth::id(),
+            'catatan_pembina' => $validated['catatan_pembina'] ?? null,
         ]);
 
         return redirect()
@@ -39,11 +38,10 @@ class NilaiPesertaController extends Controller
      */
     public function edit(NilaiPeserta $nilaiPeserta)
     {
-        $nilaiPeserta->load(['peserta', 'sesi']);
+        $nilaiPeserta->load('peserta.siswa');
 
         return view('pembina.nilai-peserta.edit', [
             'nilaiPeserta' => $nilaiPeserta,
-            'sesis' => Sesi::latest('tanggal')->get(),
         ]);
     }
 
@@ -53,9 +51,10 @@ class NilaiPesertaController extends Controller
     public function update(Request $request, NilaiPeserta $nilaiPeserta)
     {
         $validated = $request->validate([
-            'kategori' => ['required', 'string', 'max:100'],
-            'nilai' => ['required', 'integer', 'min:0', 'max:100'],
-            'sesi_id' => ['nullable', 'exists:sesis,id'],
+            'semester' => ['required', 'in:1,2'],
+            'tahun_ajaran' => ['required', 'string', 'max:20'],
+            'nilai' => ['required', 'numeric', 'min:0', 'max:100'],
+            'catatan_pembina' => ['nullable', 'string'],
         ]);
 
         $nilaiPeserta->update($validated);

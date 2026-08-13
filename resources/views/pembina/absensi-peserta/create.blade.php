@@ -21,7 +21,7 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 12h6M9 16h6M9 8h1"/></svg>
         </div>
         <h1 class="font-display text-xl font-semibold mb-1">Tambah Absensi Peserta</h1>
-        <p class="text-sm text-inksoft mb-6">Catat kehadiran peserta pada sebuah sesi latihan.</p>
+        <p class="text-sm text-inksoft mb-6">Catat kehadiran peserta pada tanggal latihan tertentu.</p>
 
         @if ($errors->any())
             <div class="bg-red-50 text-red-500 text-sm font-medium px-4 py-3 rounded-2xl mb-4">
@@ -38,41 +38,36 @@
 
             <div>
                 <label class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Peserta</label>
-                <select name="peserta_id" required
+                <select name="id_anggota" required
                         class="w-full px-3.5 py-2.5 rounded-xl border border-[#E7E7F4] text-sm focus:outline-none focus:border-lavender">
                     <option value="">— Pilih peserta —</option>
                     @foreach ($pesertas as $p)
-                        <option value="{{ $p->id }}" @selected(old('peserta_id') == $p->id)>{{ $p->nama }} @if($p->kelas) ({{ $p->kelas }}) @endif</option>
-                    @endforeach
-                </select>
-            </div>
-
-            <div>
-                <label class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Sesi</label>
-                <select name="sesi_id" required
-                        class="w-full px-3.5 py-2.5 rounded-xl border border-[#E7E7F4] text-sm focus:outline-none focus:border-lavender">
-                    <option value="">— Pilih sesi —</option>
-                    @foreach ($sesis as $s)
-                        <option value="{{ $s->id }}" @selected(old('sesi_id') == $s->id)>{{ $s->nama_sesi }} — {{ optional($s->tanggal)->translatedFormat('d M Y') }}</option>
+                        <option value="{{ $p->id_anggota }}" @selected(old('id_anggota') == $p->id_anggota)>{{ $p->nama }} @if($p->kelas) ({{ $p->kelas }}) @endif</option>
                     @endforeach
                 </select>
             </div>
 
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Jam Hadir</label>
-                    <input type="time" name="jam_hadir" value="{{ old('jam_hadir') }}"
+                    <label class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Tanggal</label>
+                    <input type="date" name="tanggal_absensi" required value="{{ old('tanggal_absensi', now()->toDateString()) }}"
                            class="w-full px-3.5 py-2.5 rounded-xl border border-[#E7E7F4] text-sm focus:outline-none focus:border-lavender">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Status</label>
-                    <select name="status" required
+                    <select name="status_kehadiran" required
                             class="w-full px-3.5 py-2.5 rounded-xl border border-[#E7E7F4] text-sm focus:outline-none focus:border-lavender">
-                        @foreach (['Hadir', 'Tidak Hadir', 'Terlambat', 'Izin'] as $status)
-                            <option value="{{ $status }}" @selected(old('status') === $status)>{{ $status }}</option>
+                        @foreach (['hadir' => 'Hadir', 'izin' => 'Izin', 'sakit' => 'Sakit', 'alpha' => 'Alpha'] as $value => $label)
+                            <option value="{{ $value }}" @selected(old('status_kehadiran') === $value)>{{ $label }}</option>
                         @endforeach
                     </select>
                 </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Catatan Kegiatan (opsional)</label>
+                <textarea name="deskripsi_kegiatan" rows="2"
+                          class="w-full px-3.5 py-2.5 rounded-xl border border-[#E7E7F4] text-sm focus:outline-none focus:border-lavender">{{ old('deskripsi_kegiatan') }}</textarea>
             </div>
 
             <div class="flex gap-3 mt-2">

@@ -41,39 +41,36 @@
 
             <div>
                 <label class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Peserta</label>
-                <select name="peserta_id" required
+                <select name="id_anggota" required
                         class="w-full px-3.5 py-2.5 rounded-xl border border-[#E7E7F4] text-sm focus:outline-none focus:border-lavender">
                     @foreach ($pesertas as $p)
-                        <option value="{{ $p->id }}" @selected(old('peserta_id', $absensiPeserta->peserta_id) == $p->id)>{{ $p->nama }} @if($p->kelas) ({{ $p->kelas }}) @endif</option>
-                    @endforeach
-                </select>
-            </div>
-
-            <div>
-                <label class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Sesi</label>
-                <select name="sesi_id" required
-                        class="w-full px-3.5 py-2.5 rounded-xl border border-[#E7E7F4] text-sm focus:outline-none focus:border-lavender">
-                    @foreach ($sesis as $s)
-                        <option value="{{ $s->id }}" @selected(old('sesi_id', $absensiPeserta->sesi_id) == $s->id)>{{ $s->nama_sesi }} — {{ optional($s->tanggal)->translatedFormat('d M Y') }}</option>
+                        <option value="{{ $p->id_anggota }}" @selected(old('id_anggota', $absensiPeserta->id_anggota) == $p->id_anggota)>{{ $p->nama }} @if($p->kelas) ({{ $p->kelas }}) @endif</option>
                     @endforeach
                 </select>
             </div>
 
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Jam Hadir</label>
-                    <input type="time" name="jam_hadir" value="{{ old('jam_hadir', $absensiPeserta->jam_hadir) }}"
+                    <label class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Tanggal</label>
+                    <input type="date" name="tanggal_absensi" required
+                           value="{{ old('tanggal_absensi', optional($absensiPeserta->tanggal_absensi)->toDateString()) }}"
                            class="w-full px-3.5 py-2.5 rounded-xl border border-[#E7E7F4] text-sm focus:outline-none focus:border-lavender">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Status</label>
-                    <select name="status" required
+                    <select name="status_kehadiran" required
                             class="w-full px-3.5 py-2.5 rounded-xl border border-[#E7E7F4] text-sm focus:outline-none focus:border-lavender">
-                        @foreach (['Hadir', 'Tidak Hadir', 'Terlambat', 'Izin'] as $status)
-                            <option value="{{ $status }}" @selected(old('status', $absensiPeserta->status) === $status)>{{ $status }}</option>
+                        @foreach (['hadir' => 'Hadir', 'izin' => 'Izin', 'sakit' => 'Sakit', 'alpha' => 'Alpha'] as $value => $label)
+                            <option value="{{ $value }}" @selected(old('status_kehadiran', $absensiPeserta->status_kehadiran) === $value)>{{ $label }}</option>
                         @endforeach
                     </select>
                 </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Catatan Kegiatan (opsional)</label>
+                <textarea name="deskripsi_kegiatan" rows="2"
+                          class="w-full px-3.5 py-2.5 rounded-xl border border-[#E7E7F4] text-sm focus:outline-none focus:border-lavender">{{ old('deskripsi_kegiatan', $absensiPeserta->deskripsi_kegiatan) }}</textarea>
             </div>
 
             <div class="flex gap-3 mt-2">

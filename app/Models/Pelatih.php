@@ -2,32 +2,40 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Pelatih extends Model
 {
-    use HasFactory;
+    protected $table = 'pelatih';
+
+    protected $primaryKey = 'id_pelatih';
 
     protected $fillable = [
-        'user_id',
-        'nama',
-        'spesialisasi',
-        'foto',
+        'nama_pelatih',
+        'jk',
+        'agama',
+        'nomor_hp',
+        'email',
+        'alamat',
+        'medsos',
+        'sertifikat_path',
     ];
 
-    public function user()
+    public function ekskuls()
     {
-        return $this->belongsTo(User::class);
-    }
-
-    public function sesi()
-    {
-        return $this->hasMany(Sesi::class);
+        return $this->hasMany(Ekskul::class, 'id_pelatih', 'id_pelatih');
     }
 
     public function absensi()
     {
-        return $this->hasMany(AbsensiPelatih::class);
+        return $this->hasMany(AbsensiPelatih::class, 'id_pelatih', 'id_pelatih');
+    }
+
+    /**
+     * Alias supaya kompatibel dengan view yang sebelumnya memakai $pelatih->nama.
+     */
+    public function getNamaAttribute(): string
+    {
+        return $this->nama_pelatih;
     }
 }

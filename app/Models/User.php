@@ -48,18 +48,18 @@ class User extends Authenticatable
         ];
     }
 
-    public function peserta()
+    public function siswa()
     {
-        return $this->hasOne(Peserta::class);
+        return $this->hasOne(Siswa::class, 'id_user');
     }
 
-    public function pelatih()
+    public function pembina()
     {
-        return $this->hasOne(Pelatih::class);
+        return $this->hasOne(Pembina::class, 'id_user');
     }
 
     public function isPembina(): bool
     {
-        return $this->role === 'pembina';
+        return $this->role === 'Pembina';
     }
 }

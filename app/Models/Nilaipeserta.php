@@ -2,35 +2,27 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Nilai peserta ekskul, disimpan di tabel `penilaian`.
+ */
 class NilaiPeserta extends Model
 {
-    use HasFactory;
+    protected $table = 'penilaian';
 
-    protected $table = 'nilai_peserta';
+    protected $primaryKey = 'id_nilai';
 
     protected $fillable = [
-        'peserta_id',
-        'sesi_id',
-        'kategori',
+        'id_anggota',
         'nilai',
-        'diberikan_oleh',
+        'tahun_ajaran',
+        'semester',
+        'catatan_pembina',
     ];
 
     public function peserta()
     {
-        return $this->belongsTo(Peserta::class);
-    }
-
-    public function sesi()
-    {
-        return $this->belongsTo(Sesi::class);
-    }
-
-    public function pemberi()
-    {
-        return $this->belongsTo(User::class, 'diberikan_oleh');
+        return $this->belongsTo(Peserta::class, 'id_anggota', 'id_anggota');
     }
 }

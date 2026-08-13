@@ -4,19 +4,31 @@ namespace App\Http\Controllers;
 
 use App\Models\AbsensiPeserta;
 use App\Models\Peserta;
-use App\Models\Sesi;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AbsensiPesertaController extends Controller
 {
+    private function pesertaUntukPembina()
+    {
+        $pembina = \App\Models\Pembina::where('id_user', Auth::id())->first();
+        $ekskulIds = $pembina ? $pembina->ekskuls()->pluck('id_ekskul') : collect();
+
+        return Peserta::with('siswa.kelas')
+            ->whereIn('id_ekskul', $ekskulIds)
+            ->where('status', 'aktif')
+            ->get()
+            ->sortBy('nama')
+            ->values();
+    }
+
     /**
      * Use case: melihat absensi peserta -> tampilkan form tambah data absensi.
      */
     public function create()
     {
         return view('pembina.absensi-peserta.create', [
-            'pesertas' => Peserta::orderBy('nama')->get(),
-            'sesis' => Sesi::latest('tanggal')->get(),
+            'pesertas' => $this->pesertaUntukPembina(),
         ]);
     }
 
@@ -26,23 +38,23 @@ class AbsensiPesertaController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'peserta_id' => ['required', 'exists:pesertas,id'],
-            'sesi_id' => ['required', 'exists:sesis,id'],
-            'jam_hadir' => ['nullable', 'date_format:H:i'],
-            'status' => ['required', 'in:Hadir,Tidak Hadir,Terlambat,Izin'],
+            'id_anggota' => ['required', 'exists:data_anggota,id_anggota'],
+            'tanggal_absensi' => ['required', 'date'],
+            'status_kehadiran' => ['required', 'in:hadir,izin,sakit,alpha'],
+            'deskripsi_kegiatan' => ['nullable', 'string'],
         ], [
-            'peserta_id.required' => 'Peserta wajib dipilih.',
-            'sesi_id.required' => 'Sesi wajib dipilih.',
+            'id_anggota.required' => 'Peserta wajib dipilih.',
+            'tanggal_absensi.required' => 'Tanggal wajib diisi.',
         ]);
 
         AbsensiPeserta::updateOrCreate(
             [
-                'peserta_id' => $validated['peserta_id'],
-                'sesi_id' => $validated['sesi_id'],
+                'id_anggota' => $validated['id_anggota'],
+                'tanggal_absensi' => $validated['tanggal_absensi'],
             ],
             [
-                'jam_hadir' => $validated['jam_hadir'] ?? null,
-                'status' => $validated['status'],
+                'status_kehadiran' => $validated['status_kehadiran'],
+                'deskripsi_kegiatan' => $validated['deskripsi_kegiatan'] ?? null,
             ]
         );
 
@@ -56,12 +68,11 @@ class AbsensiPesertaController extends Controller
      */
     public function edit(AbsensiPeserta $absensiPeserta)
     {
-        $absensiPeserta->load(['peserta', 'sesi']);
+        $absensiPeserta->load('peserta.siswa.kelas');
 
         return view('pembina.absensi-peserta.edit', [
             'absensiPeserta' => $absensiPeserta,
-            'pesertas' => Peserta::orderBy('nama')->get(),
-            'sesis' => Sesi::latest('tanggal')->get(),
+            'pesertas' => $this->pesertaUntukPembina(),
         ]);
     }
 
@@ -71,13 +82,13 @@ class AbsensiPesertaController extends Controller
     public function update(Request $request, AbsensiPeserta $absensiPeserta)
     {
         $validated = $request->validate([
-            'peserta_id' => ['required', 'exists:pesertas,id'],
-            'sesi_id' => ['required', 'exists:sesis,id'],
-            'jam_hadir' => ['nullable', 'date_format:H:i'],
-            'status' => ['required', 'in:Hadir,Tidak Hadir,Terlambat,Izin'],
+            'id_anggota' => ['required', 'exists:data_anggota,id_anggota'],
+            'tanggal_absensi' => ['required', 'date'],
+            'status_kehadiran' => ['required', 'in:hadir,izin,sakit,alpha'],
+            'deskripsi_kegiatan' => ['nullable', 'string'],
         ], [
-            'peserta_id.required' => 'Peserta wajib dipilih.',
-            'sesi_id.required' => 'Sesi wajib dipilih.',
+            'id_anggota.required' => 'Peserta wajib dipilih.',
+            'tanggal_absensi.required' => 'Tanggal wajib diisi.',
         ]);
 
         $absensiPeserta->update($validated);

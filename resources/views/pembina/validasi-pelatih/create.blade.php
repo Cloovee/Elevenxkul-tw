@@ -38,42 +38,39 @@
 
             <div>
                 <label class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Pelatih</label>
-                <select name="pelatih_id" required
+                <select name="id_pelatih" required
                         class="w-full px-3.5 py-2.5 rounded-xl border border-[#E7E7F4] text-sm focus:outline-none focus:border-lavender">
                     <option value="">— Pilih pelatih —</option>
                     @foreach ($pelatihs as $p)
-                        <option value="{{ $p->id }}" @selected(old('pelatih_id') == $p->id)>{{ $p->nama }} @if($p->spesialisasi) ({{ $p->spesialisasi }}) @endif</option>
-                    @endforeach
-                </select>
-            </div>
-
-            <div>
-                <label class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Sesi</label>
-                <select name="sesi_id" required
-                        class="w-full px-3.5 py-2.5 rounded-xl border border-[#E7E7F4] text-sm focus:outline-none focus:border-lavender">
-                    <option value="">— Pilih sesi —</option>
-                    @foreach ($sesis as $s)
-                        <option value="{{ $s->id }}" @selected(old('sesi_id') == $s->id)>{{ $s->nama_sesi }} — {{ optional($s->tanggal)->translatedFormat('d M Y') }}</option>
+                        <option value="{{ $p->id_pelatih }}" @selected(old('id_pelatih') == $p->id_pelatih)>{{ $p->nama }}</option>
                     @endforeach
                 </select>
             </div>
 
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Jam Lapor</label>
-                    <input type="time" name="jam_lapor" value="{{ old('jam_lapor') }}"
+                    <label class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Tanggal</label>
+                    <input type="date" name="tanggal_absensi" required value="{{ old('tanggal_absensi', now()->toDateString()) }}"
                            class="w-full px-3.5 py-2.5 rounded-xl border border-[#E7E7F4] text-sm focus:outline-none focus:border-lavender">
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Status</label>
-                    <select name="status" required
+                    <label class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Status Kehadiran</label>
+                    <select name="status_kehadiran" required
                             class="w-full px-3.5 py-2.5 rounded-xl border border-[#E7E7F4] text-sm focus:outline-none focus:border-lavender">
-                        @foreach (['Menunggu', 'Divalidasi', 'Ditolak'] as $status)
-                            <option value="{{ $status }}" @selected(old('status', 'Menunggu') === $status)>{{ $status }}</option>
+                        @foreach (['hadir' => 'Hadir', 'izin' => 'Izin', 'sakit' => 'Sakit', 'alpha' => 'Alpha'] as $value => $label)
+                            <option value="{{ $value }}" @selected(old('status_kehadiran') === $value)>{{ $label }}</option>
                         @endforeach
                     </select>
                 </div>
             </div>
+
+            <div>
+                <label class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Kegiatan (opsional)</label>
+                <input type="text" name="kegiatan" value="{{ old('kegiatan') }}" maxlength="100"
+                       class="w-full px-3.5 py-2.5 rounded-xl border border-[#E7E7F4] text-sm focus:outline-none focus:border-lavender">
+            </div>
+
+            <p class="text-xs text-inksoft -mt-1">Laporan baru otomatis berstatus validasi "Menunggu".</p>
 
             <div class="flex gap-3 mt-2">
                 <a href="{{ route('pembina.dashboard', ['tab' => 'validasi']) }}"

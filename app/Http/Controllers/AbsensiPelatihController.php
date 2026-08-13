@@ -4,20 +4,27 @@ namespace App\Http\Controllers;
 
 use App\Models\AbsensiPelatih;
 use App\Models\Pelatih;
-use App\Models\Sesi;
+use App\Models\Pembina;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class AbsensiPelatihController extends Controller
 {
+    private function pelatihUntukPembina()
+    {
+        $pembina = Pembina::where('id_user', Auth::id())->first();
+        $pelatihIds = $pembina ? $pembina->ekskuls()->whereNotNull('id_pelatih')->pluck('id_pelatih') : collect();
+
+        return Pelatih::whereIn('id_pelatih', $pelatihIds)->orderBy('nama_pelatih')->get();
+    }
+
     /**
      * Use case: memvalidasi absensi pelatih -> tampilkan form tambah laporan.
      */
     public function create()
     {
         return view('pembina.validasi-pelatih.create', [
-            'pelatihs' => Pelatih::orderBy('nama')->get(),
-            'sesis' => Sesi::latest('tanggal')->get(),
+            'pelatihs' => $this->pelatihUntukPembina(),
         ]);
     }
 
@@ -27,16 +34,16 @@ class AbsensiPelatihController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'pelatih_id' => ['required', 'exists:pelatihs,id'],
-            'sesi_id' => ['required', 'exists:sesis,id'],
-            'jam_lapor' => ['nullable', 'date_format:H:i'],
-            'status' => ['required', 'in:Menunggu,Divalidasi,Ditolak'],
+            'id_pelatih' => ['required', 'exists:pelatih,id_pelatih'],
+            'tanggal_absensi' => ['required', 'date'],
+            'kegiatan' => ['nullable', 'string', 'max:100'],
+            'status_kehadiran' => ['required', 'in:hadir,izin,sakit,alpha'],
         ], [
-            'pelatih_id.required' => 'Pelatih wajib dipilih.',
-            'sesi_id.required' => 'Sesi wajib dipilih.',
+            'id_pelatih.required' => 'Pelatih wajib dipilih.',
+            'tanggal_absensi.required' => 'Tanggal wajib diisi.',
         ]);
 
-        AbsensiPelatih::create($validated);
+        AbsensiPelatih::create($validated + ['status_validasi' => 'Menunggu']);
 
         return redirect()
             ->route('pembina.dashboard', ['tab' => 'validasi'])
@@ -48,12 +55,11 @@ class AbsensiPelatihController extends Controller
      */
     public function edit(AbsensiPelatih $absensiPelatih)
     {
-        $absensiPelatih->load(['pelatih', 'sesi']);
+        $absensiPelatih->load('pelatih');
 
         return view('pembina.validasi-pelatih.edit', [
             'absensiPelatih' => $absensiPelatih,
-            'pelatihs' => Pelatih::orderBy('nama')->get(),
-            'sesis' => Sesi::latest('tanggal')->get(),
+            'pelatihs' => $this->pelatihUntukPembina(),
         ]);
     }
 
@@ -63,13 +69,13 @@ class AbsensiPelatihController extends Controller
     public function update(Request $request, AbsensiPelatih $absensiPelatih)
     {
         $validated = $request->validate([
-            'pelatih_id' => ['required', 'exists:pelatihs,id'],
-            'sesi_id' => ['required', 'exists:sesis,id'],
-            'jam_lapor' => ['nullable', 'date_format:H:i'],
-            'status' => ['required', 'in:Menunggu,Divalidasi,Ditolak'],
+            'id_pelatih' => ['required', 'exists:pelatih,id_pelatih'],
+            'tanggal_absensi' => ['required', 'date'],
+            'kegiatan' => ['nullable', 'string', 'max:100'],
+            'status_validasi' => ['required', 'in:Menunggu,Divalidasi,Ditolak'],
         ], [
-            'pelatih_id.required' => 'Pelatih wajib dipilih.',
-            'sesi_id.required' => 'Sesi wajib dipilih.',
+            'id_pelatih.required' => 'Pelatih wajib dipilih.',
+            'tanggal_absensi.required' => 'Tanggal wajib diisi.',
         ]);
 
         $absensiPelatih->update($validated);
@@ -96,10 +102,12 @@ class AbsensiPelatihController extends Controller
      */
     public function setujui(AbsensiPelatih $absensiPelatih)
     {
+        $pembina = Pembina::where('id_user', Auth::id())->first();
+
         $absensiPelatih->update([
-            'status' => 'Divalidasi',
-            'divalidasi_oleh' => Auth::id(),
-            'divalidasi_pada' => now(),
+            'status_validasi' => 'Divalidasi',
+            'id_pembina_validasi' => $pembina->id_pembina ?? null,
+            'tgl_validasi' => now(),
         ]);
 
         return redirect()
@@ -112,10 +120,12 @@ class AbsensiPelatihController extends Controller
      */
     public function tolak(AbsensiPelatih $absensiPelatih)
     {
+        $pembina = Pembina::where('id_user', Auth::id())->first();
+
         $absensiPelatih->update([
-            'status' => 'Ditolak',
-            'divalidasi_oleh' => Auth::id(),
-            'divalidasi_pada' => now(),
+            'status_validasi' => 'Ditolak',
+            'id_pembina_validasi' => $pembina->id_pembina ?? null,
+            'tgl_validasi' => now(),
         ]);
 
         return redirect()

@@ -101,7 +101,7 @@
                 </div>
                 <div class="mt-7">
                     <h3 class="font-display text-lg font-semibold">Melihat Absensi Peserta</h3>
-                    <p class="text-xs text-inksoft mt-1">Pantau kehadiran peserta di setiap sesi latihan</p>
+                    <p class="text-xs text-inksoft mt-1">Pantau kehadiran peserta setiap hari latihan</p>
                 </div>
             </button>
 
@@ -166,7 +166,7 @@
                         </div>
                         <div>
                             <div class="font-extrabold text-sm">{{ $pesertaAbsensi->count() }} Peserta</div>
-                            <div class="text-[11px] text-inksoft">Terdaftar di sesi terbaru</div>
+                            <div class="text-[11px] text-inksoft">Tercatat di tanggal terbaru</div>
                         </div>
                     </div>
                     <div class="flex items-center gap-3 bg-bgsoft rounded-2xl px-3.5 py-3">
@@ -194,7 +194,7 @@
         <div data-tab-panel="absensi" class="tab-panel hidden bg-white rounded-3xl p-6 shadow-[0_10px_30px_-18px_rgba(46,43,85,0.35)]">
             <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
                 <h3 class="font-bold text-base">
-                    Absensi Peserta @if($sesiTerbaru) — {{ $sesiTerbaru->nama_sesi }} @endif
+                    Absensi Peserta @if($tanggalTerbaru) — {{ \Illuminate\Support\Carbon::parse($tanggalTerbaru)->translatedFormat('d M Y') }} @endif
                 </h3>
                 <div class="flex items-center gap-3">
                     <span class="text-xs font-bold text-lavender">{{ $hadirCount }}/{{ $pesertaAbsensi->count() }} hadir</span>
@@ -210,7 +210,7 @@
                     <tr class="text-inksoft text-[11px] uppercase tracking-wide">
                         <th class="text-left py-2 px-2 border-b border-[#EFEFF7]">Peserta</th>
                         <th class="text-left py-2 px-2 border-b border-[#EFEFF7]">Kelas</th>
-                        <th class="text-left py-2 px-2 border-b border-[#EFEFF7]">Jam Masuk</th>
+                        <th class="text-left py-2 px-2 border-b border-[#EFEFF7]">Tanggal</th>
                         <th class="text-left py-2 px-2 border-b border-[#EFEFF7]">Status</th>
                         <th class="text-left py-2 px-2 border-b border-[#EFEFF7]">Aksi</th>
                     </tr>
@@ -227,18 +227,18 @@
                                 </div>
                             </td>
                             <td class="py-2.5 px-2 text-inksoft">{{ $a->peserta->kelas ?? '-' }}</td>
-                            <td class="py-2.5 px-2 text-inksoft">{{ $a->jam_hadir ?? '-' }}</td>
+                            <td class="py-2.5 px-2 text-inksoft">{{ optional($a->tanggal_absensi)->translatedFormat('d M Y') ?? '-' }}</td>
                             <td class="py-2.5 px-2">
                                 @php
-                                    $statusClass = match($a->status) {
-                                        'Hadir' => 'bg-mint text-[#1F7A3D]',
-                                        'Tidak Hadir' => 'bg-red-100 text-red-500',
-                                        'Terlambat' => 'bg-yellow-100 text-yellow-700',
-                                        'Izin' => 'bg-sky text-[#1E6FA8]',
+                                    $statusClass = match($a->status_kehadiran) {
+                                        'hadir' => 'bg-mint text-[#1F7A3D]',
+                                        'alpha' => 'bg-red-100 text-red-500',
+                                        'sakit' => 'bg-yellow-100 text-yellow-700',
+                                        'izin' => 'bg-sky text-[#1E6FA8]',
                                         default => 'bg-gray-100 text-gray-600',
                                     };
                                 @endphp
-                                <span class="text-[11px] font-bold px-2.5 py-1 rounded-full {{ $statusClass }}">{{ $a->status }}</span>
+                                <span class="text-[11px] font-bold px-2.5 py-1 rounded-full {{ $statusClass }}">{{ ucfirst($a->status_kehadiran) }}</span>
                             </td>
                             <td class="py-2.5 px-2">
                                 <div class="flex gap-2">
@@ -246,13 +246,13 @@
                                        class="w-[30px] h-[30px] rounded-lg bg-sky text-[#1E6FA8] flex items-center justify-center">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
                                     </a>
-                                    <form id="delete-absensi-{{ $a->id }}" method="POST" action="{{ route('pembina.absensi.destroy', $a) }}" class="hidden">
+                                    <form id="delete-absensi-{{ $a->id_absensi }}" method="POST" action="{{ route('pembina.absensi.destroy', $a) }}" class="hidden">
                                         @csrf
                                         @method('DELETE')
                                     </form>
                                     <button type="button"
-                                            data-delete-form="delete-absensi-{{ $a->id }}"
-                                            data-delete-message="Hapus data absensi {{ $a->peserta->nama }} pada sesi ini? Tindakan ini tidak bisa dibatalkan."
+                                            data-delete-form="delete-absensi-{{ $a->id_absensi }}"
+                                            data-delete-message="Hapus data absensi {{ $a->peserta->nama }} pada tanggal ini? Tindakan ini tidak bisa dibatalkan."
                                             class="w-[30px] h-[30px] rounded-lg bg-red-100 text-red-500 flex items-center justify-center">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
                                     </button>
@@ -282,8 +282,8 @@
                 <thead>
                     <tr class="text-inksoft text-[11px] uppercase tracking-wide">
                         <th class="text-left py-2 px-2 border-b border-[#EFEFF7]">Pelatih</th>
-                        <th class="text-left py-2 px-2 border-b border-[#EFEFF7]">Sesi</th>
-                        <th class="text-left py-2 px-2 border-b border-[#EFEFF7]">Tanggal / Jam</th>
+                        <th class="text-left py-2 px-2 border-b border-[#EFEFF7]">Kegiatan</th>
+                        <th class="text-left py-2 px-2 border-b border-[#EFEFF7]">Tanggal</th>
                         <th class="text-left py-2 px-2 border-b border-[#EFEFF7]">Status</th>
                         <th class="text-left py-2 px-2 border-b border-[#EFEFF7]">Aksi</th>
                     </tr>
@@ -299,17 +299,17 @@
                                     {{ $v->pelatih->nama }}
                                 </div>
                             </td>
-                            <td class="py-2.5 px-2 text-inksoft">{{ $v->sesi->nama_sesi ?? '-' }}</td>
-                            <td class="py-2.5 px-2 text-inksoft">{{ optional($v->sesi->tanggal)->translatedFormat('d M Y') }}, {{ $v->jam_lapor }}</td>
+                            <td class="py-2.5 px-2 text-inksoft">{{ $v->kegiatan ?? '-' }}</td>
+                            <td class="py-2.5 px-2 text-inksoft">{{ optional($v->tanggal_absensi)->translatedFormat('d M Y') ?? '-' }}</td>
                             <td class="py-2.5 px-2">
                                 @php
-                                    $vClass = match($v->status) {
+                                    $vClass = match($v->status_validasi) {
                                         'Divalidasi' => 'bg-mint text-[#1F7A3D]',
                                         'Ditolak' => 'bg-red-100 text-red-500',
                                         default => 'bg-sky text-[#1E6FA8]',
                                     };
                                 @endphp
-                                <span class="text-[11px] font-bold px-2.5 py-1 rounded-full {{ $vClass }}">{{ $v->status }}</span>
+                                <span class="text-[11px] font-bold px-2.5 py-1 rounded-full {{ $vClass }}">{{ $v->status_validasi }}</span>
                             </td>
                             <td class="py-2.5 px-2">
                                 <div class="flex gap-2 flex-wrap">
@@ -317,7 +317,7 @@
                                         @csrf
                                         <button type="submit"
                                                 class="w-[30px] h-[30px] rounded-lg bg-mint text-[#1F7A3D] flex items-center justify-center disabled:opacity-30"
-                                                {{ $v->status !== 'Menunggu' ? 'disabled' : '' }} title="Setujui">
+                                                {{ $v->status_validasi !== 'Menunggu' ? 'disabled' : '' }} title="Setujui">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
                                         </button>
                                     </form>
@@ -325,7 +325,7 @@
                                         @csrf
                                         <button type="submit"
                                                 class="w-[30px] h-[30px] rounded-lg bg-red-100 text-red-500 flex items-center justify-center disabled:opacity-30"
-                                                {{ $v->status !== 'Menunggu' ? 'disabled' : '' }} title="Tolak">
+                                                {{ $v->status_validasi !== 'Menunggu' ? 'disabled' : '' }} title="Tolak">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                                         </button>
                                     </form>
@@ -333,12 +333,12 @@
                                        class="w-[30px] h-[30px] rounded-lg bg-sky text-[#1E6FA8] flex items-center justify-center">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
                                     </a>
-                                    <form id="delete-validasi-{{ $v->id }}" method="POST" action="{{ route('pembina.validasi.destroy', $v) }}" class="hidden">
+                                    <form id="delete-validasi-{{ $v->id_absensi }}" method="POST" action="{{ route('pembina.validasi.destroy', $v) }}" class="hidden">
                                         @csrf
                                         @method('DELETE')
                                     </form>
                                     <button type="button" title="Hapus"
-                                            data-delete-form="delete-validasi-{{ $v->id }}"
+                                            data-delete-form="delete-validasi-{{ $v->id_absensi }}"
                                             data-delete-message="Hapus laporan absensi pelatih {{ $v->pelatih->nama }} ini? Tindakan ini tidak bisa dibatalkan."
                                             class="w-[30px] h-[30px] rounded-lg bg-red-100 text-red-500 flex items-center justify-center">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
@@ -362,7 +362,7 @@
                 <thead>
                     <tr class="text-inksoft text-[11px] uppercase tracking-wide">
                         <th class="text-left py-2 px-2 border-b border-[#EFEFF7]">Peserta</th>
-                        <th class="text-left py-2 px-2 border-b border-[#EFEFF7]">Kategori</th>
+                        <th class="text-left py-2 px-2 border-b border-[#EFEFF7]">Semester terakhir</th>
                         <th class="text-left py-2 px-2 border-b border-[#EFEFF7]">Nilai terakhir</th>
                         <th class="text-left py-2 px-2 border-b border-[#EFEFF7]">Beri nilai baru</th>
                         <th class="border-b border-[#EFEFF7]"></th>
@@ -380,16 +380,18 @@
                                     {{ $p->nama }}
                                 </div>
                             </td>
-                            <td class="py-2.5 px-2 text-inksoft">{{ $terakhir->kategori ?? '-' }}</td>
+                            <td class="py-2.5 px-2 text-inksoft">{{ $terakhir ? 'Smt '.$terakhir->semester.' — '.$terakhir->tahun_ajaran : '-' }}</td>
                             <td class="py-2.5 px-2 text-inksoft">{{ $terakhir->nilai ?? '—' }}</td>
                             <td colspan="2" class="py-2.5 px-2">
-                                <form method="POST" action="{{ route('pembina.nilai.simpan', $p) }}" class="flex items-center gap-2">
+                                <form method="POST" action="{{ route('pembina.nilai.simpan', $p) }}" class="flex items-center gap-2 flex-wrap">
                                     @csrf
-                                    <select name="kategori" class="px-2.5 py-1.5 rounded-lg border border-[#E7E7F4] text-xs focus:outline-none focus:border-lavender">
-                                        <option value="Teknik">Teknik</option>
-                                        <option value="Disiplin">Disiplin</option>
-                                        <option value="Kerja Sama">Kerja Sama</option>
+                                    <select name="semester" class="px-2.5 py-1.5 rounded-lg border border-[#E7E7F4] text-xs focus:outline-none focus:border-lavender">
+                                        <option value="1">Semester 1</option>
+                                        <option value="2">Semester 2</option>
                                     </select>
+                                    <input type="text" name="tahun_ajaran" placeholder="2025/2026" required
+                                           value="{{ now()->month >= 7 ? now()->year.'/'.(now()->year + 1) : (now()->year - 1).'/'.now()->year }}"
+                                           class="w-24 px-2.5 py-1.5 rounded-lg border border-[#E7E7F4] text-xs focus:outline-none focus:border-lavender">
                                     <input type="number" name="nilai" min="0" max="100" placeholder="0-100" required
                                            class="w-20 text-center px-2.5 py-1.5 rounded-lg border border-[#E7E7F4] focus:outline-none focus:border-lavender">
                                     <button type="submit" class="bg-lavender hover:bg-[#8385f0] text-white font-bold text-xs px-3.5 py-1.5 rounded-lg">
@@ -410,8 +412,8 @@
                     <thead>
                         <tr class="text-inksoft text-[11px] uppercase tracking-wide">
                             <th class="text-left py-2 px-2 border-b border-[#EFEFF7]">Peserta</th>
-                            <th class="text-left py-2 px-2 border-b border-[#EFEFF7]">Kategori</th>
-                            <th class="text-left py-2 px-2 border-b border-[#EFEFF7]">Sesi</th>
+                            <th class="text-left py-2 px-2 border-b border-[#EFEFF7]">Semester</th>
+                            <th class="text-left py-2 px-2 border-b border-[#EFEFF7]">Tahun Ajaran</th>
                             <th class="text-left py-2 px-2 border-b border-[#EFEFF7]">Nilai</th>
                             <th class="text-left py-2 px-2 border-b border-[#EFEFF7]">Aksi</th>
                         </tr>
@@ -420,8 +422,8 @@
                         @forelse($riwayatNilai as $n)
                             <tr class="border-b border-[#F5F5FA] last:border-none">
                                 <td class="py-2.5 px-2 font-semibold">{{ $n->peserta->nama ?? '-' }}</td>
-                                <td class="py-2.5 px-2 text-inksoft">{{ $n->kategori }}</td>
-                                <td class="py-2.5 px-2 text-inksoft">{{ $n->sesi->nama_sesi ?? '-' }}</td>
+                                <td class="py-2.5 px-2 text-inksoft">{{ $n->semester }}</td>
+                                <td class="py-2.5 px-2 text-inksoft">{{ $n->tahun_ajaran }}</td>
                                 <td class="py-2.5 px-2">
                                     <span class="text-[11px] font-bold px-2.5 py-1 rounded-full bg-periwinkle/30 text-[#3F41B0]">{{ $n->nilai ?? '—' }}</span>
                                 </td>
@@ -431,13 +433,13 @@
                                            class="w-[30px] h-[30px] rounded-lg bg-sky text-[#1E6FA8] flex items-center justify-center">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
                                         </a>
-                                        <form id="delete-nilai-{{ $n->id }}" method="POST" action="{{ route('pembina.nilai.destroy', $n) }}" class="hidden">
+                                        <form id="delete-nilai-{{ $n->id_nilai }}" method="POST" action="{{ route('pembina.nilai.destroy', $n) }}" class="hidden">
                                             @csrf
                                             @method('DELETE')
                                         </form>
                                         <button type="button" title="Hapus"
-                                                data-delete-form="delete-nilai-{{ $n->id }}"
-                                                data-delete-message="Hapus nilai {{ $n->kategori }} milik {{ $n->peserta->nama ?? '' }} ini? Tindakan ini tidak bisa dibatalkan."
+                                                data-delete-form="delete-nilai-{{ $n->id_nilai }}"
+                                                data-delete-message="Hapus nilai semester {{ $n->semester }} milik {{ $n->peserta->nama ?? '' }} ini? Tindakan ini tidak bisa dibatalkan."
                                                 class="w-[30px] h-[30px] rounded-lg bg-red-100 text-red-500 flex items-center justify-center">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
                                         </button>

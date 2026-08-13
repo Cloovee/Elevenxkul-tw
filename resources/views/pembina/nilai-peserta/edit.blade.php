@@ -39,25 +39,22 @@
             @csrf
             @method('PUT')
 
-            <div>
-                <label class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Kategori</label>
-                <select name="kategori" required
-                        class="w-full px-3.5 py-2.5 rounded-xl border border-[#E7E7F4] text-sm focus:outline-none focus:border-lavender">
-                    @foreach (['Teknik', 'Disiplin', 'Kerja Sama'] as $kategori)
-                        <option value="{{ $kategori }}" @selected(old('kategori', $nilaiPeserta->kategori) === $kategori)>{{ $kategori }}</option>
-                    @endforeach
-                </select>
-            </div>
-
-            <div>
-                <label class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Sesi (opsional)</label>
-                <select name="sesi_id"
-                        class="w-full px-3.5 py-2.5 rounded-xl border border-[#E7E7F4] text-sm focus:outline-none focus:border-lavender">
-                    <option value="">— Tidak terkait sesi tertentu —</option>
-                    @foreach ($sesis as $s)
-                        <option value="{{ $s->id }}" @selected(old('sesi_id', $nilaiPeserta->sesi_id) == $s->id)>{{ $s->nama_sesi }} — {{ optional($s->tanggal)->translatedFormat('d M Y') }}</option>
-                    @endforeach
-                </select>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Semester</label>
+                    <select name="semester" required
+                            class="w-full px-3.5 py-2.5 rounded-xl border border-[#E7E7F4] text-sm focus:outline-none focus:border-lavender">
+                        @foreach (['1', '2'] as $semester)
+                            <option value="{{ $semester }}" @selected(old('semester', $nilaiPeserta->semester) == $semester)>Semester {{ $semester }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Tahun Ajaran</label>
+                    <input type="text" name="tahun_ajaran" required
+                           value="{{ old('tahun_ajaran', $nilaiPeserta->tahun_ajaran) }}"
+                           class="w-full px-3.5 py-2.5 rounded-xl border border-[#E7E7F4] text-sm focus:outline-none focus:border-lavender">
+                </div>
             </div>
 
             <div>
@@ -65,6 +62,12 @@
                 <input type="number" name="nilai" min="0" max="100" required
                        value="{{ old('nilai', $nilaiPeserta->nilai) }}"
                        class="w-full px-3.5 py-2.5 rounded-xl border border-[#E7E7F4] text-sm focus:outline-none focus:border-lavender">
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Catatan Pembina (opsional)</label>
+                <textarea name="catatan_pembina" rows="2"
+                          class="w-full px-3.5 py-2.5 rounded-xl border border-[#E7E7F4] text-sm focus:outline-none focus:border-lavender">{{ old('catatan_pembina', $nilaiPeserta->catatan_pembina) }}</textarea>
             </div>
 
             <div class="flex gap-3 mt-2">

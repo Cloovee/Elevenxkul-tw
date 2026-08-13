@@ -16,5 +16,13 @@ class UserSeeder extends Seeder
             'role' => 'ketua',
             'email_verified_at' => now(),
         ]);
+
+        User::create([
+            'name' => 'Pembina Futsal',
+            'email' => 'pembina@test.com',
+            'password' => bcrypt('password123'),
+            'role' => 'pembina',
+            'email_verified_at' => now(),
+        ]);
     }
 }

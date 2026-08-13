@@ -2,29 +2,27 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class AbsensiPeserta extends Model
 {
-    use HasFactory;
-
     protected $table = 'absensi_peserta';
 
+    protected $primaryKey = 'id_absensi';
+
     protected $fillable = [
-        'peserta_id',
-        'sesi_id',
-        'jam_hadir',
-        'status',
+        'id_anggota',
+        'tanggal_absensi',
+        'status_kehadiran',
+        'deskripsi_kegiatan',
+    ];
+
+    protected $casts = [
+        'tanggal_absensi' => 'date',
     ];
 
     public function peserta()
     {
-        return $this->belongsTo(Peserta::class);
-    }
-
-    public function sesi()
-    {
-        return $this->belongsTo(Sesi::class);
+        return $this->belongsTo(Peserta::class, 'id_anggota', 'id_anggota');
     }
 }

@@ -7,11 +7,29 @@ use Illuminate\Database\Eloquent\Model;
 class Ekskul extends Model
 {
     protected $table = 'ekskuls';
+
     protected $primaryKey = 'id_ekskul';
-    
+
     protected $fillable = [
+        'id_pembina',
+        'id_pelatih',
         'nama_ekskul',
         'kategori',
-        'deskripsi'
+        'deskripsi',
     ];
+
+    public function pembina()
+    {
+        return $this->belongsTo(Pembina::class, 'id_pembina', 'id_pembina');
+    }
+
+    public function pelatih()
+    {
+        return $this->belongsTo(Pelatih::class, 'id_pelatih', 'id_pelatih');
+    }
+
+    public function anggota()
+    {
+        return $this->hasMany(Peserta::class, 'id_ekskul', 'id_ekskul');
+    }
 }
