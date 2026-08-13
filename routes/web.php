@@ -21,4 +21,8 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+Route::get('/absensi-pelatih', function () {
+    return view('dashboard-ketua.absensi-pelatih');
+})->middleware(['auth', 'verified'])->name('ketua.absensi-pelatih');
+
 require __DIR__.'/auth.php';
