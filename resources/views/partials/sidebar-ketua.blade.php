@@ -20,8 +20,8 @@
             </svg>
         </a>
 
-        <a href="#"
-           class="w-11 h-11 rounded-2xl flex items-center justify-center text-white/90 hover:bg-white/25 hover:shadow-md transition-all"
+        <a href="{{ route('ketua.absensi-peserta') }}"
+           class="w-11 h-11 rounded-2xl flex items-center justify-center transition-all {{ request()->routeIs('ketua.absensi-peserta') ? 'bg-white text-periwinkle shadow-lg shadow-black/10' : 'text-white/90 hover:bg-white/25 hover:shadow-md' }}"
            title="Absensi Peserta">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-2.13a4 4 0 10-4-4 4 4 0 004 4zm6 0a4 4 0 10-4-4" />

@@ -4,7 +4,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect('/login');
 });
 
 Route::get('/dashboard', function () {
@@ -24,5 +24,9 @@ Route::middleware('auth')->group(function () {
 Route::get('/absensi-pelatih', function () {
     return view('dashboard-ketua.absensi-pelatih');
 })->middleware(['auth', 'verified'])->name('ketua.absensi-pelatih');
+
+Route::get('/absensi-peserta', function () {
+    return view('dashboard-ketua.absensi-peserta');
+})->middleware(['auth', 'verified'])->name('ketua.absensi-peserta');
 
 require __DIR__.'/auth.php';
