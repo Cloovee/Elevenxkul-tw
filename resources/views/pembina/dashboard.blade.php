@@ -12,10 +12,10 @@
 
 <div class="flex gap-5 p-5 min-h-screen">
 
-    {{-- ================= SIDEBAR MENGAMBANG ================= --}}
-    <aside class="w-[84px] shrink-0 sticky top-5 h-[calc(100vh-40px)] rounded-3xl
+    {{-- ================= SIDEBAR MENGAMBANG (desktop only) ================= --}}
+    <aside class="hidden md:flex w-[84px] shrink-0 sticky top-5 h-[calc(100vh-40px)] rounded-3xl
                   bg-gradient-to-b from-lavender to-periwinkle
-                  flex flex-col items-center py-6 gap-2.5
+                  flex-col items-center py-6 gap-2.5
                   shadow-[0_18px_40px_-14px_rgba(94,92,199,0.55)]">
 
         <div class="w-[42px] h-[42px] rounded-2xl bg-white/25 flex items-center justify-center
@@ -55,7 +55,7 @@
         </form>
     </aside>
 
-    <main class="flex-1 min-w-0 flex flex-col gap-5">
+    <main class="flex-1 min-w-0 flex flex-col gap-5 pb-24 md:pb-0">
 
         {{-- Notifikasi sukses --}}
         @if (session('success'))
@@ -454,6 +454,38 @@
 
     </main>
 </div>
+
+{{-- ================= BOTTOM NAV (mobile only) ================= --}}
+<nav class="md:hidden fixed bottom-0 inset-x-0 z-40 bg-gradient-to-r from-lavender to-periwinkle
+            flex items-center justify-around px-2 py-2.5
+            shadow-[0_-10px_30px_-10px_rgba(94,92,199,0.55)]">
+    <button type="button" data-tab-btn="overview"
+            class="tab-btn w-11 h-11 rounded-2xl flex items-center justify-center transition-all text-white/75 hover:bg-white/20 hover:text-white"
+            title="Dashboard">
+        <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+    </button>
+    <button type="button" data-tab-btn="absensi"
+            class="tab-btn w-11 h-11 rounded-2xl flex items-center justify-center transition-all text-white/75 hover:bg-white/20 hover:text-white"
+            title="Absensi Peserta">
+        <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 12h6M9 16h6M9 8h1"/></svg>
+    </button>
+    <button type="button" data-tab-btn="validasi"
+            class="tab-btn w-11 h-11 rounded-2xl flex items-center justify-center transition-all text-white/75 hover:bg-white/20 hover:text-white"
+            title="Validasi Absensi Pelatih">
+        <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m17 11 2 2 4-4"/></svg>
+    </button>
+    <button type="button" data-tab-btn="nilai"
+            class="tab-btn w-11 h-11 rounded-2xl flex items-center justify-center transition-all text-white/75 hover:bg-white/20 hover:text-white"
+            title="Beri Nilai Peserta">
+        <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.5 13.5 17 22l-5-3-5 3 1.5-8.5"/></svg>
+    </button>
+    <form method="POST" action="{{ url('/logout') }}">
+        @csrf
+        <button type="submit" class="w-11 h-11 rounded-2xl flex items-center justify-center text-white/75 hover:bg-white/20 hover:text-white transition-all" title="Keluar">
+            <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </button>
+    </form>
+</nav>
 
 <div id="delete-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-[#2E2B55]/40 backdrop-blur-sm px-4">
     <div class="bg-white rounded-3xl p-6 w-full max-w-sm shadow-[0_20px_50px_-20px_rgba(46,43,85,0.45)]">
