@@ -28,8 +28,8 @@
             </svg>
         </a>
 
-        <a href="#"
-           class="w-11 h-11 rounded-2xl flex items-center justify-center text-white/90 hover:bg-white/25 hover:shadow-md transition-all"
+        <a href="{{ route('ketua.kelola-anggota') }}"
+           class="w-11 h-11 rounded-2xl flex items-center justify-center transition-all {{ request()->routeIs('ketua.kelola-anggota*') ? 'bg-white text-periwinkle shadow-lg shadow-black/10' : 'text-white/90 hover:bg-white/25 hover:shadow-md' }}"
            title="Kelola Anggota">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />

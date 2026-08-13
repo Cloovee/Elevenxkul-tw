@@ -29,4 +29,23 @@ Route::get('/absensi-peserta', function () {
     return view('dashboard-ketua.absensi-peserta');
 })->middleware(['auth', 'verified'])->name('ketua.absensi-peserta');
 
+Route::get('/kelola-anggota', function () {
+    $anggota = [
+        ['id' => 1, 'nama' => 'Raka Pratama', 'nis' => '2023001', 'tanggal_bergabung' => '12 Jan 2026', 'status' => 'aktif'],
+        ['id' => 2, 'nama' => 'Dinda Ayu', 'nis' => '2023002', 'tanggal_bergabung' => '15 Jan 2026', 'status' => 'aktif'],
+        ['id' => 3, 'nama' => 'Bagas Wirawan', 'nis' => '2023003', 'tanggal_bergabung' => '20 Feb 2026', 'status' => 'tidak aktif'],
+    ];
+    return view('dashboard-ketua.kelola-anggota.index', compact('anggota'));
+})->middleware(['auth', 'verified'])->name('ketua.kelola-anggota');
+
+Route::get('/kelola-anggota/{id}', function ($id) {
+    $daftar = [
+        1 => ['nama' => 'Raka Pratama', 'nis' => '2023001', 'tanggal_bergabung' => '2026-01-12', 'status' => 'aktif'],
+        2 => ['nama' => 'Dinda Ayu', 'nis' => '2023002', 'tanggal_bergabung' => '2026-01-15', 'status' => 'aktif'],
+        3 => ['nama' => 'Bagas Wirawan', 'nis' => '2023003', 'tanggal_bergabung' => '2026-02-20', 'status' => 'tidak aktif'],
+    ];
+    $anggota = $daftar[$id] ?? abort(404);
+    return view('dashboard-ketua.kelola-anggota.detail', compact('anggota', 'id'));
+})->middleware(['auth', 'verified'])->name('ketua.kelola-anggota.detail');
+
 require __DIR__.'/auth.php';
