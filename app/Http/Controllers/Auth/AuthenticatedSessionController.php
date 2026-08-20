@@ -28,12 +28,11 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return match ($request->user()->role) {
-            'admin' => redirect()->intended(route('dashboard.admin', absolute: false)),
-            'pembina' => redirect()->intended(route('dashboard.pembina', absolute: false)),
-            'ketua' => redirect()->intended(route('dashboard.ketua', absolute: false)),
-            default => redirect()->intended(route('dashboard', absolute: false)),
-        };
+            return match ($request->user()->role) {
+                'Admin' => redirect()->to(route('admin.dashboard', absolute: false)),
+                'Ketua' => redirect()->to(route('dashboard.ketua', absolute: false)),
+                default => redirect()->to(route('dashboard', absolute: false)),
+            };
     }
 
     /**

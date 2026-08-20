@@ -9,7 +9,7 @@ Route::get('/', function () {
     return redirect('/login');
 });
 
-Route::prefix('admin')->middleware('auth')->name('admin.')->group(function () {
+Route::prefix('admin')->middleware(['auth', 'role:Admin'])->name('admin.')->group(function () {
     Route::get('/dashboard', [DashAdminController::class, 'index'])->name('dashboard');
     Route::resource('ekskul', EkskulController::class);
 });
@@ -20,7 +20,7 @@ Route::get('/dashboard', function () {
 
 Route::get('/dashboard-ketua', function () {
     return view('dashboard-ketua.index');
-})->middleware(['auth', 'verified'])->name('dashboard.ketua');
+})->middleware(['auth', 'verified', 'role:Ketua'])->name('dashboard.ketua');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
