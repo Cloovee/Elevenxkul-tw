@@ -9,7 +9,8 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-gray-500 text-sm">Total Ekskul</p>
-                    <p class="text-3xl font-bold text-gray-800">{{ $totalEkskul ?? 0 }}</p>
+              
+                    {{-- <p class="text-3xl font-bold text-gray-800">{{ $totalEkskul ?? 0 }}</p> --}}
                 </div>
                 <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
                     <i class="fas fa-building text-blue-600 text-xl"></i>
@@ -59,12 +60,12 @@
             <h3 class="text-lg font-semibold text-gray-800">
                 <i class="fas fa-clock mr-2 text-gray-400"></i>Ekskul Terbaru
             </h3>
-            <a href="{{ route('admin.ekskul.index') }}" class="text-sm text-blue-600 hover:text-blue-800">
+            {{-- <a href="{{ route('admin.ekskul.index') }}" class="text-sm text-blue-600 hover:text-blue-800">
                 Lihat semua <i class="fas fa-arrow-right ml-1"></i>
-            </a>
+            </a> --}}
         </div>
         
-        @if(isset($recentEkskuls) && $recentEkskuls->isNotEmpty())
+       {{--  @if(isset($recentEkskuls) && $recentEkskuls->isNotEmpty())
             <div class="divide-y divide-gray-100">
                 @foreach($recentEkskuls as $ekskul)
                     <div class="py-3 flex items-center justify-between">
@@ -87,6 +88,6 @@
             </div>
         @else
             <p class="text-gray-500 text-center py-8">Belum ada data ekskul.</p>
-        @endif
+        @endif --}}
     </div>
 @endsection

@@ -23,13 +23,15 @@ class DashAdminController extends Controller
         //     ->take(5)
         //     ->get();
         
-        return view('admin.dashboard', compact(
-            'totalEkskul',
-            'recentEkskuls',
+        // return view('admin.dashboard', compact(
+        //    'totalEkskul',
+        //    'recentEkskuls',
         //     'totalSiswa',
         //     'totalPembina',
         //     'totalPelatih',
         //     'recentEkskuls'
-         ));
+        // ));
+
+        return view('admin.dashboard');
     }
 }

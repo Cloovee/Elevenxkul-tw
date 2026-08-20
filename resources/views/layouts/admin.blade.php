@@ -25,13 +25,13 @@
                     <span class="ml-3">Dashboard</span>
                 </a>
                 
-                <a href="{{ route('admin.ekskul.index') }}" class="flex items-center px-4 py-3 rounded-lg @if(request()->routeIs('admin.ekskul.*')) bg-blue-50 text-blue-600 @else text-gray-700 hover:bg-gray-50 @endif transition">
-                    <i class="fas fa-building w-5"></i>
+                <a href="#" class="flex items-center px-4 py-3 rounded-lg text-gray-400 cursor-not-allowed">
+                    <i class="fas fa-user-tie w-5"></i>
                     <span class="ml-3">Kelola Ekskul</span>
                 </a>
                 
-                <a href="#" class="flex items-center px-4 py-3 rounded-lg text-gray-400 cursor-not-allowed">
-                    <i class="fas fa-users w-5"></i>
+                <a href="{{ route('admin.siswa.index') }}" class="flex items-center px-4 py-3 rounded-lg @if(request()->routeIs('admin.ekskul.*')) bg-blue-50 text-blue-600 @else text-gray-700 hover:bg-gray-50 @endif transition">
+                    <i class="fas fa-building w-5"></i>
                     <span class="ml-3">Kelola Siswa</span>
                     <span class="ml-auto text-xs bg-gray-200 text-gray-600 px-2 py-0.5 rounded">Soon</span>
                 </a>

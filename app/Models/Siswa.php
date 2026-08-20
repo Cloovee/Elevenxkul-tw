@@ -6,13 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class Siswa extends Model
 {
-    //
-    protected $table = 'siswas';
+    protected $table = 'siswa';
     protected $primaryKey = 'id_siswa';
     
     protected $fillable = [
-        'nisn',
-        'nis',
+        'id_kelas',
+        'NISN',
+        'NIS',
         'nama_siswa',
         'jk',
         'agama',
@@ -21,4 +21,14 @@ class Siswa extends Model
         'alamat',
         'medsos'
     ];
+
+    public function kelas()
+    {
+        return $this->belongsTo(Kelas::class, 'id_kelas', 'id_kelas');
+    }
+
+    public function getNamaKelasAttribute()
+    {
+        return $this->kelas ? $this->kelas->jurusan . ' - ' . $this->kelas->rombel : '-';
+    }
 }
