@@ -21,55 +21,51 @@ class PembinaDashboardController extends Controller
      */
     public function index(Request $request)
     {
-        $activeTab = $request->query('tab', 'overview');
-
         $pembina = Pembina::where('id_user', Auth::id())->first();
         $ekskulIds = $pembina ? $pembina->ekskuls()->pluck('id_ekskul') : collect();
         $pelatihIds = $pembina ? $pembina->ekskuls()->whereNotNull('id_pelatih')->pluck('id_pelatih') : collect();
         $anggotaIds = Peserta::whereIn('id_ekskul', $ekskulIds)->pluck('id_anggota');
 
-        // Absensi peserta pada tanggal terbaru yang tercatat (pengganti "sesi terbaru")
-        $tanggalTerbaru = AbsensiPeserta::whereIn('id_anggota', $anggotaIds)
-            ->max('tanggal_absensi');
+        $pelatihCount = $pelatihIds->unique()->count();
 
-        $pesertaAbsensi = $tanggalTerbaru
-            ? AbsensiPeserta::with('peserta.siswa.kelas')
-                ->whereIn('id_anggota', $anggotaIds)
-                ->whereDate('tanggal_absensi', $tanggalTerbaru)
-                ->get()
-            : collect();
+        $pendingValidasi = AbsensiPelatih::whereIn('id_pelatih', $pelatihIds)
+            ->where('status_validasi', 'Menunggu')
+            ->count();
 
-        $hadirCount = $pesertaAbsensi->where('status_kehadiran', 'hadir')->count();
-
-        // Antrian validasi absensi pelatih
-        $validasiPelatih = AbsensiPelatih::with(['pelatih', 'validator'])
-            ->whereIn('id_pelatih', $pelatihIds)
-            ->orderByRaw("status_validasi = 'Menunggu' desc")
-            ->latest('created_at')
-            ->get();
-
-        $pendingValidasi = $validasiPelatih->where('status_validasi', 'Menunggu')->count();
-
-        // Daftar peserta (anggota aktif) untuk form penilaian cepat (nilai terakhir per peserta)
-        $daftarNilai = Peserta::with(['siswa.kelas', 'nilai' => function ($q) {
-            $q->latest('id_nilai')->limit(1);
-        }])
-            ->whereIn('id_ekskul', $ekskulIds)
-            ->where('status', 'aktif')
-            ->get()
-            ->sortBy('nama')
-            ->values();
-
-        // Riwayat lengkap nilai peserta untuk keperluan edit / hapus (CRUD)
-        $riwayatNilai = NilaiPeserta::with('peserta.siswa')
+        // ===== Riwayat aktivitas terbaru (gabungan nilai + laporan absensi pelatih) =====
+        $riwayatNilai = NilaiPeserta::with('peserta.siswa', 'peserta.ekskul')
             ->whereIn('id_anggota', $anggotaIds)
             ->latest('id_nilai')
-            ->get();
+            ->limit(5)
+            ->get()
+            ->map(function ($n) {
+                return [
+                    'nama' => $n->peserta->nama ?? '-',
+                    'pesan' => 'Anda baru saja memberikan nilai '.($n->nilai ?? '-').' untuk ekstrakulikuler '.($n->peserta->ekskul->nama_ekskul ?? '-').'.',
+                    'waktu' => $n->created_at,
+                ];
+            });
 
-        $nilaiTerisi = NilaiPeserta::whereIn('id_anggota', $anggotaIds)
-            ->whereNotNull('nilai')
-            ->whereMonth('created_at', now()->month)
-            ->count();
+        $riwayatAbsensiPelatih = AbsensiPelatih::with('pelatih')
+            ->whereIn('id_pelatih', $pelatihIds)
+            ->latest('created_at')
+            ->limit(5)
+            ->get()
+            ->map(function ($a) {
+                $pesan = 'Baru saja mengisi absensi';
+                $pesan .= $a->foto_kehadiran ? ' dan melampirkan foto absensi.' : ' untuk kegiatan '.($a->kegiatan ?? 'latihan').'.';
+
+                return [
+                    'nama' => $a->pelatih->nama_pelatih ?? '-',
+                    'pesan' => $pesan,
+                    'waktu' => $a->created_at,
+                ];
+            });
+
+        $riwayatAktivitas = $riwayatNilai->concat($riwayatAbsensiPelatih)
+            ->sortByDesc('waktu')
+            ->take(5)
+            ->values();
 
         // Tren kehadiran peserta 6 bulan terakhir (persentase hadir per bulan)
         $trend = collect(range(5, 0))->map(function ($i) use ($anggotaIds) {
@@ -93,15 +89,10 @@ class PembinaDashboardController extends Controller
         });
 
         return view('pembina.dashboard', [
-            'activeTab' => $activeTab,
-            'tanggalTerbaru' => $tanggalTerbaru,
-            'pesertaAbsensi' => $pesertaAbsensi,
-            'hadirCount' => $hadirCount,
-            'validasiPelatih' => $validasiPelatih,
+            'pembina' => $pembina,
+            'pelatihCount' => $pelatihCount,
             'pendingValidasi' => $pendingValidasi,
-            'daftarNilai' => $daftarNilai,
-            'riwayatNilai' => $riwayatNilai,
-            'nilaiTerisi' => $nilaiTerisi,
+            'riwayatAktivitas' => $riwayatAktivitas,
             'trend' => $trend,
         ]);
     }

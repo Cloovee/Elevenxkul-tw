@@ -28,7 +28,17 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        $user = Auth::user();
+
+        // Arahkan ke dashboard sesuai role masing-masing.
+        $redirectTo = match ($user->role) {
+            'Admin' => route('admin.dashboard'),
+            'Pembina' => route('pembina.dashboard'),
+            'Ketua' => route('dashboard.ketua'),
+            default => route('dashboard'),
+        };
+
+        return redirect()->intended($redirectTo);
     }
 
     /**

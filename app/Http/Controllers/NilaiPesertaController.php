@@ -3,11 +3,58 @@
 namespace App\Http\Controllers;
 
 use App\Models\NilaiPeserta;
+use App\Models\Pembina;
 use App\Models\Peserta;
 use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
 
 class NilaiPesertaController extends Controller
 {
+    /**
+     * Redirect ramah (bukan 404) ketika akun yang login belum
+     * terhubung ke data pembina manapun.
+     */
+    private function belumTerhubung(): RedirectResponse
+    {
+        return redirect()->route('pembina.dashboard')
+            ->with('error', 'Akun Anda belum terhubung dengan data pembina. Hubungi admin untuk menghubungkan akun Anda.');
+    }
+
+    /**
+     * Use case: memberi nilai peserta -> halaman daftar & form beri nilai (terpisah dari dashboard).
+     */
+    public function index()
+    {
+        $pembina = Pembina::where('id_user', Auth::id())->first();
+
+        if (! $pembina) {
+            return $this->belumTerhubung();
+        }
+
+        $ekskulIds = $pembina->ekskuls()->pluck('id_ekskul');
+        $anggotaIds = Peserta::whereIn('id_ekskul', $ekskulIds)->pluck('id_anggota');
+
+        $daftarPeserta = Peserta::with(['siswa.kelas', 'ekskul', 'nilai' => function ($q) {
+            $q->latest('id_nilai')->limit(1);
+        }])
+            ->whereIn('id_ekskul', $ekskulIds)
+            ->where('status', 'aktif')
+            ->get()
+            ->sortBy('nama')
+            ->values();
+
+        $riwayatNilai = NilaiPeserta::with('peserta.siswa')
+            ->whereIn('id_anggota', $anggotaIds)
+            ->latest('id_nilai')
+            ->paginate(10);
+
+        return view('pembina.nilai-peserta.index', [
+            'daftarPeserta' => $daftarPeserta,
+            'riwayatNilai' => $riwayatNilai,
+        ]);
+    }
+
     /**
      * Use case: memberi nilai peserta -> simpan nilai baru.
      */
@@ -29,7 +76,7 @@ class NilaiPesertaController extends Controller
         ]);
 
         return redirect()
-            ->route('pembina.dashboard', ['tab' => 'nilai'])
+            ->route('pembina.nilai.index')
             ->with('success', 'Nilai peserta berhasil disimpan.');
     }
 
@@ -60,7 +107,7 @@ class NilaiPesertaController extends Controller
         $nilaiPeserta->update($validated);
 
         return redirect()
-            ->route('pembina.dashboard', ['tab' => 'nilai'])
+            ->route('pembina.nilai.index')
             ->with('success', 'Nilai peserta berhasil diperbarui.');
     }
 
@@ -72,7 +119,7 @@ class NilaiPesertaController extends Controller
         $nilaiPeserta->delete();
 
         return redirect()
-            ->route('pembina.dashboard', ['tab' => 'nilai'])
+            ->route('pembina.nilai.index')
             ->with('success', 'Nilai peserta berhasil dihapus.');
     }
 }

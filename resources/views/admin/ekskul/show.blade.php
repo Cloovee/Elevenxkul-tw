@@ -4,49 +4,49 @@
 @section('page-title', 'Detail Ekstrakurikuler')
 
 @section('content')
-<div class="bg-white rounded-lg shadow-sm p-6">
+<div class="animate-fade-in-up bg-white/90 rounded-3xl shadow-[0_10px_30px_-18px_rgba(46,43,85,0.35)] p-6">
     @php
         $colors = [
-            'organisasi' => 'bg-blue-100 text-blue-700',
-            'ekstrakulikuler' => 'bg-green-100 text-green-700',
-            'komunitas' => 'bg-purple-100 text-purple-700'
+            'organisasi' => 'bg-periwinkle/20 text-[#5E5CC7]',
+            'ekstrakulikuler' => 'bg-mint/60 text-emerald-700',
+            'komunitas' => 'bg-lavender/25 text-[#5E5CC7]'
         ];
     @endphp
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-            <label class="block text-sm font-medium text-gray-500 mb-1">Nama Ekskul</label>
-            <p class="text-lg font-semibold text-gray-800">{{ $ekskul->nama_ekskul }}</p>
+            <label class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Nama Ekskul</label>
+            <p class="text-lg font-semibold text-ink">{{ $ekskul->nama_ekskul }}</p>
         </div>
 
         <div>
-            <label class="block text-sm font-medium text-gray-500 mb-1">Kategori</label>
-            <span class="px-3 py-1 text-sm rounded-full {{ $colors[$ekskul->kategori] ?? 'bg-gray-100 text-gray-700' }}">
+            <label class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Kategori</label>
+            <span class="px-3 py-1 text-sm rounded-full {{ $colors[$ekskul->kategori] ?? 'bg-bgsoft text-inksoft' }}">
                 {{ ucfirst($ekskul->kategori) }}
             </span>
         </div>
 
         <div class="md:col-span-2">
-            <label class="block text-sm font-medium text-gray-500 mb-1">Deskripsi</label>
-            <p class="text-gray-700">{{ $ekskul->deskripsi ?: '-' }}</p>
+            <label class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Deskripsi</label>
+            <p class="text-ink">{{ $ekskul->deskripsi ?: '-' }}</p>
         </div>
 
         <div class="md:col-span-2">
-            <label class="block text-sm font-medium text-gray-500 mb-1">Dibuat Pada</label>
-            <p class="text-gray-700">{{ $ekskul->created_at->format('d F Y H:i') }}</p>
+            <label class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Dibuat Pada</label>
+            <p class="text-ink">{{ $ekskul->created_at->format('d F Y H:i') }}</p>
         </div>
 
         <div class="md:col-span-2">
-            <label class="block text-sm font-medium text-gray-500 mb-1">Terakhir Diupdate</label>
-            <p class="text-gray-700">{{ $ekskul->updated_at->format('d F Y H:i') }}</p>
+            <label class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Terakhir Diupdate</label>
+            <p class="text-ink">{{ $ekskul->updated_at->format('d F Y H:i') }}</p>
         </div>
     </div>
 
-    <div class="flex items-center gap-3 mt-6 pt-6 border-t border-gray-200">
-        <a href="{{ route('admin.ekskul.edit', $ekskul->id_ekskul) }}" class="px-6 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition">
+    <div class="flex items-center gap-3 mt-6 pt-6 border-t border-[#EFEFF7]">
+        <a href="{{ route('admin.ekskul.edit', $ekskul->id_ekskul) }}" class="px-6 py-2.5 bg-gradient-to-r from-sky to-periwinkle text-white font-semibold rounded-xl hover:opacity-90 transition shadow-md shadow-periwinkle/30">
             <i class="fas fa-edit mr-2"></i>Edit
         </a>
-        <a href="{{ route('admin.ekskul.index') }}" class="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition">
+        <a href="{{ route('admin.ekskul.index') }}" class="px-6 py-2.5 bg-bgsoft text-ink font-semibold rounded-xl hover:bg-[#E9EAF9] transition">
             <i class="fas fa-arrow-left mr-2"></i>Kembali
         </a>
     </div>

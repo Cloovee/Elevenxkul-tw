@@ -4,9 +4,11 @@ use App\Http\Controllers\AbsensiPelatihController;
 use App\Http\Controllers\AbsensiPesertaController;
 use App\Http\Controllers\NilaiPesertaController;
 use App\Http\Controllers\PembinaDashboardController;
+use App\Http\Controllers\PembinaProfileController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\DashAdminController;
 use App\Http\Controllers\Admin\EkskulController;
+use App\Http\Controllers\Admin\PembinaController as AdminPembinaController;
 use Illuminate\Support\Facades\Route;
 
 // 1. Arahkan route utama '/' langsung ke halaman login
@@ -18,14 +20,23 @@ Route::get('/', function () {
 Route::prefix('admin')->middleware('auth')->name('admin.')->group(function () {
     Route::get('/dashboard', [DashAdminController::class, 'index'])->name('dashboard');
     Route::resource('ekskul', EkskulController::class);
+    Route::resource('pembina', AdminPembinaController::class)->except(['show']);
 });
 
 // 3. Grup route khusus Pembina (wajib login)
 Route::prefix('pembina')->middleware('auth')->name('pembina.')->group(function () {
     Route::get('/dashboard', [PembinaDashboardController::class, 'index'])->name('dashboard');
 
+    // ===== Profil Pembina (halaman khusus, terpisah dari /profile umum) =====
+    Route::prefix('profile')->name('profile.')->group(function () {
+        Route::get('/', [PembinaProfileController::class, 'index'])->name('index');
+        Route::patch('/', [PembinaProfileController::class, 'update'])->name('update');
+        Route::patch('/password', [PembinaProfileController::class, 'updatePassword'])->name('password');
+    });
+
     // ===== CRUD: Melihat & mengelola Absensi Peserta =====
     Route::prefix('absensi-peserta')->name('absensi.')->group(function () {
+        Route::get('/', [AbsensiPesertaController::class, 'index'])->name('index');
         Route::get('/create', [AbsensiPesertaController::class, 'create'])->name('create');
         Route::post('/', [AbsensiPesertaController::class, 'store'])->name('store');
         Route::get('/{absensiPeserta}/edit', [AbsensiPesertaController::class, 'edit'])->name('edit');
@@ -35,6 +46,7 @@ Route::prefix('pembina')->middleware('auth')->name('pembina.')->group(function (
 
     // ===== CRUD: Memvalidasi Absensi Pelatih =====
     Route::prefix('validasi-pelatih')->name('validasi.')->group(function () {
+        Route::get('/', [AbsensiPelatihController::class, 'index'])->name('index');
         Route::get('/create', [AbsensiPelatihController::class, 'create'])->name('create');
         Route::post('/', [AbsensiPelatihController::class, 'store'])->name('store');
         Route::get('/{absensiPelatih}/edit', [AbsensiPelatihController::class, 'edit'])->name('edit');
@@ -46,6 +58,7 @@ Route::prefix('pembina')->middleware('auth')->name('pembina.')->group(function (
 
     // ===== CRUD: Memberi Nilai Peserta =====
     Route::prefix('nilai-peserta')->name('nilai.')->group(function () {
+        Route::get('/', [NilaiPesertaController::class, 'index'])->name('index');
         Route::post('/{peserta}', [NilaiPesertaController::class, 'store'])->name('simpan');
         Route::get('/{nilaiPeserta}/edit', [NilaiPesertaController::class, 'edit'])->name('edit');
         Route::put('/{nilaiPeserta}', [NilaiPesertaController::class, 'update'])->name('update');

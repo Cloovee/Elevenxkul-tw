@@ -10,7 +10,7 @@
       style="background-image: radial-gradient(circle at 100% 0%, rgba(174,226,255,0.35), transparent 45%), radial-gradient(circle at 0% 100%, rgba(217,249,223,0.4), transparent 40%);">
 
 <div class="w-full max-w-lg">
-    <a href="{{ route('pembina.dashboard', ['tab' => 'absensi']) }}"
+    <a href="{{ route('pembina.absensi.index') }}"
        class="inline-flex items-center gap-2 text-sm font-semibold text-inksoft hover:text-ink mb-4">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
         Kembali ke Dashboard
@@ -74,7 +74,7 @@
             </div>
 
             <div class="flex gap-3 mt-2">
-                <a href="{{ route('pembina.dashboard', ['tab' => 'absensi']) }}"
+                <a href="{{ route('pembina.absensi.index') }}"
                    class="flex-1 text-center py-2.5 rounded-xl border border-[#E7E7F4] font-semibold text-sm text-inksoft hover:bg-bgsoft">Batal</a>
                 <button type="submit"
                         class="flex-1 bg-lavender hover:bg-[#8385f0] text-white font-bold text-sm py-2.5 rounded-xl">

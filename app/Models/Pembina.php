@@ -13,6 +13,7 @@ class Pembina extends Model
     protected $fillable = [
         'id_user',
         'nama_pembina',
+        'foto',
         'jk',
         'agama',
         'nomor_hp',
@@ -20,6 +21,41 @@ class Pembina extends Model
         'medsos',
         'alamat',
     ];
+
+    /**
+     * URL publik foto profil, atau null jika belum ada foto yang diunggah.
+     */
+    public function getFotoUrlAttribute(): ?string
+    {
+        if (! $this->foto) {
+            return null;
+        }
+
+        return \Illuminate\Support\Facades\Storage::disk('public')->exists($this->foto)
+            ? asset('storage/'.$this->foto)
+            : null;
+    }
+
+    /**
+     * Inisial nama, dipakai sebagai avatar cadangan saat belum ada foto.
+     */
+    public function getInisialAttribute(): string
+    {
+        $nama = trim((string) $this->nama_pembina);
+
+        if ($nama === '') {
+            return 'P';
+        }
+
+        $kata = preg_split('/\s+/', $nama);
+        $inisial = strtoupper(substr($kata[0], 0, 1));
+
+        if (count($kata) > 1) {
+            $inisial .= strtoupper(substr(end($kata), 0, 1));
+        }
+
+        return $inisial;
+    }
 
     public function user()
     {
