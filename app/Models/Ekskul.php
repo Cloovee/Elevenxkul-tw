@@ -8,7 +8,7 @@ class Ekskul extends Model
 {
     protected $table = 'ekskuls';
     protected $primaryKey = 'id_ekskul';
-    
+
     protected $fillable = [
         'nama_ekskul',
         'kategori',

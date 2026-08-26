@@ -8,9 +8,13 @@ use Illuminate\Http\Request;
 
 class EkskulController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $ekskuls = Ekskul::latest()->paginate(10);
+        $ekskuls = Ekskul::when($request->search, function ($query, $search) {
+            $query->where('nama_ekskul', 'like', "%{$search}%");
+        })
+        ->latest()
+        ->paginate(10);
         return view('admin.ekskul.index', compact('ekskuls'));
     }
 
@@ -64,4 +68,6 @@ class EkskulController extends Controller
         return redirect()->route('admin.ekskul.index')
             ->with('success', 'Ekskul berhasil dihapus');
     }
+
+    
 }
