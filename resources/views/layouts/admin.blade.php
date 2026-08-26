@@ -39,17 +39,17 @@
                     <i class="fas fa-user-cog text-xl"></i>
                 </a>
 
-                <!-- Kelola Ekskul -->
-                <a href="#" class="w-14 h-14 mx-auto flex items-center justify-center rounded-[1.2rem] transition-all duration-300 text-white/70 hover:bg-white/20 hover:text-white" title="Kelola Ekskul">
+                <!-- Kelola Ekskul (Aktif) -->
+                <a href="{{ route('admin.ekskul.index') }}" class="w-14 h-14 mx-auto flex items-center justify-center rounded-[1.2rem] transition-all duration-300 @if(request()->routeIs('admin.ekskul.*')) bg-white text-[#868dfb] shadow-lg shadow-white/20 scale-105 @else text-white/70 hover:bg-white/20 hover:text-white @endif" title="Kelola Ekskul">
                     <i class="fas fa-cube text-xl"></i>
                 </a>
                 
-                <!-- Kelola Pembina -->
-                <a href="#" class="w-14 h-14 mx-auto flex items-center justify-center rounded-[1.2rem] transition-all duration-300 text-white/70 hover:bg-white/20 hover:text-white" title="Kelola Pembina">
+                <!-- Kelola Pembina (Aktif) -->
+                <a href="{{ route('admin.pembina.index') }}" class="w-14 h-14 mx-auto flex items-center justify-center rounded-[1.2rem] transition-all duration-300 @if(request()->routeIs('admin.pembina.*')) bg-white text-[#868dfb] shadow-lg shadow-white/20 scale-105 @else text-white/70 hover:bg-white/20 hover:text-white @endif" title="Kelola Pembina">
                     <i class="fas fa-user-tie text-xl"></i>
                 </a>
 
-                <!-- Laporan / Grafik -->
+                <!-- Laporan / Grafik (Belum Aktif) -->
                 <a href="#" class="w-14 h-14 mx-auto flex items-center justify-center rounded-[1.2rem] transition-all duration-300 text-white/70 hover:bg-white/20 hover:text-white" title="Laporan & Statistik">
                     <i class="fas fa-chart-line text-xl"></i>
                 </a>

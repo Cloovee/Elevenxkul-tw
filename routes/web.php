@@ -6,8 +6,8 @@ use App\Http\Controllers\Admin\DashAdminController;
 use App\Http\Controllers\Admin\SiswaController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\PembinaController;
+use App\Http\Controllers\Admin\EkskulController;
 use Illuminate\Support\Facades\Auth; 
-
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -37,6 +37,7 @@ Route::prefix('/admin')
             Route::get('/', [SiswaController::class, 'index'])->name('index');
             Route::get('/create', [SiswaController::class, 'create'])->name('create');
             Route::post('/store', [SiswaController::class, 'store'])->name('store');
+            Route::get('/{id}', [SiswaController::class, 'show'])->name('show');
             Route::get('/{id}/edit', [SiswaController::class, 'edit'])->name('edit');
             Route::put('/{id}', [SiswaController::class, 'update'])->name('update');
             Route::delete('/{id}', [SiswaController::class, 'destroy'])->name('destroy');
@@ -57,13 +58,24 @@ Route::prefix('/admin')
         });
 
         Route::prefix('/pembina')->name('pembina.')->group(function () {
-        Route::get('/', [PembinaController::class, 'index'])->name('index');
-        Route::get('/create', [PembinaController::class, 'create'])->name('create');
-        Route::post('/store', [PembinaController::class, 'store'])->name('store');
-        Route::get('/{id}/edit', [PembinaController::class, 'edit'])->name('edit');
-        Route::put('/{id}', [PembinaController::class, 'update'])->name('update');
-        Route::delete('/{id}', [PembinaController::class, 'destroy'])->name('destroy');
-    });
+            Route::get('/', [PembinaController::class, 'index'])->name('index');
+            Route::get('/create', [PembinaController::class, 'create'])->name('create');
+            Route::post('/store', [PembinaController::class, 'store'])->name('store');
+            Route::get('/{id}/edit', [PembinaController::class, 'edit'])->name('edit');
+            Route::put('/{id}', [PembinaController::class, 'update'])->name('update');
+            Route::delete('/{id}', [PembinaController::class, 'destroy'])->name('destroy');
+        });
+
+        // Route Kelola Ekskul (Sudah Ditambahkan Route Show)
+        Route::prefix('/ekskul')->name('ekskul.')->group(function () {
+            Route::get('/', [EkskulController::class, 'index'])->name('index');
+            Route::get('/create', [EkskulController::class, 'create'])->name('create');
+            Route::post('/store', [EkskulController::class, 'store'])->name('store');
+            Route::get('/{ekskul}', [EkskulController::class, 'show'])->name('show');
+            Route::get('/{ekskul}/edit', [EkskulController::class, 'edit'])->name('edit');
+            Route::put('/{ekskul}', [EkskulController::class, 'update'])->name('update');
+            Route::delete('/{ekskul}', [EkskulController::class, 'destroy'])->name('destroy');
+        });
     });
 
 Route::prefix('/pembina')

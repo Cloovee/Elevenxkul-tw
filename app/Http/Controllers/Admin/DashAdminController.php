@@ -7,7 +7,7 @@ use App\Models\Ekskul;
 use App\Models\Siswa;
 use App\Models\User;
 use App\Models\Pembina;
-// use App\Models\Pelatih;
+
 
 class DashAdminController extends Controller
 {
@@ -15,25 +15,24 @@ class DashAdminController extends Controller
     {
         $totalSiswa = Siswa::count();
         $totalUser = User::count();
-        // $totalEkskul = Ekskul::count();
-        // $recentEkskuls = Ekskul::latest()->take(5)->get();
-        // $totalSiswa = Siswa::count();
+        $totalEkskul = Ekskul::count();
+        $recentEkskuls = Ekskul::latest()->take(5)->get();
+        $totalSiswa = Siswa::count();
         $totalPembina = Pembina::count();
         
         
-        // $recentEkskuls = Ekskul::with(['pembina', 'pelatih'])
-        //     ->latest()
-        //     ->take(5)
-        //     ->get();
+        $recentEkskuls = Ekskul::with(['pembina', 'pelatih'])
+        ->latest()
+        ->take(5)
+        ->get();
         
         return view('admin.dashboard', compact(
-        //    'totalEkskul',
-        //    'recentEkskuls',
+            'totalEkskul',
+            'recentEkskuls',
             'totalSiswa',
             'totalUser',
             'totalPembina',
-        //     'totalPelatih',
-        //     'recentEkskuls'
+            'recentEkskuls'
         ));
 
     }

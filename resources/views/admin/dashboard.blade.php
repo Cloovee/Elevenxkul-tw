@@ -26,10 +26,8 @@
                         </div>
                         <div>
                             <p class="text-[#a3aed1] font-bold text-[10px] uppercase tracking-wider">Total Ekskul</p>
-                            <!-- Di-komentar sementara jika belum pakai DB -->
                             <p class="text-2xl font-extrabold text-[#2b3674] leading-none mt-1">
-                                {{-- {{ $totalEkskul }} --}}
-                                0
+                                {{ $totalEkskul ?? 0 }}
                             </p>
                         </div>
                     </div>
@@ -40,7 +38,7 @@
                         </div>
                         <div>
                             <p class="text-[#a3aed1] font-bold text-[10px] uppercase tracking-wider">Total Siswa</p>
-                            <p class="text-2xl font-extrabold text-[#2b3674] leading-none mt-1">{{ $totalSiswa }}</p>
+                            <p class="text-2xl font-extrabold text-[#2b3674] leading-none mt-1">{{ $totalSiswa ?? 0 }}</p>
                         </div>
                     </div>
 
@@ -50,7 +48,7 @@
                         </div>
                         <div>
                             <p class="text-[#a3aed1] font-bold text-[10px] uppercase tracking-wider">Total Pembina</p>
-                            <p class="text-2xl font-extrabold text-[#2b3674] leading-none mt-1">{{ $totalPembina }}</p>
+                            <p class="text-2xl font-extrabold text-[#2b3674] leading-none mt-1">{{ $totalPembina ?? 0 }}</p>
                         </div>
                     </div>
 
@@ -60,16 +58,16 @@
                         </div>
                         <div>
                             <p class="text-[#a3aed1] font-bold text-[10px] uppercase tracking-wider">Total User</p>
-                            <p class="text-2xl font-extrabold text-[#2b3674] leading-none mt-1">{{ $totalUser }}</p>
+                            <p class="text-2xl font-extrabold text-[#2b3674] leading-none mt-1">{{ $totalUser ?? 0 }}</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- 2. Menu Kelola (Grid 2x2: Siswa, Users, Pembina aktif; Ekskul belum) -->
+            <!-- 2. Menu Kelola (Grid 2x2: Semua Aktif) -->
             <div class="grid grid-cols-2 gap-4 flex-1">
 
-                <!-- Kelola Siswa (aktif) -->
+                <!-- Kelola Siswa -->
                 <a href="{{ route('admin.siswa.index') }}" class="bg-white rounded-[1.5rem] p-5 shadow-[0_4px_24px_-8px_rgba(0,0,0,0.05)] group cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-all duration-300 border border-gray-50 block">
                     <div class="w-12 h-12 bg-gradient-to-br from-blue-100 to-blue-50 rounded-xl flex items-center justify-center text-blue-500 text-xl mb-4 group-hover:scale-110 group-hover:bg-blue-500 group-hover:text-white transition-all duration-300">
                         <i class="fas fa-users"></i>
@@ -78,7 +76,7 @@
                     <p class="text-[#a3aed1] text-xs font-medium mt-1">Data anggota ekskul</p>
                 </a>
 
-                <!-- Kelola Users (aktif) -->
+                <!-- Kelola Users -->
                 <a href="{{ route('admin.user.index') }}" class="bg-white rounded-[1.5rem] p-5 shadow-[0_4px_24px_-8px_rgba(0,0,0,0.05)] group cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-all duration-300 border border-gray-50 block">
                     <div class="w-12 h-12 bg-gradient-to-br from-indigo-100 to-indigo-50 rounded-xl flex items-center justify-center text-indigo-500 text-xl mb-4 group-hover:scale-110 group-hover:bg-indigo-500 group-hover:text-white transition-all duration-300">
                         <i class="fas fa-user-cog"></i>
@@ -87,7 +85,7 @@
                     <p class="text-[#a3aed1] text-xs font-medium mt-1">Manajemen akun sistem</p>
                 </a>
 
-                <!-- Kelola Pembina (aktif) -->
+                <!-- Kelola Pembina -->
                 <a href="{{ route('admin.pembina.index') }}" class="bg-white rounded-[1.5rem] p-5 shadow-[0_4px_24px_-8px_rgba(0,0,0,0.05)] group cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-all duration-300 border border-gray-50 block">
                     <div class="w-12 h-12 bg-gradient-to-br from-teal-100 to-teal-50 rounded-xl flex items-center justify-center text-teal-500 text-xl mb-4 group-hover:scale-110 group-hover:bg-teal-500 group-hover:text-white transition-all duration-300">
                         <i class="fas fa-user-tie"></i>
@@ -96,14 +94,14 @@
                     <p class="text-[#a3aed1] text-xs font-medium mt-1">Manajemen guru pembina</p>
                 </a>
 
-                <!-- Kelola Ekskul (belum aktif) -->
-                <div class="bg-white rounded-[1.5rem] p-5 shadow-[0_4px_24px_-8px_rgba(0,0,0,0.05)] border border-gray-50 opacity-60 cursor-not-allowed">
-                    <div class="w-12 h-12 bg-gradient-to-br from-purple-100 to-purple-50 rounded-xl flex items-center justify-center text-purple-500 text-xl mb-4">
+                <!-- Kelola Ekskul (Aktif) -->
+                <a href="{{ route('admin.ekskul.index') }}" class="bg-white rounded-[1.5rem] p-5 shadow-[0_4px_24px_-8px_rgba(0,0,0,0.05)] group cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-all duration-300 border border-gray-50 block">
+                    <div class="w-12 h-12 bg-gradient-to-br from-purple-100 to-purple-50 rounded-xl flex items-center justify-center text-purple-500 text-xl mb-4 group-hover:scale-110 group-hover:bg-purple-500 group-hover:text-white transition-all duration-300">
                         <i class="fas fa-layer-group"></i>
                     </div>
                     <p class="text-[#2b3674] font-bold text-base">Kelola Ekskul</p>
-                    <p class="text-[#a3aed1] text-xs font-medium mt-1">Segera hadir</p>
-                </div>
+                    <p class="text-[#a3aed1] text-xs font-medium mt-1">Manajemen data ekskul</p>
+                </a>
                 
             </div>
         </div>
@@ -112,27 +110,22 @@
         <div class="xl:col-span-5 flex flex-col gap-6">
 
             <!-- 3. LAPORAN DATA EKSKUL (Grafik jumlah siswa per ekskul) -->
-            {{-- 
-            BAGIAN GRAFIK EKSKUL DI-KOMENTAR SEMENTARA
             <div class="bg-white rounded-[1.5rem] p-6 shadow-[0_4px_24px_-8px_rgba(0,0,0,0.05)] border border-gray-50">
                 <p class="text-[#a3aed1] font-bold text-xs tracking-wider mb-1 uppercase">Statistik</p>
                 <h4 class="text-[#2b3674] font-bold text-lg mb-6">Laporan Data Ekskul</h4>
 
-                @if($ekskulChart->isEmpty())
-                    <div class="h-32 flex items-center justify-center text-[#a3aed1] text-sm">
-                        Belum ada data ekskul.
-                    </div>
-                @else
+                @if(!empty($ekskulChart) && count($ekskulChart) > 0)
                     <div class="flex items-end justify-between h-32 gap-3 px-2">
                         @foreach($ekskulChart as $ek)
                             @php
-                                $heightPercent = $maxAnggota > 0 ? ($ek->anggota_count / $maxAnggota) * 100 : 0;
-                                $heightPx = max(8, round($heightPercent / 100 * 112)); // 112px = h-28 max
+                                $maxVal = $maxAnggota ?? 1;
+                                $heightPercent = $maxVal > 0 ? ($ek->anggota_count / $maxVal) * 100 : 0;
+                                $heightPx = max(8, round($heightPercent / 100 * 112));
                             @endphp
                             <div class="w-full flex flex-col items-center gap-2 group">
                                 <div class="w-full bg-gradient-to-t from-[#868dfb]/40 to-[#b6bbfc]/40 group-hover:from-[#868dfb] group-hover:to-[#b6bbfc] rounded-md transition-all duration-300 relative" style="height: {{ $heightPx }}px;">
                                     <div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-[#2b3674] text-white text-[9px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                                        {{ $ek->anggota_count }} siswa
+                                        {{ $ek->anggota_count ?? 0 }} siswa
                                     </div>
                                 </div>
                                 <span class="text-[10px] text-[#a3aed1] font-bold text-center leading-tight" title="{{ $ek->nama_ekskul }}">
@@ -141,17 +134,11 @@
                             </div>
                         @endforeach
                     </div>
+                @else
+                    <div class="h-32 flex items-center justify-center text-[#a3aed1] text-sm bg-gray-50 rounded-xl border border-dashed border-gray-200">
+                        Belum ada data ekskul.
+                    </div>
                 @endif
-            </div>
-            --}}
-
-            <!-- Placeholder Statis agar tampilan Layout tidak berantakan saat Grafik Ekskul di-komentar -->
-            <div class="bg-white rounded-[1.5rem] p-6 shadow-[0_4px_24px_-8px_rgba(0,0,0,0.05)] border border-gray-50">
-                <p class="text-[#a3aed1] font-bold text-xs tracking-wider mb-1 uppercase">Statistik</p>
-                <h4 class="text-[#2b3674] font-bold text-lg mb-4">Laporan Data Ekskul</h4>
-                <div class="h-32 flex items-center justify-center text-[#a3aed1] text-sm bg-gray-50 rounded-xl border border-dashed border-gray-200">
-                    Fitur statistik ekskul belum terhubung.
-                </div>
             </div>
 
             <!-- 4. Card History (Bottom Right) -->
