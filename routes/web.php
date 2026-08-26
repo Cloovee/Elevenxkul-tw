@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\DashAdminController;
 use App\Http\Controllers\Admin\SiswaController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\PembinaController;
 use Illuminate\Support\Facades\Auth; 
 
 
@@ -54,6 +55,15 @@ Route::prefix('/admin')
             Route::put('/{id}', [UserController::class, 'update'])->name('update');
             Route::delete('/{id}', [UserController::class, 'destroy'])->name('destroy');
         });
+
+        Route::prefix('/pembina')->name('pembina.')->group(function () {
+        Route::get('/', [PembinaController::class, 'index'])->name('index');
+        Route::get('/create', [PembinaController::class, 'create'])->name('create');
+        Route::post('/store', [PembinaController::class, 'store'])->name('store');
+        Route::get('/{id}/edit', [PembinaController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [PembinaController::class, 'update'])->name('update');
+        Route::delete('/{id}', [PembinaController::class, 'destroy'])->name('destroy');
+    });
     });
 
 Route::prefix('/pembina')

@@ -1,55 +1,51 @@
-<section class="space-y-6">
-    <header>
-        <h2 class="text-lg font-medium text-gray-900">
-            {{ __('Delete Account') }}
-        </h2>
+<button
+    type="button"
+    x-data=""
+    x-on:click.prevent="$dispatch('open-modal', 'confirm-user-deletion')"
+    class="inline-flex items-center gap-2 px-6 py-2.5 bg-red-50 hover:bg-red-500 text-red-600 hover:text-white rounded-full text-sm font-bold transition-colors"
+>
+    <i class="fas fa-trash"></i> Hapus Akun
+</button>
 
-        <p class="mt-1 text-sm text-gray-600">
-            {{ __('Once your account is deleted, all of its resources and data will be permanently deleted. Before deleting your account, please download any data or information that you wish to retain.') }}
-        </p>
-    </header>
+<x-modal name="confirm-user-deletion" :show="$errors->userDeletion->isNotEmpty()" focusable>
+    <form method="post" action="{{ route('profile.destroy') }}" class="p-6">
+        @csrf
+        @method('delete')
 
-    <x-danger-button
-        x-data=""
-        x-on:click.prevent="$dispatch('open-modal', 'confirm-user-deletion')"
-    >{{ __('Delete Account') }}</x-danger-button>
-
-    <x-modal name="confirm-user-deletion" :show="$errors->userDeletion->isNotEmpty()" focusable>
-        <form method="post" action="{{ route('profile.destroy') }}" class="p-6">
-            @csrf
-            @method('delete')
-
-            <h2 class="text-lg font-medium text-gray-900">
-                {{ __('Are you sure you want to delete your account?') }}
+        <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 bg-red-50 text-red-500 rounded-xl flex items-center justify-center">
+                <i class="fas fa-triangle-exclamation"></i>
+            </div>
+            <h2 class="text-lg font-extrabold text-[#2b3674]">
+                Yakin mau hapus akun ini?
             </h2>
+        </div>
 
-            <p class="mt-1 text-sm text-gray-600">
-                {{ __('Once your account is deleted, all of its resources and data will be permanently deleted. Please enter your password to confirm you would like to permanently delete your account.') }}
-            </p>
+        <p class="text-sm text-[#a3aed1] mb-6">
+            Setelah akun dihapus, semua data dan resource-nya akan hilang permanen. Masukkan password buat konfirmasi.
+        </p>
 
-            <div class="mt-6">
-                <x-input-label for="password" value="{{ __('Password') }}" class="sr-only" />
+        <div>
+            <label for="password" class="sr-only">Password</label>
+            <input
+                id="password"
+                name="password"
+                type="password"
+                class="w-full px-4 py-2.5 bg-[#f4f7fe] border-none rounded-xl text-sm text-[#2b3674] focus:ring-2 focus:ring-red-400 @error('password', 'userDeletion') ring-2 ring-red-400 @enderror"
+                placeholder="Password"
+            />
+            @error('password', 'userDeletion')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+        </div>
 
-                <x-text-input
-                    id="password"
-                    name="password"
-                    type="password"
-                    class="mt-1 block w-3/4"
-                    placeholder="{{ __('Password') }}"
-                />
-
-                <x-input-error :messages="$errors->userDeletion->get('password')" class="mt-2" />
-            </div>
-
-            <div class="mt-6 flex justify-end">
-                <x-secondary-button x-on:click="$dispatch('close')">
-                    {{ __('Cancel') }}
-                </x-secondary-button>
-
-                <x-danger-button class="ms-3">
-                    {{ __('Delete Account') }}
-                </x-danger-button>
-            </div>
-        </form>
-    </x-modal>
-</section>
+        <div class="mt-6 flex justify-end gap-3">
+            <button type="button" x-on:click="$dispatch('close')"
+                class="inline-flex items-center gap-2 px-6 py-2.5 bg-[#f4f7fe] hover:bg-[#e9edfb] text-[#2b3674] rounded-full text-sm font-bold transition-colors">
+                Batal
+            </button>
+            <button type="submit"
+                class="inline-flex items-center gap-2 px-6 py-2.5 bg-red-500 hover:bg-red-600 text-white rounded-full text-sm font-bold transition-colors">
+                <i class="fas fa-trash"></i> Hapus Akun
+            </button>
+        </div>
+    </form>
+</x-modal>

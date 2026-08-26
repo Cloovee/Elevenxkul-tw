@@ -50,7 +50,7 @@
                         </div>
                         <div>
                             <p class="text-[#a3aed1] font-bold text-[10px] uppercase tracking-wider">Total Pembina</p>
-                        {{-- <p class="text-2xl font-extrabold text-[#2b3674] leading-none mt-1">{{ $totalPembina }}</p> --}} 
+                            <p class="text-2xl font-extrabold text-[#2b3674] leading-none mt-1">{{ $totalPembina }}</p>
                         </div>
                     </div>
 
@@ -66,7 +66,7 @@
                 </div>
             </div>
 
-            <!-- 2. Menu Kelola (Grid 2x2: Siswa, Users aktif; Pembina, Ekskul belum) -->
+            <!-- 2. Menu Kelola (Grid 2x2: Siswa, Users, Pembina aktif; Ekskul belum) -->
             <div class="grid grid-cols-2 gap-4 flex-1">
 
                 <!-- Kelola Siswa (aktif) -->
@@ -87,14 +87,14 @@
                     <p class="text-[#a3aed1] text-xs font-medium mt-1">Manajemen akun sistem</p>
                 </a>
 
-                <!-- Kelola Pembina (belum aktif) -->
-                <div class="bg-white rounded-[1.5rem] p-5 shadow-[0_4px_24px_-8px_rgba(0,0,0,0.05)] border border-gray-50 opacity-60 cursor-not-allowed">
-                    <div class="w-12 h-12 bg-gradient-to-br from-teal-100 to-teal-50 rounded-xl flex items-center justify-center text-teal-500 text-xl mb-4">
+                <!-- Kelola Pembina (aktif) -->
+                <a href="{{ route('admin.pembina.index') }}" class="bg-white rounded-[1.5rem] p-5 shadow-[0_4px_24px_-8px_rgba(0,0,0,0.05)] group cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-all duration-300 border border-gray-50 block">
+                    <div class="w-12 h-12 bg-gradient-to-br from-teal-100 to-teal-50 rounded-xl flex items-center justify-center text-teal-500 text-xl mb-4 group-hover:scale-110 group-hover:bg-teal-500 group-hover:text-white transition-all duration-300">
                         <i class="fas fa-user-tie"></i>
                     </div>
                     <p class="text-[#2b3674] font-bold text-base">Kelola Pembina</p>
-                    <p class="text-[#a3aed1] text-xs font-medium mt-1">Segera hadir</p>
-                </div>
+                    <p class="text-[#a3aed1] text-xs font-medium mt-1">Manajemen guru pembina</p>
+                </a>
 
                 <!-- Kelola Ekskul (belum aktif) -->
                 <div class="bg-white rounded-[1.5rem] p-5 shadow-[0_4px_24px_-8px_rgba(0,0,0,0.05)] border border-gray-50 opacity-60 cursor-not-allowed">
