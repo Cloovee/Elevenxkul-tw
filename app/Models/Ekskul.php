@@ -12,6 +12,17 @@ class Ekskul extends Model
     protected $fillable = [
         'nama_ekskul',
         'kategori',
-        'deskripsi'
+        'deskripsi',
+        'id_pembina',
+        'id_pelatih',
     ];
+
+    /**
+     * Relasi ke model Pembina
+     */
+    public function pembina()
+    {
+        return $this->belongsTo(Pembina::class, 'id_pembina');
+    }
+
 }

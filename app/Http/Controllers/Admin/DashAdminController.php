@@ -21,7 +21,7 @@ class DashAdminController extends Controller
         $totalPembina = Pembina::count();
         
         
-        $recentEkskuls = Ekskul::with(['pembina', 'pelatih'])
+        $recentEkskuls = Ekskul::with(['pembina'])
         ->latest()
         ->take(5)
         ->get();
