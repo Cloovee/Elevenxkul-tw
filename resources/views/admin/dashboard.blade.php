@@ -1,93 +1,180 @@
 @extends('layouts.admin')
 
 @section('title', 'Dashboard Admin')
-@section('page-title', 'Dashboard')
+@section('page-title', 'Dashboard Utama')
 
 @section('content')
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-        <div class="bg-white rounded-lg shadow-sm p-6 border-l-4 border-blue-500">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-gray-500 text-sm">Total Ekskul</p>
-              
-                    {{-- <p class="text-3xl font-bold text-gray-800">{{ $totalEkskul ?? 0 }}</p> --}}
-                </div>
-                <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                    <i class="fas fa-building text-blue-600 text-xl"></i>
-                </div>
-            </div>
-        </div>
+    <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 h-full pb-4">
         
-        <div class="bg-white rounded-lg shadow-sm p-6 border-l-4 border-green-500">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-gray-500 text-sm">Total Siswa</p>
-                    <p class="text-3xl font-bold text-gray-800">0</p>
-                </div>
-                <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                    <i class="fas fa-users text-green-600 text-xl"></i>
-                </div>
-            </div>
-        </div>
-        
-        <div class="bg-white rounded-lg shadow-sm p-6 border-l-4 border-purple-500">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-gray-500 text-sm">Total Pembina</p>
-                    <p class="text-3xl font-bold text-gray-800">0</p>
-                </div>
-                <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
-                    <i class="fas fa-user-tie text-purple-600 text-xl"></i>
-                </div>
-            </div>
-        </div>
-        
-        <div class="bg-white rounded-lg shadow-sm p-6 border-l-4 border-orange-500">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-gray-500 text-sm">Total Pelatih</p>
-                    <p class="text-3xl font-bold text-gray-800">0</p>
-                </div>
-                <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
-                    <i class="fas fa-chalkboard-teacher text-orange-600 text-xl"></i>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="bg-white rounded-lg shadow-sm p-6">
-        <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-semibold text-gray-800">
-                <i class="fas fa-clock mr-2 text-gray-400"></i>Ekskul Terbaru
-            </h3>
-            {{-- <a href="{{ route('admin.ekskul.index') }}" class="text-sm text-blue-600 hover:text-blue-800">
-                Lihat semua <i class="fas fa-arrow-right ml-1"></i>
-            </a> --}}
-        </div>
-        
-       {{--  @if(isset($recentEkskuls) && $recentEkskuls->isNotEmpty())
-            <div class="divide-y divide-gray-100">
-                @foreach($recentEkskuls as $ekskul)
-                    <div class="py-3 flex items-center justify-between">
+        <!-- ================= KOLOM KIRI (Span 7) ================= -->
+        <div class="xl:col-span-7 flex flex-col gap-6">
+            
+            <!-- 1. Card Nyapa Admin -->
+            <div class="bg-gradient-to-br from-white to-[#f8faff] rounded-[1.5rem] p-8 shadow-[0_4px_24px_-8px_rgba(0,0,0,0.05)] relative overflow-hidden border border-white/60">
+                <div class="absolute -top-10 -right-10 w-40 h-40 bg-[#868dfb]/10 rounded-full blur-3xl"></div>
+
+                <h3 class="text-3xl font-extrabold text-[#2b3674] mb-2 leading-tight">Program Pembinaan<br>Aplikasi Ekskul</h3>
+                <p class="text-[#a3aed1] font-medium text-sm w-4/5 mb-8">
+                    Pantau kehadiran, kelola data pengguna, validasi laporan pembina, dan cek tren aktivitas — semua dari satu layar.
+                </p>
+
+                <!-- 4 Card Total, sejajar -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-white rounded-2xl px-5 py-4 shadow-sm border border-gray-50 flex items-center gap-3">
+                        <div class="w-10 h-10 bg-[#f4f7fe] rounded-xl flex items-center justify-center text-[#868dfb] flex-shrink-0">
+                            <i class="fas fa-building text-lg"></i>
+                        </div>
                         <div>
-                            <p class="font-medium text-gray-800">{{ $ekskul->nama_ekskul }}</p>
-                            <p class="text-sm text-gray-500">
-                                <span class="inline-block px-2 py-0.5 rounded text-xs 
-                                    @if($ekskul->kategori == 'organisasi') bg-blue-100 text-blue-700
-                                    @elseif($ekskul->kategori == 'ekstrakulikuler') bg-green-100 text-green-700
-                                    @else bg-purple-100 text-purple-700 @endif">
-                                    {{ ucfirst($ekskul->kategori) }}
-                                </span>
+                            <p class="text-[#a3aed1] font-bold text-[10px] uppercase tracking-wider">Total Ekskul</p>
+                            <!-- Di-komentar sementara jika belum pakai DB -->
+                            <p class="text-2xl font-extrabold text-[#2b3674] leading-none mt-1">
+                                {{-- {{ $totalEkskul }} --}}
+                                0
                             </p>
                         </div>
-                        <span class="text-sm text-gray-400">
-                            {{ $ekskul->created_at->diffForHumans() }}
-                        </span>
                     </div>
-                @endforeach
+
+                    <div class="bg-white rounded-2xl px-5 py-4 shadow-sm border border-gray-50 flex items-center gap-3">
+                        <div class="w-10 h-10 bg-[#fff4e5] rounded-xl flex items-center justify-center text-orange-400 flex-shrink-0">
+                            <i class="fas fa-user-graduate text-lg"></i>
+                        </div>
+                        <div>
+                            <p class="text-[#a3aed1] font-bold text-[10px] uppercase tracking-wider">Total Siswa</p>
+                            <p class="text-2xl font-extrabold text-[#2b3674] leading-none mt-1">{{ $totalSiswa }}</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl px-5 py-4 shadow-sm border border-gray-50 flex items-center gap-3">
+                        <div class="w-10 h-10 bg-teal-50 rounded-xl flex items-center justify-center text-teal-500 flex-shrink-0">
+                            <i class="fas fa-user-tie text-lg"></i>
+                        </div>
+                        <div>
+                            <p class="text-[#a3aed1] font-bold text-[10px] uppercase tracking-wider">Total Pembina</p>
+                        {{-- <p class="text-2xl font-extrabold text-[#2b3674] leading-none mt-1">{{ $totalPembina }}</p> --}} 
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl px-5 py-4 shadow-sm border border-gray-50 flex items-center gap-3">
+                        <div class="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-500 flex-shrink-0">
+                            <i class="fas fa-user-cog text-lg"></i>
+                        </div>
+                        <div>
+                            <p class="text-[#a3aed1] font-bold text-[10px] uppercase tracking-wider">Total User</p>
+                            <p class="text-2xl font-extrabold text-[#2b3674] leading-none mt-1">{{ $totalUser }}</p>
+                        </div>
+                    </div>
+                </div>
             </div>
-        @else
-            <p class="text-gray-500 text-center py-8">Belum ada data ekskul.</p>
-        @endif --}}
+
+            <!-- 2. Menu Kelola (Grid 2x2: Siswa, Users aktif; Pembina, Ekskul belum) -->
+            <div class="grid grid-cols-2 gap-4 flex-1">
+
+                <!-- Kelola Siswa (aktif) -->
+                <a href="{{ route('admin.siswa.index') }}" class="bg-white rounded-[1.5rem] p-5 shadow-[0_4px_24px_-8px_rgba(0,0,0,0.05)] group cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-all duration-300 border border-gray-50 block">
+                    <div class="w-12 h-12 bg-gradient-to-br from-blue-100 to-blue-50 rounded-xl flex items-center justify-center text-blue-500 text-xl mb-4 group-hover:scale-110 group-hover:bg-blue-500 group-hover:text-white transition-all duration-300">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <p class="text-[#2b3674] font-bold text-base">Kelola Siswa</p>
+                    <p class="text-[#a3aed1] text-xs font-medium mt-1">Data anggota ekskul</p>
+                </a>
+
+                <!-- Kelola Users (aktif) -->
+                <a href="{{ route('admin.user.index') }}" class="bg-white rounded-[1.5rem] p-5 shadow-[0_4px_24px_-8px_rgba(0,0,0,0.05)] group cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-all duration-300 border border-gray-50 block">
+                    <div class="w-12 h-12 bg-gradient-to-br from-indigo-100 to-indigo-50 rounded-xl flex items-center justify-center text-indigo-500 text-xl mb-4 group-hover:scale-110 group-hover:bg-indigo-500 group-hover:text-white transition-all duration-300">
+                        <i class="fas fa-user-cog"></i>
+                    </div>
+                    <p class="text-[#2b3674] font-bold text-base">Kelola Users</p>
+                    <p class="text-[#a3aed1] text-xs font-medium mt-1">Manajemen akun sistem</p>
+                </a>
+
+                <!-- Kelola Pembina (belum aktif) -->
+                <div class="bg-white rounded-[1.5rem] p-5 shadow-[0_4px_24px_-8px_rgba(0,0,0,0.05)] border border-gray-50 opacity-60 cursor-not-allowed">
+                    <div class="w-12 h-12 bg-gradient-to-br from-teal-100 to-teal-50 rounded-xl flex items-center justify-center text-teal-500 text-xl mb-4">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <p class="text-[#2b3674] font-bold text-base">Kelola Pembina</p>
+                    <p class="text-[#a3aed1] text-xs font-medium mt-1">Segera hadir</p>
+                </div>
+
+                <!-- Kelola Ekskul (belum aktif) -->
+                <div class="bg-white rounded-[1.5rem] p-5 shadow-[0_4px_24px_-8px_rgba(0,0,0,0.05)] border border-gray-50 opacity-60 cursor-not-allowed">
+                    <div class="w-12 h-12 bg-gradient-to-br from-purple-100 to-purple-50 rounded-xl flex items-center justify-center text-purple-500 text-xl mb-4">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                    <p class="text-[#2b3674] font-bold text-base">Kelola Ekskul</p>
+                    <p class="text-[#a3aed1] text-xs font-medium mt-1">Segera hadir</p>
+                </div>
+                
+            </div>
+        </div>
+
+        <!-- ================= KOLOM KANAN (Span 5) ================= -->
+        <div class="xl:col-span-5 flex flex-col gap-6">
+
+            <!-- 3. LAPORAN DATA EKSKUL (Grafik jumlah siswa per ekskul) -->
+            {{-- 
+            BAGIAN GRAFIK EKSKUL DI-KOMENTAR SEMENTARA
+            <div class="bg-white rounded-[1.5rem] p-6 shadow-[0_4px_24px_-8px_rgba(0,0,0,0.05)] border border-gray-50">
+                <p class="text-[#a3aed1] font-bold text-xs tracking-wider mb-1 uppercase">Statistik</p>
+                <h4 class="text-[#2b3674] font-bold text-lg mb-6">Laporan Data Ekskul</h4>
+
+                @if($ekskulChart->isEmpty())
+                    <div class="h-32 flex items-center justify-center text-[#a3aed1] text-sm">
+                        Belum ada data ekskul.
+                    </div>
+                @else
+                    <div class="flex items-end justify-between h-32 gap-3 px-2">
+                        @foreach($ekskulChart as $ek)
+                            @php
+                                $heightPercent = $maxAnggota > 0 ? ($ek->anggota_count / $maxAnggota) * 100 : 0;
+                                $heightPx = max(8, round($heightPercent / 100 * 112)); // 112px = h-28 max
+                            @endphp
+                            <div class="w-full flex flex-col items-center gap-2 group">
+                                <div class="w-full bg-gradient-to-t from-[#868dfb]/40 to-[#b6bbfc]/40 group-hover:from-[#868dfb] group-hover:to-[#b6bbfc] rounded-md transition-all duration-300 relative" style="height: {{ $heightPx }}px;">
+                                    <div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-[#2b3674] text-white text-[9px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                                        {{ $ek->anggota_count }} siswa
+                                    </div>
+                                </div>
+                                <span class="text-[10px] text-[#a3aed1] font-bold text-center leading-tight" title="{{ $ek->nama_ekskul }}">
+                                    {{ \Illuminate\Support\Str::limit($ek->nama_ekskul, 8) }}
+                                </span>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+            </div>
+            --}}
+
+            <!-- Placeholder Statis agar tampilan Layout tidak berantakan saat Grafik Ekskul di-komentar -->
+            <div class="bg-white rounded-[1.5rem] p-6 shadow-[0_4px_24px_-8px_rgba(0,0,0,0.05)] border border-gray-50">
+                <p class="text-[#a3aed1] font-bold text-xs tracking-wider mb-1 uppercase">Statistik</p>
+                <h4 class="text-[#2b3674] font-bold text-lg mb-4">Laporan Data Ekskul</h4>
+                <div class="h-32 flex items-center justify-center text-[#a3aed1] text-sm bg-gray-50 rounded-xl border border-dashed border-gray-200">
+                    Fitur statistik ekskul belum terhubung.
+                </div>
+            </div>
+
+            <!-- 4. Card History (Bottom Right) -->
+            <div class="bg-white rounded-[1.5rem] p-6 shadow-[0_4px_24px_-8px_rgba(0,0,0,0.05)] border border-gray-50 flex-1 flex flex-col">
+                <div class="flex justify-between items-center mb-4">
+                    <div>
+                        <p class="text-[#a3aed1] font-bold text-xs tracking-wider mb-1 uppercase">Terbaru</p>
+                        <h4 class="text-[#2b3674] font-bold text-lg">Riwayat Admin</h4>
+                    </div>
+                    <a href="#" class="text-[#868dfb] text-xs font-bold hover:underline">Lihat Semua</a>
+                </div>
+                
+                <div class="flex-1 flex flex-col gap-3 justify-center">
+                    <div class="p-5 rounded-xl bg-[#f4f7fe]/50 border border-dashed border-[#868dfb]/30 flex flex-col items-center justify-center text-center">
+                        <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-[#a3aed1] mb-2 shadow-sm">
+                            <i class="fas fa-inbox"></i>
+                        </div>
+                        <p class="text-[#868dfb] font-bold text-sm">Belum ada aktivitas.</p>
+                        <p class="text-[#a3aed1] text-xs mt-1">Riwayat tindakan akan muncul di sini.</p>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
     </div>
 @endsection

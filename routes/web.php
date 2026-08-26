@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\DashAdminController;
 use App\Http\Controllers\Admin\SiswaController;
+use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Auth; 
 
 
@@ -43,6 +44,15 @@ Route::prefix('/admin')
             Route::post('/import', [SiswaController::class, 'import'])->name('import');
             Route::get('/export', [SiswaController::class, 'export'])->name('export');
             Route::get('/template', [SiswaController::class, 'downloadTemplate'])->name('template');
+        });
+
+        Route::prefix('/user')->name('user.')->group(function () {
+            Route::get('/', [UserController::class, 'index'])->name('index');
+            Route::get('/create', [UserController::class, 'create'])->name('create');
+            Route::post('/store', [UserController::class, 'store'])->name('store');
+            Route::get('/{id}/edit', [UserController::class, 'edit'])->name('edit');
+            Route::put('/{id}', [UserController::class, 'update'])->name('update');
+            Route::delete('/{id}', [UserController::class, 'destroy'])->name('destroy');
         });
     });
 
