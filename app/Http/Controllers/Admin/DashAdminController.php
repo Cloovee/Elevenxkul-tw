@@ -16,6 +16,7 @@ class DashAdminController extends Controller
         $totalSiswa = Siswa::count();
         $totalUser = User::count();
         $totalEkskul = Ekskul::count();
+        $totalPembina = Pembina::count();
         $recentEkskuls = Ekskul::latest()->take(5)->get();
         $totalSiswa = Siswa::count();
         $totalPembina = Pembina::count();
@@ -28,6 +29,7 @@ class DashAdminController extends Controller
         
         return view('admin.dashboard', compact(
             'totalEkskul',
+            'totalPembina',
             'recentEkskuls',
             'totalSiswa',
             'totalUser',

@@ -27,8 +27,8 @@ class Pembina extends Model
     }
 
     // Ekskul yang dibina oleh pembina ini
-//    public function ekskuls()
-//    {
-//       return $this->hasMany(Ekskul::class, 'id_pembina', 'id_pembina');
-//    }
+    public function ekskuls()
+    {
+        return $this->hasMany(Ekskul::class, 'id_pembina', 'id_pembina');
+    }
 }

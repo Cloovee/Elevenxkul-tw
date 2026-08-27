@@ -1,13 +1,19 @@
 <?php
 
+use App\Http\Controllers\AbsensiPelatihController;
+use App\Http\Controllers\AbsensiPesertaController;
+use App\Http\Controllers\NilaiPesertaController;
+use App\Http\Controllers\PembinaDashboardController;
+use App\Http\Controllers\PembinaProfileController;
 use App\Http\Controllers\ProfileController;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Admin\DashAdminController;
 use App\Http\Controllers\Admin\SiswaController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\PembinaController;
 use App\Http\Controllers\Admin\EkskulController;
+use App\Http\Controllers\Admin\PembinaController as AdminPembinaController;
+use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -15,6 +21,50 @@ Route::get('/', function () {
 
 require __DIR__.'/auth.php';
 
+// 3. Grup route khusus Pembina (wajib login)
+Route::prefix('pembina')->middleware('auth')->name('pembina.')->group(function () {
+    Route::get('/dashboard', [PembinaDashboardController::class, 'index'])->name('dashboard');
+
+    // ===== Profil Pembina (halaman khusus, terpisah dari /profile umum) =====
+    Route::prefix('profile')->name('profile.')->group(function () {
+        Route::get('/', [PembinaProfileController::class, 'index'])->name('index');
+        Route::patch('/', [PembinaProfileController::class, 'update'])->name('update');
+        Route::patch('/password', [PembinaProfileController::class, 'updatePassword'])->name('password');
+    });
+
+    // ===== CRUD: Melihat & mengelola Absensi Peserta =====
+    Route::prefix('absensi-peserta')->name('absensi.')->group(function () {
+        Route::get('/', [AbsensiPesertaController::class, 'index'])->name('index');
+        Route::get('/create', [AbsensiPesertaController::class, 'create'])->name('create');
+        Route::post('/', [AbsensiPesertaController::class, 'store'])->name('store');
+        Route::get('/{absensiPeserta}/edit', [AbsensiPesertaController::class, 'edit'])->name('edit');
+        Route::put('/{absensiPeserta}', [AbsensiPesertaController::class, 'update'])->name('update');
+        Route::delete('/{absensiPeserta}', [AbsensiPesertaController::class, 'destroy'])->name('destroy');
+    });
+
+    // ===== CRUD: Memvalidasi Absensi Pelatih =====
+    Route::prefix('validasi-pelatih')->name('validasi.')->group(function () {
+        Route::get('/', [AbsensiPelatihController::class, 'index'])->name('index');
+        Route::get('/create', [AbsensiPelatihController::class, 'create'])->name('create');
+        Route::post('/', [AbsensiPelatihController::class, 'store'])->name('store');
+        Route::get('/{absensiPelatih}/edit', [AbsensiPelatihController::class, 'edit'])->name('edit');
+        Route::put('/{absensiPelatih}', [AbsensiPelatihController::class, 'update'])->name('update');
+        Route::delete('/{absensiPelatih}', [AbsensiPelatihController::class, 'destroy'])->name('destroy');
+        Route::post('/{absensiPelatih}/setujui', [AbsensiPelatihController::class, 'setujui'])->name('setujui');
+        Route::post('/{absensiPelatih}/tolak', [AbsensiPelatihController::class, 'tolak'])->name('tolak');
+    });
+
+    // ===== CRUD: Memberi Nilai Peserta =====
+    Route::prefix('nilai-peserta')->name('nilai.')->group(function () {
+        Route::get('/', [NilaiPesertaController::class, 'index'])->name('index');
+        Route::post('/{peserta}', [NilaiPesertaController::class, 'store'])->name('simpan');
+        Route::get('/{nilaiPeserta}/edit', [NilaiPesertaController::class, 'edit'])->name('edit');
+        Route::put('/{nilaiPeserta}', [NilaiPesertaController::class, 'update'])->name('update');
+        Route::delete('/{nilaiPeserta}', [NilaiPesertaController::class, 'destroy'])->name('destroy');
+    });
+});
+
+// 4. Dashboard umum (redirect setelah login, dipakai role lain / fallback)
 Route::get('/dashboard', function () {
     $user = Auth::user();
 
@@ -78,20 +128,6 @@ Route::prefix('/admin')
 
 /*
 |--------------------------------------------------------------------------
-| PEMBINA ROUTES
-|--------------------------------------------------------------------------
-*/
-Route::prefix('/pembina')
-    ->middleware(['auth', 'verified', 'role:Pembina'])
-    ->name('pembina.')
-    ->group(function () {
-        Route::get('/dashboard', function () {
-            return view('pembina.dashboard');
-        })->name('dashboard');
-    });
-
-/*
-|--------------------------------------------------------------------------
 | KETUA ROUTES
 |--------------------------------------------------------------------------
 */
@@ -104,6 +140,7 @@ Route::prefix('/ketua')
         })->name('dashboard');
     });
 
+// 5. Dashboard Ketua
 Route::get('/dashboard-ketua', function () {
     return view('dashboard-ketua.index');
 })->middleware(['auth', 'verified', 'role:Ketua'])->name('dashboard.ketua');
@@ -143,6 +180,7 @@ Route::get('/kelola-anggota/{id}', function ($id) {
 | PROFILE ROUTES
 |--------------------------------------------------------------------------
 */
+// 6. Profile (semua role yang login)
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

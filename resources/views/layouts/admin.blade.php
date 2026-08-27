@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>@yield('title', 'Dashboard Admin') - Ekskul App</title>
+    <title>@yield('title', 'Dashboard Admin') - Elevenxkul</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <!-- Alpine.js untuk penanganan dropdown UI -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -64,6 +64,18 @@
                     <i class="fas fa-sign-out-alt text-xl group-hover:scale-110 transition-transform"></i>
                 </button>
             </nav>
+
+            <div class="p-4">
+                <div class="rounded-2xl bg-white/5 border border-white/10 p-4 flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-full bg-gradient-to-br from-lavender to-mint flex items-center justify-center text-panelnight font-bold text-sm shrink-0">
+                        {{ strtoupper(substr(auth()->user()->name ?? 'A', 0, 1)) }}
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-xs font-semibold text-white truncate">{{ auth()->user()->name ?? 'Admin' }}</p>
+                        <p class="text-[11px] text-white/45 truncate">{{ auth()->user()->email ?? '' }}</p>
+                    </div>
+                </div>
+            </div>
         </aside>
         
         <!-- MAIN CONTENT AREA -->
@@ -120,13 +132,13 @@
                         <i class="fas fa-check-circle mr-2"></i>{{ session('success') }}
                     </div>
                 @endif
-                
+
                 @if(session('error'))
                     <div class="mb-4 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 rounded-2xl shadow-sm">
                         <i class="fas fa-exclamation-circle mr-2"></i>{{ session('error') }}
                     </div>
                 @endif
-                
+
                 @yield('content')
             </main>
         </div>
