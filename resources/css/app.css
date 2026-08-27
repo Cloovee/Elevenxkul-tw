@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Instrument+Sans:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 @import 'tailwindcss';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
@@ -10,7 +10,6 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 
-    /* Palet & font khusus dashboard Pembina */
     --font-body: 'Plus Jakarta Sans', sans-serif;
     --font-display: 'Fredoka', sans-serif;
 
@@ -22,12 +21,10 @@
     --color-inksoft: #6B6795;
     --color-bgsoft: #F3F4FC;
 
-    /* Palet gelap lembut untuk sidebar & panel admin, biar tidak dominan putih */
     --color-panelnight: #262450;
     --color-panelnight-soft: #34317A;
 }
 
-/* ================= Animasi bersama (dipakai merata di semua dashboard) ================= */
 @keyframes fadeInUp {
     from {
         opacity: 0;
@@ -43,7 +40,6 @@
     animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-/* Delay bertingkat supaya animasi terasa merata & tidak "meledak" bersamaan */
 .animate-delay-1 { animation-delay: 0.05s; }
 .animate-delay-2 { animation-delay: 0.1s; }
 .animate-delay-3 { animation-delay: 0.15s; }
