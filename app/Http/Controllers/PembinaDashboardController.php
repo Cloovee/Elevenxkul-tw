@@ -1,8 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Pembina;
-
-use App\Http\Controllers\Controller;
+namespace App\Http\Controllers;
 
 use App\Models\AbsensiPelatih;
 use App\Models\AbsensiPeserta;

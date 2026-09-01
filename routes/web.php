@@ -1,10 +1,10 @@
 <?php
 
-use App\Http\Controllers\AbsensiPelatihController;
-use App\Http\Controllers\AbsensiPesertaController;
-use App\Http\Controllers\NilaiPesertaController;
-use App\Http\Controllers\PembinaDashboardController;
-use App\Http\Controllers\PembinaProfileController;
+use App\Http\Controllers\Pembina\AbsensiPelatihController;
+use App\Http\Controllers\Pembina\AbsensiPesertaController;
+use App\Http\Controllers\Pembina\NilaiPesertaController;
+use App\Http\Controllers\Pembina\PembinaDashboardController;
+use App\Http\Controllers\Pembina\PembinaProfileController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Admin\DashAdminController;
@@ -29,15 +29,18 @@ Route::prefix('pembina')->middleware('auth')->name('pembina.')->group(function (
     Route::prefix('profile')->name('profile.')->group(function () {
         Route::get('/', [PembinaProfileController::class, 'index'])->name('index');
         Route::patch('/', [PembinaProfileController::class, 'update'])->name('update');
+        Route::patch('/password', [PembinaProfileController::class, 'updatePassword'])->name('password');
     });
 
-    // ===== Menampilkan Absensi Peserta (read-only, data diisi oleh Ketua) =====
+    // ===== Melihat & mengelola Absensi Peserta (data diinput oleh admin) =====
     Route::prefix('absensi-peserta')->name('absensi.')->group(function () {
         Route::get('/', [AbsensiPesertaController::class, 'index'])->name('index');
+        Route::get('/{absensiPeserta}/edit', [AbsensiPesertaController::class, 'edit'])->name('edit');
+        Route::put('/{absensiPeserta}', [AbsensiPesertaController::class, 'update'])->name('update');
         Route::delete('/{absensiPeserta}', [AbsensiPesertaController::class, 'destroy'])->name('destroy');
     });
 
-    // ===== Memvalidasi Absensi Pelatih (laporan diisi oleh Ketua) =====
+    // ===== Memvalidasi Absensi Pelatih (data diinput oleh admin) =====
     Route::prefix('validasi-pelatih')->name('validasi.')->group(function () {
         Route::get('/', [AbsensiPelatihController::class, 'index'])->name('index');
         Route::get('/{absensiPelatih}/edit', [AbsensiPelatihController::class, 'edit'])->name('edit');
@@ -124,23 +127,27 @@ Route::prefix('/admin')
 | KETUA ROUTES
 |--------------------------------------------------------------------------
 */
+Route::prefix('/ketua')
+    ->middleware(['auth', 'verified', 'role:Ketua'])
+    ->name('ketua.')
+    ->group(function () {
+        Route::get('/dashboard', function () {
+            return view('ketua.dashboard');
+        })->name('dashboard');
+    });
 
 // 5. Dashboard Ketua
 Route::get('/dashboard-ketua', function () {
     return view('dashboard-ketua.index');
 })->middleware(['auth', 'verified', 'role:Ketua'])->name('dashboard.ketua');
 
-Route::middleware(['auth', 'verified', 'role:Ketua'])->group(function () {
-    Route::get('/absensi-pelatih', [\App\Http\Controllers\Ketua\AbsensiPelatihController::class, 'index'])
-        ->name('ketua.absensi-pelatih');
-    Route::post('/absensi-pelatih', [\App\Http\Controllers\Ketua\AbsensiPelatihController::class, 'store'])
-        ->name('ketua.absensi-pelatih.store');
+Route::get('/absensi-pelatih', function () {
+    return view('dashboard-ketua.absensi-pelatih');
+})->middleware(['auth', 'verified'])->name('ketua.absensi-pelatih');
 
-    Route::get('/absensi-peserta', [\App\Http\Controllers\Ketua\AbsensiPesertaController::class, 'index'])
-        ->name('ketua.absensi-peserta');
-    Route::post('/absensi-peserta', [\App\Http\Controllers\Ketua\AbsensiPesertaController::class, 'store'])
-        ->name('ketua.absensi-peserta.store');
-});
+Route::get('/absensi-peserta', function () {
+    return view('dashboard-ketua.absensi-peserta');
+})->middleware(['auth', 'verified'])->name('ketua.absensi-peserta');
 
 Route::get('/kelola-anggota', function () {
     $anggota = [

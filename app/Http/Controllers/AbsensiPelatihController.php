@@ -1,10 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\Pembina;
-
-use App\Http\Controllers\Controller;
+namespace App\Http\Controllers;
 
 use App\Models\AbsensiPelatih;
+use App\Models\Pelatih;
 use App\Models\Pembina;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
@@ -22,15 +21,18 @@ class AbsensiPelatihController extends Controller
             ->with('error', 'Akun Anda belum terhubung dengan data pembina. Hubungi admin untuk menghubungkan akun Anda.');
     }
 
+    private function pelatihUntukPembina()
+    {
+        $pembina = Pembina::where('id_user', Auth::id())->first();
+        $pelatihIds = $pembina ? $pembina->ekskuls()->whereNotNull('id_pelatih')->pluck('id_pelatih') : collect();
+
+        return Pelatih::whereIn('id_pelatih', $pelatihIds)->orderBy('nama_pelatih')->get();
+    }
+
     /**
-     * Use case: memvalidasi absensi pelatih -> halaman daftar & validasi.
-     *
-     * Catatan: laporan absensi pelatih HANYA dibuat oleh Ketua lewat halaman
-     * "Absensi Pelatih" milik Ketua (id_pelatih + status_kehadiran diisi di sana).
-     * Pembina tidak menambahkan laporan baru, pembina hanya menampilkan &
-     * memvalidasi (setuju/tolak) laporan kehadiran yang masuk.
+     * Use case: memvalidasi absensi pelatih -> halaman daftar & validasi (terpisah dari dashboard).
      */
-    public function index(Request $request)
+    public function index()
     {
         $pembina = Pembina::where('id_user', Auth::id())->first();
 
@@ -40,56 +42,25 @@ class AbsensiPelatihController extends Controller
 
         $pelatihIds = $pembina->ekskuls()->whereNotNull('id_pelatih')->pluck('id_pelatih');
 
-        // Filter status_validasi lewat query string (?status=Menunggu|Divalidasi|Ditolak),
-        // default: tampilkan semua tapi laporan "Menunggu" selalu di atas.
-        $status = $request->query('status');
-
-        $query = AbsensiPelatih::with('pelatih')
-            ->whereIn('id_pelatih', $pelatihIds);
-
-        if (in_array($status, ['Menunggu', 'Divalidasi', 'Ditolak'], true)) {
-            $query->where('status_validasi', $status);
-        }
-
-        $laporan = $query
+        $laporan = AbsensiPelatih::with('pelatih')
+            ->whereIn('id_pelatih', $pelatihIds)
             ->orderByRaw("status_validasi = 'Menunggu' desc")
             ->latest('tanggal_absensi')
-            ->paginate(15)
-            ->withQueryString();
+            ->paginate(15);
 
         $pendingCount = AbsensiPelatih::whereIn('id_pelatih', $pelatihIds)
             ->where('status_validasi', 'Menunggu')
             ->count();
 
-        $divalidasiCount = AbsensiPelatih::whereIn('id_pelatih', $pelatihIds)
-            ->where('status_validasi', 'Divalidasi')
-            ->count();
-
-        $ditolakCount = AbsensiPelatih::whereIn('id_pelatih', $pelatihIds)
-            ->where('status_validasi', 'Ditolak')
-            ->count();
-
-        // Ringkasan kehadiran (hadir/izin/sakit/alpha) dari laporan yang masuk,
-        // supaya pembina langsung lihat pola melatih/tidaknya tanpa buka satu-satu.
-        $kehadiranSummary = AbsensiPelatih::whereIn('id_pelatih', $pelatihIds)
-            ->selectRaw('status_kehadiran, count(*) as total')
-            ->groupBy('status_kehadiran')
-            ->pluck('total', 'status_kehadiran');
-
         return view('pembina.validasi-pelatih.index', [
             'laporan' => $laporan,
             'pendingCount' => $pendingCount,
-            'divalidasiCount' => $divalidasiCount,
-            'ditolakCount' => $ditolakCount,
-            'kehadiranSummary' => $kehadiranSummary,
-            'statusAktif' => $status,
         ]);
     }
 
     /**
-     * Use case: memvalidasi absensi pelatih -> lihat detail laporan sebelum
-     * memutuskan status validasi. Pembina hanya boleh mengubah status_validasi
-     * dan catatan_validasi, bukan isi laporan kehadiran itu sendiri (itu milik Ketua).
+     * Use case: memvalidasi absensi pelatih -> arahkan ke halaman/form pengeditan.
+     * (Laporan absensi dibuat oleh admin; pembina hanya memvalidasi/mengoreksi.)
      */
     public function edit(AbsensiPelatih $absensiPelatih)
     {
@@ -97,33 +68,34 @@ class AbsensiPelatihController extends Controller
 
         return view('pembina.validasi-pelatih.edit', [
             'absensiPelatih' => $absensiPelatih,
+            'pelatihs' => $this->pelatihUntukPembina(),
         ]);
     }
 
     /**
-     * Simpan keputusan validasi (status_validasi + catatan_validasi) untuk sebuah laporan.
+     * Simpan perubahan laporan absensi pelatih.
      */
     public function update(Request $request, AbsensiPelatih $absensiPelatih)
     {
         $validated = $request->validate([
+            'id_pelatih' => ['required', 'exists:pelatih,id_pelatih'],
+            'tanggal_absensi' => ['required', 'date'],
+            'kegiatan' => ['nullable', 'string', 'max:100'],
             'status_validasi' => ['required', 'in:Menunggu,Divalidasi,Ditolak'],
-            'catatan_validasi' => ['nullable', 'string', 'max:500'],
+        ], [
+            'id_pelatih.required' => 'Pelatih wajib dipilih.',
+            'tanggal_absensi.required' => 'Tanggal wajib diisi.',
         ]);
 
-        $pembina = Pembina::where('id_user', Auth::id())->first();
-
-        $absensiPelatih->update($validated + [
-            'id_pembina_validasi' => $pembina->id_pembina ?? $absensiPelatih->id_pembina_validasi,
-            'tgl_validasi' => now(),
-        ]);
+        $absensiPelatih->update($validated);
 
         return redirect()
             ->route('pembina.validasi.index')
-            ->with('success', 'Validasi absensi pelatih berhasil disimpan.');
+            ->with('success', 'Laporan absensi pelatih berhasil diperbarui.');
     }
 
     /**
-     * Hapus laporan absensi pelatih (mis. laporan ganda/keliru).
+     * Hapus laporan absensi pelatih (dikonfirmasi via popup di halaman dashboard).
      */
     public function destroy(AbsensiPelatih $absensiPelatih)
     {

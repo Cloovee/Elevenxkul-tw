@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Pembina;
+
+use App\Http\Controllers\Controller;
 
 use App\Models\Pembina;
 use Illuminate\Http\Request;
