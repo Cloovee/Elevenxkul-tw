@@ -7,6 +7,7 @@ use App\Models\Ekskul;
 use App\Models\Siswa;
 use App\Models\User;
 use App\Models\Pembina;
+use App\Models\Kelas; 
 
 
 class DashAdminController extends Controller
@@ -20,6 +21,7 @@ class DashAdminController extends Controller
         $recentEkskuls = Ekskul::latest()->take(5)->get();
         $totalSiswa = Siswa::count();
         $totalPembina = Pembina::count();
+        $totalKelas = Kelas::count(); 
         
         
         $recentEkskuls = Ekskul::with(['pembina'])

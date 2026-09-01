@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\PembinaController;
 use App\Http\Controllers\Admin\EkskulController;
 use App\Http\Controllers\Admin\PembinaController as AdminPembinaController;
+use App\Http\Controllers\Admin\KelasController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -118,6 +119,15 @@ Route::prefix('/admin')
             Route::get('/{id}/edit', [PembinaController::class, 'edit'])->name('edit');
             Route::put('/{id}', [PembinaController::class, 'update'])->name('update');
             Route::delete('/{id}', [PembinaController::class, 'destroy'])->name('destroy');
+        });
+
+        Route::prefix('/kelas')->name('kelas.')->group(function () {
+            Route::get('/', [KelasController::class, 'index'])->name('index');
+            Route::get('/create', [KelasController::class, 'create'])->name('create');
+            Route::post('/store', [KelasController::class, 'store'])->name('store');
+            Route::get('/{id}/edit', [KelasController::class, 'edit'])->name('edit');
+            Route::put('/{id}', [KelasController::class, 'update'])->name('update');
+            Route::delete('/{id}', [KelasController::class, 'destroy'])->name('destroy');
         });
 
         // Kelola Ekskul — pakai resource, otomatis generate semua route CRUD
