@@ -31,4 +31,28 @@ class Pembina extends Model
     {
         return $this->hasMany(Ekskul::class, 'id_pembina', 'id_pembina');
     }
+
+    /**
+     * Semua pelatih dari ekskul-ekskul yang dibina oleh pembina ini.
+     * Dipakai untuk membatasi data pada halaman validasi absensi pelatih.
+     */
+    public function pelatihs()
+    {
+        return Pelatih::whereIn(
+            'id_pelatih',
+            $this->ekskuls()->whereNotNull('id_pelatih')->pluck('id_pelatih')
+        );
+    }
+
+    /**
+     * Laporan absensi pelatih yang perlu/​sudah divalidasi oleh pembina ini
+     * (absensi milik pelatih dari ekskul yang dibina).
+     */
+    public function absensiPelatih()
+    {
+        return AbsensiPelatih::whereIn(
+            'id_pelatih',
+            $this->ekskuls()->whereNotNull('id_pelatih')->pluck('id_pelatih')
+        );
+    }
 }

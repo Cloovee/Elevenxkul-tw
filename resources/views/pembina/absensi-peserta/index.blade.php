@@ -41,14 +41,13 @@
                         <div class="font-display text-xl font-bold text-[#1F7A3D]">{{ $hadirBulanIni }}/{{ $totalBulanIni }}</div>
                         <div class="text-[11px] text-inksoft">Hadir bulan ini</div>
                     </div>
-                    <a href="{{ route('pembina.absensi.create') }}"
-                       class="inline-flex items-center gap-1.5 bg-[#1F7A3D] hover:bg-[#186531] text-white font-bold text-sm px-4 py-2.5 rounded-xl shadow-md shadow-[#1F7A3D]/20 transition-all hover:-translate-y-0.5">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                        Tambah Absensi
-                    </a>
                 </div>
             </div>
-            <a href="{{ route('pembina.validasi.index') }}" class="relative inline-flex items-center gap-1 text-xs font-semibold text-[#1F7A3D] mt-4 hover:underline">
+            <p class="relative text-xs text-inksoft mt-4 flex items-center gap-1.5">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" class="shrink-0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                Data ini otomatis terisi dari input absensi peserta yang dilakukan Ketua.
+            </p>
+            <a href="{{ route('pembina.validasi.index') }}" class="relative inline-flex items-center gap-1 text-xs font-semibold text-[#1F7A3D] mt-2 hover:underline">
                 Lihat validasi absensi pelatih
                 <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
             </a>
@@ -97,10 +96,6 @@
                             </td>
                             <td class="py-2.5 px-2">
                                 <div class="flex gap-2">
-                                    <a href="{{ route('pembina.absensi.edit', $a) }}"
-                                       class="w-[30px] h-[30px] rounded-lg bg-sky text-[#1E6FA8] flex items-center justify-center">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
-                                    </a>
                                     <form id="delete-absensi-{{ $a->id_absensi }}" method="POST" action="{{ route('pembina.absensi.destroy', $a) }}" class="hidden">
                                         @csrf
                                         @method('DELETE')
@@ -122,8 +117,7 @@
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 12h6M9 16h6M9 8h1"/></svg>
                                     </div>
                                     <p class="text-sm font-semibold text-ink">Belum ada data absensi peserta</p>
-                                    <p class="text-xs text-inksoft max-w-xs">Data akan muncul di sini setelah kamu mencatat kehadiran peserta.</p>
-                                    <a href="{{ route('pembina.absensi.create') }}" class="mt-1 text-xs font-bold text-[#1F7A3D] hover:underline">+ Tambah absensi pertama</a>
+                                    <p class="text-xs text-inksoft max-w-xs">Data akan muncul di sini setelah Ketua mencatat kehadiran peserta.</p>
                                 </div>
                             </td>
                         </tr>

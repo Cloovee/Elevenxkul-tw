@@ -41,17 +41,56 @@
                         <div class="font-display text-xl font-bold text-[#1E6FA8]">{{ $pendingCount }}</div>
                         <div class="text-[11px] text-inksoft">Menunggu tindakan</div>
                     </div>
-                    <a href="{{ route('pembina.validasi.create') }}"
-                       class="inline-flex items-center gap-1.5 bg-[#1E6FA8] hover:bg-[#185b8a] text-white font-bold text-sm px-4 py-2.5 rounded-xl shadow-md shadow-[#1E6FA8]/20 transition-all hover:-translate-y-0.5">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                        Tambah Laporan
-                    </a>
                 </div>
             </div>
-            <a href="{{ route('pembina.absensi.index') }}" class="relative inline-flex items-center gap-1 text-xs font-semibold text-[#1E6FA8] mt-4 hover:underline">
+            <p class="relative text-xs text-inksoft mt-4 flex items-center gap-1.5">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" class="shrink-0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                Laporan kehadiran pelatih diisi oleh Ketua. Tugas kamu di sini hanya menyetujui atau menolaknya.
+            </p>
+            <a href="{{ route('pembina.absensi.index') }}" class="relative inline-flex items-center gap-1 text-xs font-semibold text-[#1E6FA8] mt-2 hover:underline">
                 Lihat absensi peserta
                 <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
             </a>
+        </div>
+
+        {{-- RINGKASAN KEHADIRAN — hadir / izin / sakit / alpha --}}
+        <div class="animate-fade-in-up animate-delay-1 grid grid-cols-2 sm:grid-cols-4 gap-3">
+            @php
+                $kehadiranLabel = ['hadir' => 'Hadir', 'izin' => 'Izin', 'sakit' => 'Sakit', 'alpha' => 'Tidak Melatih'];
+                $kehadiranColor = [
+                    'hadir' => 'bg-mint text-[#1F7A3D]',
+                    'izin' => 'bg-sky text-[#1E6FA8]',
+                    'sakit' => 'bg-yellow-100 text-yellow-700',
+                    'alpha' => 'bg-red-100 text-red-500',
+                ];
+            @endphp
+            @foreach ($kehadiranLabel as $key => $label)
+                <div class="bg-white rounded-2xl p-4 shadow-[0_10px_30px_-18px_rgba(46,43,85,0.25)] flex items-center justify-between">
+                    <div>
+                        <p class="text-[11px] font-semibold text-inksoft">{{ $label }}</p>
+                        <p class="font-display text-lg font-bold text-ink">{{ $kehadiranSummary[$key] ?? 0 }}</p>
+                    </div>
+                    <span class="text-[10px] font-bold px-2 py-1 rounded-full {{ $kehadiranColor[$key] }}">{{ strtoupper($key) }}</span>
+                </div>
+            @endforeach
+        </div>
+
+        {{-- FILTER STATUS VALIDASI --}}
+        <div class="animate-fade-in-up animate-delay-1 flex flex-wrap gap-2">
+            @php
+                $tabs = [
+                    null => 'Semua',
+                    'Menunggu' => 'Menunggu ('.$pendingCount.')',
+                    'Divalidasi' => 'Divalidasi ('.$divalidasiCount.')',
+                    'Ditolak' => 'Ditolak ('.$ditolakCount.')',
+                ];
+            @endphp
+            @foreach ($tabs as $value => $label)
+                <a href="{{ route('pembina.validasi.index', $value ? ['status' => $value] : []) }}"
+                   class="text-xs font-semibold px-3.5 py-2 rounded-xl transition-colors {{ $statusAktif === $value ? 'bg-[#1E6FA8] text-white' : 'bg-white text-inksoft hover:bg-sky/40' }}">
+                    {{ $label }}
+                </a>
+            @endforeach
         </div>
 
         {{-- TABLE --}}
@@ -64,7 +103,8 @@
                         <th class="text-left py-2 px-2 border-b border-[#EFEFF7]">Pelatih</th>
                         <th class="text-left py-2 px-2 border-b border-[#EFEFF7]">Kegiatan</th>
                         <th class="text-left py-2 px-2 border-b border-[#EFEFF7]">Tanggal</th>
-                        <th class="text-left py-2 px-2 border-b border-[#EFEFF7]">Status</th>
+                        <th class="text-left py-2 px-2 border-b border-[#EFEFF7]">Melatih?</th>
+                        <th class="text-left py-2 px-2 border-b border-[#EFEFF7]">Validasi</th>
                         <th class="text-left py-2 px-2 border-b border-[#EFEFF7]">Aksi</th>
                     </tr>
                 </thead>
@@ -81,6 +121,28 @@
                             </td>
                             <td class="py-2.5 px-2 text-inksoft">{{ $v->kegiatan ?? '-' }}</td>
                             <td class="py-2.5 px-2 text-inksoft">{{ optional($v->tanggal_absensi)->translatedFormat('d M Y') }}</td>
+                            <td class="py-2.5 px-2">
+                                @php
+                                    $kClass = match($v->status_kehadiran) {
+                                        'hadir' => 'bg-mint text-[#1F7A3D]',
+                                        'izin' => 'bg-sky text-[#1E6FA8]',
+                                        'sakit' => 'bg-yellow-100 text-yellow-700',
+                                        'alpha' => 'bg-red-100 text-red-500',
+                                        default => 'bg-gray-100 text-gray-600',
+                                    };
+                                    $kLabel = match($v->status_kehadiran) {
+                                        'hadir' => 'Hadir',
+                                        'izin' => 'Izin',
+                                        'sakit' => 'Sakit',
+                                        'alpha' => 'Tidak Melatih',
+                                        default => '-',
+                                    };
+                                @endphp
+                                <span class="text-[11px] font-bold px-2.5 py-1 rounded-full {{ $kClass }}">{{ $kLabel }}</span>
+                                @if ($v->foto_kehadiran)
+                                    <a href="{{ \Illuminate\Support\Facades\Storage::url($v->foto_kehadiran) }}" target="_blank" class="block text-[10px] text-[#1E6FA8] font-semibold mt-1 hover:underline">Lihat foto</a>
+                                @endif
+                            </td>
                             <td class="py-2.5 px-2">
                                 @php
                                     $vClass = match($v->status_validasi) {
@@ -109,9 +171,9 @@
                                             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                                         </button>
                                     </form>
-                                    <a href="{{ route('pembina.validasi.edit', $v) }}" title="Edit"
+                                    <a href="{{ route('pembina.validasi.edit', $v) }}" title="Lihat detail &amp; validasi"
                                        class="w-[30px] h-[30px] rounded-lg bg-sky text-[#1E6FA8] flex items-center justify-center">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                                     </a>
                                     <form id="delete-validasi-{{ $v->id_absensi }}" method="POST" action="{{ route('pembina.validasi.destroy', $v) }}" class="hidden">
                                         @csrf
@@ -128,14 +190,13 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="py-12">
+                            <td colspan="6" class="py-12">
                                 <div class="flex flex-col items-center justify-center text-center gap-2">
                                     <div class="w-14 h-14 rounded-2xl bg-sky/60 text-[#1E6FA8] flex items-center justify-center mb-1">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                     </div>
                                     <p class="text-sm font-semibold text-ink">Belum ada laporan untuk divalidasi</p>
-                                    <p class="text-xs text-inksoft max-w-xs">Laporan absensi pelatih akan muncul di sini untuk kamu setujui atau tolak.</p>
-                                    <a href="{{ route('pembina.validasi.create') }}" class="mt-1 text-xs font-bold text-[#1E6FA8] hover:underline">+ Tambah laporan pertama</a>
+                                    <p class="text-xs text-inksoft max-w-xs">Laporan absensi pelatih dari Ketua akan muncul di sini untuk kamu setujui atau tolak.</p>
                                 </div>
                             </td>
                         </tr>

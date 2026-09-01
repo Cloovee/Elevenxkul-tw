@@ -29,24 +29,17 @@ Route::prefix('pembina')->middleware('auth')->name('pembina.')->group(function (
     Route::prefix('profile')->name('profile.')->group(function () {
         Route::get('/', [PembinaProfileController::class, 'index'])->name('index');
         Route::patch('/', [PembinaProfileController::class, 'update'])->name('update');
-        Route::patch('/password', [PembinaProfileController::class, 'updatePassword'])->name('password');
     });
 
-    // ===== CRUD: Melihat & mengelola Absensi Peserta =====
+    // ===== Menampilkan Absensi Peserta (read-only, data diisi oleh Ketua) =====
     Route::prefix('absensi-peserta')->name('absensi.')->group(function () {
         Route::get('/', [AbsensiPesertaController::class, 'index'])->name('index');
-        Route::get('/create', [AbsensiPesertaController::class, 'create'])->name('create');
-        Route::post('/', [AbsensiPesertaController::class, 'store'])->name('store');
-        Route::get('/{absensiPeserta}/edit', [AbsensiPesertaController::class, 'edit'])->name('edit');
-        Route::put('/{absensiPeserta}', [AbsensiPesertaController::class, 'update'])->name('update');
         Route::delete('/{absensiPeserta}', [AbsensiPesertaController::class, 'destroy'])->name('destroy');
     });
 
-    // ===== CRUD: Memvalidasi Absensi Pelatih =====
+    // ===== Memvalidasi Absensi Pelatih (laporan diisi oleh Ketua) =====
     Route::prefix('validasi-pelatih')->name('validasi.')->group(function () {
         Route::get('/', [AbsensiPelatihController::class, 'index'])->name('index');
-        Route::get('/create', [AbsensiPelatihController::class, 'create'])->name('create');
-        Route::post('/', [AbsensiPelatihController::class, 'store'])->name('store');
         Route::get('/{absensiPelatih}/edit', [AbsensiPelatihController::class, 'edit'])->name('edit');
         Route::put('/{absensiPelatih}', [AbsensiPelatihController::class, 'update'])->name('update');
         Route::delete('/{absensiPelatih}', [AbsensiPelatihController::class, 'destroy'])->name('destroy');
@@ -145,13 +138,17 @@ Route::get('/dashboard-ketua', function () {
     return view('dashboard-ketua.index');
 })->middleware(['auth', 'verified', 'role:Ketua'])->name('dashboard.ketua');
 
-Route::get('/absensi-pelatih', function () {
-    return view('dashboard-ketua.absensi-pelatih');
-})->middleware(['auth', 'verified'])->name('ketua.absensi-pelatih');
+Route::middleware(['auth', 'verified', 'role:Ketua'])->group(function () {
+    Route::get('/absensi-pelatih', [\App\Http\Controllers\Ketua\AbsensiPelatihController::class, 'index'])
+        ->name('ketua.absensi-pelatih');
+    Route::post('/absensi-pelatih', [\App\Http\Controllers\Ketua\AbsensiPelatihController::class, 'store'])
+        ->name('ketua.absensi-pelatih.store');
 
-Route::get('/absensi-peserta', function () {
-    return view('dashboard-ketua.absensi-peserta');
-})->middleware(['auth', 'verified'])->name('ketua.absensi-peserta');
+    Route::get('/absensi-peserta', [\App\Http\Controllers\Ketua\AbsensiPesertaController::class, 'index'])
+        ->name('ketua.absensi-peserta');
+    Route::post('/absensi-peserta', [\App\Http\Controllers\Ketua\AbsensiPesertaController::class, 'store'])
+        ->name('ketua.absensi-peserta.store');
+});
 
 Route::get('/kelola-anggota', function () {
     $anggota = [

@@ -27,19 +27,6 @@ class AbsensiPesertaController extends Controller
             ->with('error', 'Akun Anda belum terhubung dengan data pembina. Hubungi admin untuk menghubungkan akun Anda.');
     }
 
-    private function pesertaUntukPembina()
-    {
-        $pembina = Pembina::where('id_user', Auth::id())->first();
-        $ekskulIds = $pembina ? $pembina->ekskuls()->pluck('id_ekskul') : collect();
-
-        return Peserta::with('siswa.kelas')
-            ->whereIn('id_ekskul', $ekskulIds)
-            ->where('status', 'aktif')
-            ->get()
-            ->sortBy('nama')
-            ->values();
-    }
-
     /**
      * Use case: melihat absensi peserta -> halaman daftar absensi (terpisah dari dashboard).
      */
@@ -76,83 +63,14 @@ class AbsensiPesertaController extends Controller
     }
 
     /**
-     * Use case: melihat absensi peserta -> tampilkan form tambah data absensi.
+     * Catatan: Absensi Peserta TIDAK bisa ditambahkan/diubah dari sisi Pembina.
+     * Data ini murni hasil input dari halaman "Absensi Peserta" milik Ketua.
+     * Pembina hanya menampilkan (read-only) riwayat kehadiran peserta di sini.
+     * Aksi yang tersisa untuk pembina hanyalah menghapus data yang keliru/ganda.
      */
-    public function create()
-    {
-        return view('pembina.absensi-peserta.create', [
-            'pesertas' => $this->pesertaUntukPembina(),
-        ]);
-    }
 
     /**
-     * Simpan data absensi peserta baru.
-     */
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'id_anggota' => ['required', 'exists:data_anggota,id_anggota'],
-            'tanggal_absensi' => ['required', 'date'],
-            'status_kehadiran' => ['required', 'in:hadir,izin,sakit,alpha'],
-            'deskripsi_kegiatan' => ['nullable', 'string'],
-        ], [
-            'id_anggota.required' => 'Peserta wajib dipilih.',
-            'tanggal_absensi.required' => 'Tanggal wajib diisi.',
-        ]);
-
-        AbsensiPeserta::updateOrCreate(
-            [
-                'id_anggota' => $validated['id_anggota'],
-                'tanggal_absensi' => $validated['tanggal_absensi'],
-            ],
-            [
-                'status_kehadiran' => $validated['status_kehadiran'],
-                'deskripsi_kegiatan' => $validated['deskripsi_kegiatan'] ?? null,
-            ]
-        );
-
-        return redirect()
-            ->route('pembina.absensi.index')
-            ->with('success', 'Data absensi peserta berhasil ditambahkan.');
-    }
-
-    /**
-     * Use case: melihat absensi peserta -> arahkan ke halaman/form pengeditan.
-     */
-    public function edit(AbsensiPeserta $absensiPeserta)
-    {
-        $absensiPeserta->load('peserta.siswa.kelas');
-
-        return view('pembina.absensi-peserta.edit', [
-            'absensiPeserta' => $absensiPeserta,
-            'pesertas' => $this->pesertaUntukPembina(),
-        ]);
-    }
-
-    /**
-     * Simpan perubahan data absensi peserta.
-     */
-    public function update(Request $request, AbsensiPeserta $absensiPeserta)
-    {
-        $validated = $request->validate([
-            'id_anggota' => ['required', 'exists:data_anggota,id_anggota'],
-            'tanggal_absensi' => ['required', 'date'],
-            'status_kehadiran' => ['required', 'in:hadir,izin,sakit,alpha'],
-            'deskripsi_kegiatan' => ['nullable', 'string'],
-        ], [
-            'id_anggota.required' => 'Peserta wajib dipilih.',
-            'tanggal_absensi.required' => 'Tanggal wajib diisi.',
-        ]);
-
-        $absensiPeserta->update($validated);
-
-        return redirect()
-            ->route('pembina.absensi.index')
-            ->with('success', 'Data absensi peserta berhasil diperbarui.');
-    }
-
-    /**
-     * Hapus data absensi peserta.
+     * Hapus data absensi peserta (mis. data ganda/keliru dari input Ketua).
      */
     public function destroy(AbsensiPeserta $absensiPeserta)
     {
