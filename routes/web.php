@@ -124,14 +124,6 @@ Route::prefix('/admin')
 | KETUA ROUTES
 |--------------------------------------------------------------------------
 */
-Route::prefix('/ketua')
-    ->middleware(['auth', 'verified', 'role:Ketua'])
-    ->name('ketua.')
-    ->group(function () {
-        Route::get('/dashboard', function () {
-            return view('ketua.dashboard');
-        })->name('dashboard');
-    });
 
 // 5. Dashboard Ketua
 Route::get('/dashboard-ketua', function () {
