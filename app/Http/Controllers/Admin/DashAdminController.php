@@ -38,4 +38,4 @@ class DashAdminController extends Controller
         ));
 
     }
-}
+}                           

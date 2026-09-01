@@ -88,15 +88,18 @@ Route::prefix('/admin')
             Route::get('/', [SiswaController::class, 'index'])->name('index');
             Route::get('/create', [SiswaController::class, 'create'])->name('create');
             Route::post('/store', [SiswaController::class, 'store'])->name('store');
-            Route::get('/{id}', [SiswaController::class, 'show'])->name('show');
-            Route::get('/{id}/edit', [SiswaController::class, 'edit'])->name('edit');
-            Route::put('/{id}', [SiswaController::class, 'update'])->name('update');
-            Route::delete('/{id}', [SiswaController::class, 'destroy'])->name('destroy');
 
+            // Route spesifik (nama tetap, bukan wildcard) HARUS di atas /{id}
             Route::get('/import', [SiswaController::class, 'showImportForm'])->name('import.form');
             Route::post('/import', [SiswaController::class, 'import'])->name('import');
             Route::get('/export', [SiswaController::class, 'export'])->name('export');
             Route::get('/template', [SiswaController::class, 'downloadTemplate'])->name('template');
+
+            // Wildcard /{id} ditaruh PALING BAWAH, biar nggak "nyerobot" route di atasnya
+            Route::get('/{id}', [SiswaController::class, 'show'])->name('show');
+            Route::get('/{id}/edit', [SiswaController::class, 'edit'])->name('edit');
+            Route::put('/{id}', [SiswaController::class, 'update'])->name('update');
+            Route::delete('/{id}', [SiswaController::class, 'destroy'])->name('destroy');
         });
 
         Route::prefix('/user')->name('user.')->group(function () {
