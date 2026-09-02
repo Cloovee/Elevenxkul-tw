@@ -33,26 +33,33 @@
                         <h2 class="font-semibold text-gray-800 border-b border-gray-100 pb-3 mb-4">Daftar Anggota</h2>
 
                         <div class="space-y-2">
-                            @foreach ($anggota as $item)
-                                <a href="{{ route('ketua.kelola-anggota.detail', $item['id']) }}"
+                            @forelse ($anggota as $item)
+                                <a href="{{ route('ketua.kelola-anggota.detail', $item->id_anggota) }}"
                                    class="flex items-center justify-between gap-4 bg-white rounded-2xl px-4 py-3 shadow-sm ring-1 ring-black/5 hover:shadow-md transition"
                                 >
                                     <div class="flex items-center gap-3">
                                         <div class="w-10 h-10 rounded-full bg-gradient-to-br from-periwinkle to-sky flex items-center justify-center text-white font-semibold text-sm">
-                                            {{ strtoupper(substr($item['nama'], 0, 1)) }}
+                                            {{ strtoupper(substr($item->siswa->nama_siswa, 0, 1)) }}
                                         </div>
-                                        <p class="font-medium text-gray-800">{{ $item['nama'] }}</p>
+
+                                        <p class="font-medium text-gray-800">
+                                            {{ $item->siswa->nama_siswa }}
+                                        </p>
                                     </div>
 
-                                    <span class="text-xs font-medium px-3 py-1 rounded-full {{ $item['status'] === 'aktif' ? 'bg-mint/50 text-emerald-700' : 'bg-gray-100 text-gray-500' }}">
-                                        {{ ucfirst($item['status']) }}
+                                    <span class="text-xs font-medium px-3 py-1 rounded-full {{ $item->status === 'aktif' ? 'bg-mint/50 text-emerald-700' : 'bg-gray-100 text-gray-500' }}">
+                                        {{ ucfirst($item->status) }}
                                     </span>
                                 </a>
-                            @endforeach
+                            @empty
+                                <div class="text-center py-10 text-gray-400">
+                                    Belum ada anggota.
+                                </div>
+                            @endforelse
                         </div>
 
                         <!-- Tombol tambah, mengambang di kanan bawah -->
-                        <a href="#"
+                        <a href="{{ route('ketua.kelola-anggota.tambah') }}"
                            class="absolute bottom-6 right-6 w-14 h-14 rounded-full bg-gradient-to-br from-periwinkle to-sky flex items-center justify-center text-white shadow-lg shadow-periwinkle/40 hover:opacity-90 transition"
                            title="Tambah anggota"
                         >

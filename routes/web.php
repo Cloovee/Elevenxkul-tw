@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\EkskulController;
 use App\Http\Controllers\Admin\PembinaController as AdminPembinaController;
 use App\Http\Controllers\Admin\KelasController;
 use Illuminate\Support\Facades\Route;
+use App\Models\Peserta;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -163,26 +164,102 @@ Route::get('/absensi-peserta', function () {
 })->middleware(['auth', 'verified'])->name('ketua.absensi-peserta');
 
 Route::get('/kelola-anggota', function () {
-    $anggota = [
-        ['id' => 1, 'nama' => 'Raka Pratama', 'nis' => '2023001', 'tanggal_bergabung' => '12 Jan 2026', 'status' => 'aktif'],
-        ['id' => 2, 'nama' => 'Dinda Ayu', 'nis' => '2023002', 'tanggal_bergabung' => '15 Jan 2026', 'status' => 'aktif'],
-        ['id' => 3, 'nama' => 'Bagas Wirawan', 'nis' => '2023003', 'tanggal_bergabung' => '20 Feb 2026', 'status' => 'tidak aktif'],
-    ];
 
-    return view('dashboard-ketua.kelola-anggota.index', compact('anggota'));
-})->middleware(['auth', 'verified'])->name('ketua.kelola-anggota');
+    $anggota = Peserta::with('siswa')->get();
+
+    return view(
+        'dashboard-ketua.kelola-anggota.index',
+        compact('anggota')
+    );
+
+})->middleware(['auth', 'verified', 'role:Ketua'])
+  ->name('ketua.kelola-anggota');
+
+
+Route::get('/kelola-anggota', function () {
+
+    $anggota = Peserta::with('siswa')
+        ->where('id_ekskul', 1)
+        ->get();
+
+    return view(
+        'dashboard-ketua.kelola-anggota.index',
+        compact('anggota')
+    );
+
+})->middleware(['auth', 'verified', 'role:Ketua'])
+  ->name('ketua.kelola-anggota');
+
+
+Route::get('/kelola-anggota/tambah', function () {
+    return view('dashboard-ketua.kelola-anggota.tambah');
+})->middleware(['auth', 'verified', 'role:Ketua'])
+  ->name('ketua.kelola-anggota.tambah');
+
+
+Route::post('/kelola-anggota/tambah', function (\Illuminate\Http\Request $request) {
+
+    $request->validate([
+        'nama' => ['required', 'string'],
+        'nis' => ['required', 'string'],
+    ]);
+
+    // Cari siswa berdasarkan nama dan NIS
+    $siswa = \App\Models\Siswa::where('nama_siswa', $request->nama)
+        ->where('NIS', $request->nis)
+        ->first();
+
+    // Jika siswa tidak ditemukan
+    if (!$siswa) {
+        return back()
+            ->withInput()
+            ->with('error', 'Siswa dengan nama dan NIS tersebut tidak ditemukan.');
+    }
+
+    // Sementara: Ketua mengelola Basket
+    $idEkskul = 1;
+
+    // Cek apakah siswa sudah menjadi anggota Basket
+    $sudahAnggota = \App\Models\Peserta::where('id_siswa', $siswa->id_siswa)
+        ->where('id_ekskul', $idEkskul)
+        ->exists();
+
+    if ($sudahAnggota) {
+        return back()
+            ->withInput()
+            ->with('error', 'Siswa tersebut sudah menjadi anggota ekskul ini.');
+    }
+
+    // Simpan anggota baru
+    \App\Models\Peserta::create([
+        'id_siswa' => $siswa->id_siswa,
+        'id_ekskul' => $idEkskul,
+        'tanggal_bergabung' => now(),
+        'status' => 'aktif',
+    ]);
+
+    return redirect()
+        ->route('ketua.kelola-anggota')
+        ->with('success', 'Anggota berhasil ditambahkan.');
+
+})->middleware(['auth', 'verified', 'role:Ketua'])
+  ->name('ketua.kelola-anggota.store');
+
 
 Route::get('/kelola-anggota/{id}', function ($id) {
-    $daftar = [
-        1 => ['nama' => 'Raka Pratama', 'nis' => '2023001', 'tanggal_bergabung' => '2026-01-12', 'status' => 'aktif'],
-        2 => ['nama' => 'Dinda Ayu', 'nis' => '2023002', 'tanggal_bergabung' => '2026-01-15', 'status' => 'aktif'],
-        3 => ['nama' => 'Bagas Wirawan', 'nis' => '2023003', 'tanggal_bergabung' => '2026-02-20', 'status' => 'tidak aktif'],
-    ];
 
-    $anggota = $daftar[$id] ?? abort(404);
+    $anggota = \App\Models\Peserta::with('siswa')
+        ->where('id_anggota', $id)
+        ->where('id_ekskul', 1)
+        ->firstOrFail();
 
-    return view('dashboard-ketua.kelola-anggota.detail', compact('anggota', 'id'));
-})->middleware(['auth', 'verified'])->name('ketua.kelola-anggota.detail');
+    return view(
+        'dashboard-ketua.kelola-anggota.detail',
+        compact('anggota')
+    );
+
+})->middleware(['auth', 'verified', 'role:Ketua'])
+  ->name('ketua.kelola-anggota.detail');
 
 /*
 |--------------------------------------------------------------------------
