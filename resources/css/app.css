@@ -46,3 +46,20 @@
 .animate-delay-4 { animation-delay: 0.2s; }
 .animate-delay-5 { animation-delay: 0.25s; }
 .animate-delay-6 { animation-delay: 0.3s; }
+
+/*
+ * Fix: autofill Chrome/Safari menimpa background input dengan warna birunya
+ * sendiri dan itu mengabaikan border-radius, jadi sudut input terlihat
+ * kotak walau sudah diberi class rounded-*. Ini memaksa autofill memakai
+ * warna kita sendiri lewat trik box-shadow inset raksasa.
+ */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 1000px #FFFFFF inset;
+    box-shadow: 0 0 0 1000px #FFFFFF inset;
+    -webkit-text-fill-color: #2E2B55;
+    caret-color: #2E2B55;
+    transition: background-color 9999s ease-in-out 0s;
+}
