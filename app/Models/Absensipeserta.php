@@ -14,6 +14,7 @@ class AbsensiPeserta extends Model
         'id_anggota',
         'tanggal_absensi',
         'status_kehadiran',
+        'catatan',
         'deskripsi_kegiatan',
     ];
 

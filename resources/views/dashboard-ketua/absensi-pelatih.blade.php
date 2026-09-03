@@ -139,60 +139,6 @@
                         </div>
                     </form>
 
-                    <!-- Riwayat -->
-                    <div class="bg-white rounded-3xl shadow-xl shadow-black/5 ring-1 ring-black/5 p-6">
-                        <h2 class="font-semibold text-gray-800 border-b border-gray-100 pb-3 mb-4">Riwayat Laporan yang Dikirim</h2>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-sm border-collapse min-w-[600px]">
-                                <thead>
-                                    <tr class="text-gray-400 text-[11px] uppercase tracking-wide">
-                                        <th class="text-left py-2 px-2">Pelatih</th>
-                                        <th class="text-left py-2 px-2">Tanggal</th>
-                                        <th class="text-left py-2 px-2">Kehadiran</th>
-                                        <th class="text-left py-2 px-2">Status Validasi</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @forelse ($riwayat as $r)
-                                        <tr class="border-t border-gray-100">
-                                            <td class="py-2.5 px-2 font-medium text-gray-700">{{ $r->pelatih->nama_pelatih ?? '-' }}</td>
-                                            <td class="py-2.5 px-2 text-gray-500">{{ optional($r->tanggal_absensi)->translatedFormat('d M Y') }}</td>
-                                            <td class="py-2.5 px-2">
-                                                @php
-                                                    $kClass = match($r->status_kehadiran) {
-                                                        'hadir' => 'bg-mint text-[#1F7A3D]',
-                                                        'izin' => 'bg-sky text-[#1E6FA8]',
-                                                        'sakit' => 'bg-yellow-100 text-yellow-700',
-                                                        'alpha' => 'bg-red-100 text-red-500',
-                                                        default => 'bg-gray-100 text-gray-600',
-                                                    };
-                                                @endphp
-                                                <span class="text-[11px] font-bold px-2.5 py-1 rounded-full {{ $kClass }}">{{ ucfirst($r->status_kehadiran) }}</span>
-                                            </td>
-                                            <td class="py-2.5 px-2">
-                                                @php
-                                                    $vClass = match($r->status_validasi) {
-                                                        'Divalidasi' => 'bg-mint text-[#1F7A3D]',
-                                                        'Ditolak' => 'bg-red-100 text-red-500',
-                                                        default => 'bg-sky text-[#1E6FA8]',
-                                                    };
-                                                @endphp
-                                                <span class="text-[11px] font-bold px-2.5 py-1 rounded-full {{ $vClass }}">{{ $r->status_validasi }}</span>
-                                            </td>
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="4" class="py-8 text-center text-sm text-gray-400">Belum ada laporan yang dikirim.</td>
-                                        </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="mt-4">
-                            {{ $riwayat->links() }}
-                        </div>
-                    </div>
-
                 </div>
             </div>
         </div>
