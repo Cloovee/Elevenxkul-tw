@@ -13,6 +13,7 @@ class Kelas extends Model
     protected $primaryKey = 'id_kelas';
 
     protected $fillable = [
+        'tingkat',
         'jurusan',
         'rombel',
     ];
@@ -20,5 +21,10 @@ class Kelas extends Model
     public function siswa()
     {
         return $this->hasMany(Siswa::class, 'id_kelas', 'id_kelas');
+    }
+
+    public function getNamaKelasAttribute(): string
+    {
+        return trim("{$this->tingkat} {$this->jurusan} - {$this->rombel}");
     }
 }

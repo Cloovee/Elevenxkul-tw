@@ -164,9 +164,9 @@ class SiswaController extends Controller
     public function downloadTemplate()
     {
         $data = [
-            ['NISN', 'NIS', 'Nama Siswa', 'Jenis Kelamin', 'Agama', 'Jurusan', 'Rombel', 'Nomor HP', 'Email', 'MedSos', 'Alamat'],
-            ['1234567890', '10001', 'Budi Santoso', 'L', 'Islam', 'IPA', '10', '08123456789', 'budi@email.com', '@budi', 'Jl. Merdeka No.1'],
-            ['1234567891', '10002', 'Siti Rahayu', 'P', 'Islam', 'IPA', '10', '08123456788', 'siti@email.com', '@siti', 'Jl. Merdeka No.2'],
+            ['NISN', 'NIS', 'Nama Siswa', 'Jenis Kelamin', 'Agama', 'Tingkat', 'Jurusan', 'Rombel', 'Nomor HP', 'Email', 'MedSos', 'Alamat'],
+            ['1234567890', '10001', 'Budi Santoso', 'L', 'Islam', 'X', 'IPA', '1', '08123456789', 'budi@email.com', '@budi', 'Jl. Merdeka No.1'],
+            ['1234567891', '10002', 'Siti Rahayu', 'P', 'Islam', 'X', 'IPA', '1', '08123456788', 'siti@email.com', '@siti', 'Jl. Merdeka No.2'],
         ];
 
         return Excel::download(

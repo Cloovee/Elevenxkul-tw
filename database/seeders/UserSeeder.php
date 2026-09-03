@@ -22,7 +22,7 @@ class UserSeeder extends Seeder
         );
 
         User::firstOrCreate(
-            ['email' => 'admin@email.com'],
+            ['email' => 'admin@test.com'],
             [
                 'name' => 'Admin',
                 'password' => Hash::make('password'),

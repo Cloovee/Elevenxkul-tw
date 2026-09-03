@@ -50,23 +50,49 @@ class SiswaImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnFai
             return null;
         }
 
-        // Tentukan kelas: cari dari jurusan+rombel di Excel,
-        // kalau belum ada di database, otomatis dibuatkan.
-        // Kalau jurusan/rombel kosong di Excel, pakai kelas default dari form.
+        // Tentukan kelas: cari dari tingkat+jurusan+rombel di Excel.
+        // WAJIB sudah ada di database (tidak lagi auto-create) — kalau belum
+        // terdaftar, baris ini gagal diimport.
+        // Kalau tingkat/jurusan/rombel kosong semua di Excel, pakai kelas
+        // default dari form.
         $idKelas = $this->idKelasDefault;
 
-        if (!empty($row['jurusan']) && !empty($row['rombel'])) {
-            $kelas = Kelas::firstOrCreate([
-                'jurusan' => trim($row['jurusan']),
-                'rombel'  => trim($row['rombel']),
-            ]);
+        $tingkat = trim($row['tingkat'] ?? '');
+        $jurusan = trim($row['jurusan'] ?? '');
+        $rombel  = trim($row['rombel'] ?? '');
+
+        $adaSebagian = $tingkat !== '' || $jurusan !== '' || $rombel !== '';
+        $lengkap = $tingkat !== '' && $jurusan !== '' && $rombel !== '';
+
+        if ($adaSebagian && !$lengkap) {
+            $this->barisError[] = [
+                'baris' => $this->totalBaris + 1,
+                'error' => "Kolom tingkat/jurusan/rombel harus diisi lengkap semua atau dikosongkan semua (pakai kelas default)"
+            ];
+            return null;
+        }
+
+        if ($lengkap) {
+            $kelas = Kelas::where('tingkat', $tingkat)
+                           ->where('jurusan', $jurusan)
+                           ->where('rombel', $rombel)
+                           ->first();
+
+            if (!$kelas) {
+                $this->barisError[] = [
+                    'baris' => $this->totalBaris + 1,
+                    'error' => "Kelas {$tingkat} {$jurusan} - {$rombel} belum terdaftar. Tambahkan dulu di menu Kelola Kelas sebelum import."
+                ];
+                return null;
+            }
+
             $idKelas = $kelas->id_kelas;
         }
 
         if (!$idKelas) {
             $this->barisError[] = [
                 'baris' => $this->totalBaris + 1,
-                'error' => "Kelas tidak ditentukan (jurusan/rombel kosong di Excel dan tidak ada kelas default dipilih)"
+                'error' => "Kelas tidak ditentukan (tingkat/jurusan/rombel kosong di Excel dan tidak ada kelas default dipilih)"
             ];
             return null;
         }

@@ -10,9 +10,12 @@ return new class extends Migration
     {
         Schema::create('kelas', function (Blueprint $table) {
             $table->id('id_kelas');
+            $table->string('tingkat', 10); // contoh: "X", "XI", "XII"
             $table->string('jurusan', 50);
             $table->string('rombel', 10);
             $table->timestamps();
+
+            $table->unique(['tingkat', 'jurusan', 'rombel']);
         });
     }
 

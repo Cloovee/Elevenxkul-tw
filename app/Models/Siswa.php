@@ -29,6 +29,6 @@ class Siswa extends Model
 
     public function getNamaKelasAttribute()
     {
-        return $this->kelas ? $this->kelas->jurusan . ' - ' . $this->kelas->rombel : '-';
+        return $this->kelas ? $this->kelas->nama_kelas : '-';
     }
 }

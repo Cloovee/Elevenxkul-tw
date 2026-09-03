@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Kelas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class KelasController extends Controller
 {
@@ -16,12 +17,13 @@ class KelasController extends Controller
         if ($request->search) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
-                $q->where('jurusan', 'LIKE', "%{$search}%")
+                $q->where('tingkat', 'LIKE', "%{$search}%")
+                  ->orWhere('jurusan', 'LIKE', "%{$search}%")
                   ->orWhere('rombel', 'LIKE', "%{$search}%");
             });
         }
 
-        $kelas = $query->orderBy('jurusan')->orderBy('rombel')->paginate(20);
+        $kelas = $query->orderBy('tingkat')->orderBy('jurusan')->orderBy('rombel')->paginate(20);
 
         return view('admin.kelas.index', compact('kelas'));
     }
@@ -34,15 +36,24 @@ class KelasController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
+            'tingkat' => [
+                'required', 'string', 'max:10',
+                Rule::unique('kelas')->where(function ($q) use ($request) {
+                    return $q->where('jurusan', $request->jurusan)
+                             ->where('rombel', $request->rombel);
+                }),
+            ],
             'jurusan' => 'required|string|max:50',
             'rombel' => 'required|string|max:20',
+        ], [
+            'tingkat.unique' => 'Kelas dengan tingkat, jurusan, dan rombel yang sama sudah ada.',
         ]);
 
         if ($validator->fails()) {
             return back()->withErrors($validator)->withInput();
         }
 
-        Kelas::create($request->only('jurusan', 'rombel'));
+        Kelas::create($request->only('tingkat', 'jurusan', 'rombel'));
 
         return redirect()->route('admin.kelas.index')
             ->with('success', 'Kelas berhasil ditambahkan!');
@@ -59,15 +70,24 @@ class KelasController extends Controller
         $kelas = Kelas::findOrFail($id);
 
         $validator = Validator::make($request->all(), [
+            'tingkat' => [
+                'required', 'string', 'max:10',
+                Rule::unique('kelas')->ignore($kelas->id_kelas, 'id_kelas')->where(function ($q) use ($request) {
+                    return $q->where('jurusan', $request->jurusan)
+                             ->where('rombel', $request->rombel);
+                }),
+            ],
             'jurusan' => 'required|string|max:50',
             'rombel' => 'required|string|max:20',
+        ], [
+            'tingkat.unique' => 'Kelas dengan tingkat, jurusan, dan rombel yang sama sudah ada.',
         ]);
 
         if ($validator->fails()) {
             return back()->withErrors($validator)->withInput();
         }
 
-        $kelas->update($request->only('jurusan', 'rombel'));
+        $kelas->update($request->only('tingkat', 'jurusan', 'rombel'));
 
         return redirect()->route('admin.kelas.index')
             ->with('success', 'Kelas berhasil diupdate!');

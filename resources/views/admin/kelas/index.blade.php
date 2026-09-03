@@ -13,7 +13,7 @@
         <form method="GET" class="flex flex-wrap items-center gap-2">
             <div class="relative">
                 <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-[#a3aed1] text-sm"></i>
-                <input type="text" name="search" placeholder="Cari jurusan/rombel..." value="{{ request('search') }}"
+                <input type="text" name="search" placeholder="Cari tingkat/jurusan/rombel..." value="{{ request('search') }}"
                     class="pl-10 pr-4 py-2 bg-[#f4f7fe] border-none rounded-full text-sm text-[#2b3674] placeholder-[#a3aed1] focus:ring-2 focus:ring-[#868dfb] w-56">
             </div>
             <button type="submit" class="px-4 py-2 bg-[#f4f7fe] hover:bg-[#e9edfb] text-[#2b3674] rounded-full text-sm font-bold transition-colors">
@@ -49,6 +49,7 @@
             <thead>
                 <tr class="text-left text-[#a3aed1] text-[11px] font-bold uppercase tracking-wider border-b border-gray-100">
                     <th class="px-3 py-3">No</th>
+                    <th class="px-3 py-3">Tingkat</th>
                     <th class="px-3 py-3">Jurusan</th>
                     <th class="px-3 py-3">Rombel</th>
                     <th class="px-3 py-3">Jumlah Siswa</th>
@@ -59,6 +60,7 @@
                 @forelse($kelas as $key => $k)
                 <tr class="hover:bg-[#f4f7fe]/60 transition-colors">
                     <td class="px-3 py-3 text-[#a3aed1] font-medium">{{ $kelas->firstItem() + $key }}</td>
+                    <td class="px-3 py-3 text-[#2b3674] font-semibold">{{ $k->tingkat }}</td>
                     <td class="px-3 py-3">
                         <div class="flex items-center gap-3">
                             <div class="w-9 h-9 rounded-full bg-orange-50 text-orange-500 flex items-center justify-center font-extrabold text-sm ring-2 ring-orange-100 flex-shrink-0">
@@ -89,7 +91,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="5" class="text-center py-12">
+                    <td colspan="6" class="text-center py-12">
                         <div class="flex flex-col items-center text-[#a3aed1]">
                             <i class="fas fa-school text-3xl mb-2"></i>
                             <p class="font-bold text-sm">Belum ada data kelas.</p>

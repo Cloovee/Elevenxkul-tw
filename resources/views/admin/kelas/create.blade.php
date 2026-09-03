@@ -17,6 +17,12 @@
         @csrf
 
         <div class="mb-5">
+            <label class="block text-xs font-bold text-[#a3aed1] uppercase tracking-wider mb-2">Tingkat <span class="text-red-500">*</span></label>
+            <input type="text" name="tingkat" placeholder="Contoh: X" class="w-full px-4 py-2.5 bg-[#f4f7fe] border-none rounded-xl text-sm text-[#2b3674] focus:ring-2 focus:ring-[#868dfb] @error('tingkat') ring-2 ring-red-400 @enderror" value="{{ old('tingkat') }}" required>
+            @error('tingkat')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+        </div>
+
+        <div class="mb-5">
             <label class="block text-xs font-bold text-[#a3aed1] uppercase tracking-wider mb-2">Jurusan <span class="text-red-500">*</span></label>
             <input type="text" name="jurusan" placeholder="Contoh: IPA" class="w-full px-4 py-2.5 bg-[#f4f7fe] border-none rounded-xl text-sm text-[#2b3674] focus:ring-2 focus:ring-[#868dfb] @error('jurusan') ring-2 ring-red-400 @enderror" value="{{ old('jurusan') }}" required>
             @error('jurusan')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
