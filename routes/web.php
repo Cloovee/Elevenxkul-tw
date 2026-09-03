@@ -155,13 +155,17 @@ Route::get('/dashboard-ketua', function () {
     return view('dashboard-ketua.index');
 })->middleware(['auth', 'verified', 'role:Ketua'])->name('dashboard.ketua');
 
-Route::get('/absensi-pelatih', function () {
-    return view('dashboard-ketua.absensi-pelatih');
-})->middleware(['auth', 'verified'])->name('ketua.absensi-pelatih');
+Route::middleware(['auth', 'verified', 'role:Ketua'])->group(function () {
+    Route::get('/absensi-pelatih', [\App\Http\Controllers\Ketua\AbsensiPelatihController::class, 'index'])
+        ->name('ketua.absensi-pelatih');
+    Route::post('/absensi-pelatih', [\App\Http\Controllers\Ketua\AbsensiPelatihController::class, 'store'])
+        ->name('ketua.absensi-pelatih.store');
 
-Route::get('/absensi-peserta', function () {
-    return view('dashboard-ketua.absensi-peserta');
-})->middleware(['auth', 'verified'])->name('ketua.absensi-peserta');
+    Route::get('/absensi-peserta', [\App\Http\Controllers\Ketua\AbsensiPesertaController::class, 'index'])
+        ->name('ketua.absensi-peserta');
+    Route::post('/absensi-peserta', [\App\Http\Controllers\Ketua\AbsensiPesertaController::class, 'store'])
+        ->name('ketua.absensi-peserta.store');
+});
 
 Route::get('/kelola-anggota', function () {
 
