@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <style>[x-cloak] { display: none !important; }</style>
 </head>
 <body class="font-sans antialiased bg-gray-100">
 
@@ -48,26 +49,15 @@
 
                     <form method="POST" action="{{ route('ketua.absensi-peserta.store') }}" class="space-y-6">
                         @csrf
+                        @foreach ($pesertas as $p)
+                            <input type="hidden" name="ids[]" value="{{ $p->id_anggota }}">
+                        @endforeach
 
-                        <div class="bg-gradient-to-br from-white to-periwinkle/10 rounded-3xl shadow-xl shadow-periwinkle/10 ring-1 ring-black/5 p-6 space-y-4">
+                        <div class="bg-gradient-to-br from-white to-periwinkle/10 rounded-3xl shadow-xl shadow-periwinkle/10 ring-1 ring-black/5 p-6 space-y-5">
                             <h2 class="font-semibold text-gray-800 border-b border-gray-100 pb-3">Data Absensi</h2>
 
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1.5">Peserta</label>
-                                <select name="id_anggota" required
-                                    class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-periwinkle focus:border-periwinkle transition"
-                                >
-                                    <option value="">Pilih peserta</option>
-                                    @foreach ($pesertas as $p)
-                                        <option value="{{ $p->id_anggota }}" @selected(old('id_anggota') == $p->id_anggota)>
-                                            {{ $p->nama }} — {{ $p->kelas ?? '-' }} ({{ $p->ekskul->nama_ekskul ?? '-' }})
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1.5">Tanggal Kehadiran</label>
+                                <label class="block text-sm font-medium text-gray-700 mb-1.5">Tanggal Kegiatan</label>
                                 <input type="date" name="tanggal_absensi" required value="{{ old('tanggal_absensi', now()->toDateString()) }}"
                                     class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-periwinkle focus:border-periwinkle transition"
                                 />
@@ -75,22 +65,73 @@
 
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1.5">Deskripsi Kegiatan</label>
-                                <textarea name="deskripsi_kegiatan" rows="3" placeholder="Ceritakan kegiatan hari ini..."
-                                    class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-periwinkle focus:border-periwinkle transition resize-none"
-                                >{{ old('deskripsi_kegiatan') }}</textarea>
+                                <input type="text" name="deskripsi_kegiatan" placeholder="Contoh: Latihan rutin mingguan" value="{{ old('deskripsi_kegiatan') }}"
+                                    class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-periwinkle focus:border-periwinkle transition"
+                                />
                             </div>
 
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1.5">Status Kehadiran</label>
-                                <select name="status_kehadiran" required
-                                    class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-periwinkle focus:border-periwinkle transition"
-                                >
-                                    <option value="">Pilih status</option>
-                                    <option value="hadir" @selected(old('status_kehadiran') === 'hadir')>Hadir</option>
-                                    <option value="izin" @selected(old('status_kehadiran') === 'izin')>Izin</option>
-                                    <option value="sakit" @selected(old('status_kehadiran') === 'sakit')>Sakit</option>
-                                    <option value="alpha" @selected(old('status_kehadiran') === 'alpha')>Tidak Hadir</option>
-                                </select>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Absensi</label>
+
+                                @if ($pesertas->isEmpty())
+                                    <p class="text-sm text-gray-400 border border-dashed border-gray-200 rounded-xl py-6 text-center">
+                                        Belum ada peserta aktif di ekskul ini.
+                                    </p>
+                                @else
+                                    <div class="overflow-x-auto rounded-2xl ring-1 ring-gray-200"
+                                        x-data="{
+                                            statuses: { @foreach ($pesertas as $p) {{ $p->id_anggota }}: @js(old('status.'.$p->id_anggota)), @endforeach },
+                                            get adaIzin() { return Object.values(this.statuses).includes('izin') }
+                                        }"
+                                    >
+                                        <table class="w-full text-sm border-collapse min-w-[560px]">
+                                            <thead>
+                                                <tr class="bg-periwinkle/10 text-gray-500 text-[11px] uppercase tracking-wide">
+                                                    <th class="text-left py-2.5 px-3" rowspan="2">Nama</th>
+                                                    <th class="text-left py-2.5 px-2" rowspan="2">Kelas</th>
+                                                    <th class="text-center py-2 px-2" colspan="3">Keterangan</th>
+                                                    <th class="text-left py-2.5 px-2" rowspan="2" x-show="adaIzin" x-cloak>Catatan</th>
+                                                </tr>
+                                                <tr class="bg-periwinkle/10 text-gray-500 text-[11px] uppercase tracking-wide">
+                                                    <th class="text-center py-1.5 px-2 w-12 border-t border-periwinkle/20">H</th>
+                                                    <th class="text-center py-1.5 px-2 w-12 border-t border-periwinkle/20">S</th>
+                                                    <th class="text-center py-1.5 px-2 w-12 border-t border-periwinkle/20">I</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach ($pesertas as $p)
+                                                    <tr class="border-t border-gray-100">
+                                                        <td class="py-2.5 px-3 font-medium text-gray-700">{{ $p->nama }}</td>
+                                                        <td class="py-2.5 px-2 text-gray-500">{{ $p->kelas ?? '-' }}</td>
+                                                        <td class="text-center py-2.5 px-2">
+                                                            <input type="radio" name="status[{{ $p->id_anggota }}]" value="hadir"
+                                                                x-model="statuses[{{ $p->id_anggota }}]"
+                                                                class="w-4 h-4 accent-periwinkle cursor-pointer">
+                                                        </td>
+                                                        <td class="text-center py-2.5 px-2">
+                                                            <input type="radio" name="status[{{ $p->id_anggota }}]" value="sakit"
+                                                                x-model="statuses[{{ $p->id_anggota }}]"
+                                                                class="w-4 h-4 accent-yellow-500 cursor-pointer">
+                                                        </td>
+                                                        <td class="text-center py-2.5 px-2">
+                                                            <input type="radio" name="status[{{ $p->id_anggota }}]" value="izin"
+                                                                x-model="statuses[{{ $p->id_anggota }}]"
+                                                                class="w-4 h-4 accent-sky cursor-pointer">
+                                                        </td>
+                                                        <td class="py-2 px-2" x-show="adaIzin" x-cloak>
+                                                            <input type="text" name="catatan[{{ $p->id_anggota }}]" value="{{ old('catatan.'.$p->id_anggota) }}"
+                                                                x-show="statuses[{{ $p->id_anggota }}] === 'izin'" x-cloak
+                                                                placeholder="Keterangan izin"
+                                                                class="w-full px-3 py-1.5 rounded-lg border border-gray-200 bg-white text-xs focus:outline-none focus:ring-2 focus:ring-periwinkle focus:border-periwinkle transition"
+                                                            />
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <p class="text-xs text-gray-400 mt-2">Peserta yang tidak dicentang otomatis tercatat sebagai Alpha (tidak hadir).</p>
+                                @endif
                             </div>
                         </div>
 
@@ -100,51 +141,6 @@
                             Kirim Absensi
                         </button>
                     </form>
-
-                    <!-- Riwayat -->
-                    <div class="bg-white rounded-3xl shadow-xl shadow-black/5 ring-1 ring-black/5 p-6">
-                        <h2 class="font-semibold text-gray-800 border-b border-gray-100 pb-3 mb-4">Riwayat Absensi yang Dikirim</h2>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-sm border-collapse min-w-[600px]">
-                                <thead>
-                                    <tr class="text-gray-400 text-[11px] uppercase tracking-wide">
-                                        <th class="text-left py-2 px-2">Peserta</th>
-                                        <th class="text-left py-2 px-2">Ekskul</th>
-                                        <th class="text-left py-2 px-2">Tanggal</th>
-                                        <th class="text-left py-2 px-2">Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @forelse ($riwayat as $r)
-                                        <tr class="border-t border-gray-100">
-                                            <td class="py-2.5 px-2 font-medium text-gray-700">{{ $r->peserta->nama ?? '-' }}</td>
-                                            <td class="py-2.5 px-2 text-gray-500">{{ $r->peserta->ekskul->nama_ekskul ?? '-' }}</td>
-                                            <td class="py-2.5 px-2 text-gray-500">{{ optional($r->tanggal_absensi)->translatedFormat('d M Y') }}</td>
-                                            <td class="py-2.5 px-2">
-                                                @php
-                                                    $sClass = match($r->status_kehadiran) {
-                                                        'hadir' => 'bg-mint text-[#1F7A3D]',
-                                                        'izin' => 'bg-sky text-[#1E6FA8]',
-                                                        'sakit' => 'bg-yellow-100 text-yellow-700',
-                                                        'alpha' => 'bg-red-100 text-red-500',
-                                                        default => 'bg-gray-100 text-gray-600',
-                                                    };
-                                                @endphp
-                                                <span class="text-[11px] font-bold px-2.5 py-1 rounded-full {{ $sClass }}">{{ ucfirst($r->status_kehadiran) }}</span>
-                                            </td>
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="4" class="py-8 text-center text-sm text-gray-400">Belum ada absensi yang dikirim.</td>
-                                        </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="mt-4">
-                            {{ $riwayat->links() }}
-                        </div>
-                    </div>
 
                 </div>
             </div>

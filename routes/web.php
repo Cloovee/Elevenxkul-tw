@@ -152,20 +152,73 @@ Route::prefix('/ketua')
 
 // 5. Dashboard Ketua
 Route::get('/dashboard-ketua', function () {
-    return view('dashboard-ketua.index');
+    // Sementara: Ketua mengelola ekskul dengan id_ekskul = 1
+    $jumlahPeserta = App\Models\Peserta::where('id_ekskul', 1)->count();
+
+    $totalPeserta = App\Models\Peserta::where('id_ekskul', 1)
+        ->where('status', 'aktif')
+        ->count();
+
+    // Riwayat aktivitas: gabungan dari 3 sumber, diurutkan dari yang terbaru.
+    $riwayatPelatih = App\Models\AbsensiPelatih::with('pelatih')
+        ->latest('created_at')
+        ->take(5)
+        ->get()
+        ->map(fn ($r) => [
+            'warna' => 'periwinkle',
+            'teks' => 'Menginput absensi pelatih ' . ($r->pelatih->nama_pelatih ?? '-'),
+            'waktu' => $r->created_at,
+        ]);
+
+    $riwayatPeserta = App\Models\AbsensiPeserta::whereHas('peserta', fn ($q) => $q->where('id_ekskul', 1))
+        ->selectRaw('tanggal_absensi, COUNT(*) as jumlah, MAX(created_at) as waktu')
+        ->groupBy('tanggal_absensi')
+        ->orderByDesc('waktu')
+        ->take(5)
+        ->get()
+        ->map(fn ($r) => [
+            'warna' => 'mint',
+            'teks' => 'Mengisi absensi peserta (' . $r->jumlah . ' orang)',
+            'waktu' => \Illuminate\Support\Carbon::parse($r->waktu),
+        ]);
+
+    $riwayatAnggota = App\Models\Peserta::with('siswa')
+        ->where('id_ekskul', 1)
+        ->latest('created_at')
+        ->take(5)
+        ->get()
+        ->map(fn ($p) => [
+            'warna' => 'sky',
+            'teks' => 'Menambahkan anggota baru: ' . ($p->siswa->nama_siswa ?? '-'),
+            'waktu' => $p->created_at,
+        ]);
+
+    $riwayat = $riwayatPelatih
+        ->concat($riwayatPeserta)
+        ->concat($riwayatAnggota)
+        ->sortByDesc('waktu')
+        ->take(5)
+        ->values();
+
+    return view('dashboard-ketua.index', [
+        'jumlahPeserta' => $jumlahPeserta,
+        'totalPeserta' => $totalPeserta,
+        'riwayat' => $riwayat,
+    ]);
 })->middleware(['auth', 'verified', 'role:Ketua'])->name('dashboard.ketua');
 
-Route::middleware(['auth', 'verified', 'role:Ketua'])->group(function () {
-    Route::get('/absensi-pelatih', [\App\Http\Controllers\Ketua\AbsensiPelatihController::class, 'index'])
-        ->name('ketua.absensi-pelatih');
-    Route::post('/absensi-pelatih', [\App\Http\Controllers\Ketua\AbsensiPelatihController::class, 'store'])
-        ->name('ketua.absensi-pelatih.store');
 
-    Route::get('/absensi-peserta', [\App\Http\Controllers\Ketua\AbsensiPesertaController::class, 'index'])
-        ->name('ketua.absensi-peserta');
-    Route::post('/absensi-peserta', [\App\Http\Controllers\Ketua\AbsensiPesertaController::class, 'store'])
-        ->name('ketua.absensi-peserta.store');
-});
+Route::get('/absensi-pelatih', [App\Http\Controllers\Ketua\AbsensiPelatihController::class, 'index'])
+    ->middleware(['auth', 'verified'])->name('ketua.absensi-pelatih');
+
+Route::post('/absensi-pelatih', [App\Http\Controllers\Ketua\AbsensiPelatihController::class, 'store'])
+    ->middleware(['auth', 'verified'])->name('ketua.absensi-pelatih.store');
+
+Route::get('/absensi-peserta', [App\Http\Controllers\Ketua\AbsensiPesertaController::class, 'index'])
+    ->middleware(['auth', 'verified'])->name('ketua.absensi-peserta');
+
+Route::post('/absensi-peserta', [App\Http\Controllers\Ketua\AbsensiPesertaController::class, 'store'])
+    ->middleware(['auth', 'verified'])->name('ketua.absensi-peserta.store');
 
 Route::get('/kelola-anggota', function () {
 

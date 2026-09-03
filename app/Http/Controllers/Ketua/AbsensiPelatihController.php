@@ -12,19 +12,14 @@ class AbsensiPelatihController extends Controller
 {
     /**
      * Use case: Ketua mencatat/mengirim laporan absensi pelatih.
-     * Menampilkan form input + riwayat laporan yang sudah dikirim.
+     * Riwayat/validasi laporan ditampilkan di halaman Pembina, bukan di sini.
      */
     public function index()
     {
         $pelatihs = Pelatih::orderBy('nama_pelatih')->get();
 
-        $riwayat = AbsensiPelatih::with('pelatih')
-            ->latest('tanggal_absensi')
-            ->paginate(10);
-
         return view('dashboard-ketua.absensi-pelatih', [
             'pelatihs' => $pelatihs,
-            'riwayat' => $riwayat,
         ]);
     }
 
