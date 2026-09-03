@@ -9,48 +9,52 @@
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans text-gray-900 antialiased">
-        <div class="min-h-screen flex">
+    <body class="font-sans text-ink antialiased">
+        <div class="min-h-screen grid lg:grid-cols-2">
 
-            <!-- Panel kiri: gradient dekoratif -->
-            <div class="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-gradient-to-br from-periwinkle via-periwinkle to-sky flex-col justify-between p-12">
-                <div class="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-white/10"></div>
-                <div class="absolute top-1/3 -left-16 w-64 h-64 rounded-full bg-white/10"></div>
-                <div class="absolute bottom-10 right-24 w-32 h-32 rounded-full border border-white/20"></div>
-                <div class="absolute top-16 right-40 w-3 h-3 rounded-full bg-white/40"></div>
-                <div class="absolute top-40 right-64 w-2 h-2 rounded-full bg-white/40"></div>
+            <!-- Panel kiri: identitas sekolah, penuh satu sisi layar -->
+            <div class="hidden lg:flex flex-col justify-between relative overflow-hidden bg-panelnight px-14 py-12 lg:rounded-r-[2.5rem] lg:shadow-2xl lg:shadow-ink/20">
+                <!-- pola titik halus -->
+                <div class="absolute inset-0 opacity-[0.08]" style="background-image: radial-gradient(#fff 1.5px, transparent 1.5px); background-size: 24px 24px;"></div>
+                <!-- aksen cahaya tunggal -->
+                <div class="absolute -bottom-40 -left-40 w-[32rem] h-[32rem] rounded-full bg-periwinkle/25 blur-[100px] pointer-events-none"></div>
+                <div class="absolute top-0 right-0 w-72 h-72 rounded-full bg-sky/10 blur-[80px] pointer-events-none"></div>
 
-                <div class="relative z-10">
-                    <a href="/" class="w-11 h-11 rounded-2xl bg-white/20 flex items-center justify-center font-bold text-white">
-                        ES
-                    </a>
-                </div>
+                {{--
+                    ==== GANTI LOGO SEKOLAH DI SINI ====
+                    Timpa file public/images/smkn11logo.png dengan logo SMKN 11 milikmu.
+                    Kalau formatnya bukan .png, sesuaikan ekstensi di baris "src" di bawah (ada 2 tempat).
+                    Logo sengaja tanpa kotak/background supaya menyatu dengan panel.
+                --}}
+                <div class="relative z-10 m-auto flex flex-col items-center text-center max-w-xs">
+                    <img
+                        src="{{ asset('images/smkn11logo.png') }}"
+                        alt="Logo SMKN 11"
+                        class="w-28 h-28 object-contain drop-shadow-[0_8px_24px_rgba(0,0,0,0.25)]"
+                    />
 
-                <div class="relative z-10">
-                    <p class="text-white/70 text-sm tracking-[0.2em] uppercase mb-3 font-semibold">Sistem Ekstrakurikuler</p>
-                    <h1 class="text-5xl font-bold text-white leading-[1.1]">
-                        Ekskul Sebelas
+                    <h1 class="font-display font-bold text-white text-2xl mt-6">
+                        SMKN 11 Bandung
                     </h1>
-                    <p class="text-white/80 mt-6 max-w-sm leading-relaxed">
-                        Satu tempat untuk mengelola kegiatan, kehadiran, dan penilaian
-                        seluruh ekstrakurikuler sekolah.
+                    <p class="text-periwinkle font-semibold text-sm mt-1">
+                        Sistem Ekstrakurikuler
+                    </p>
+                    <p class="text-white/55 text-sm mt-4 leading-relaxed">
+                        Kelola presensi, validasi laporan, dan penilaian kegiatan ekskul dalam satu platform.
                     </p>
                 </div>
-
-                <div class="relative z-10 flex gap-8 text-white/80 text-sm font-medium">
-                    <span>Admin</span>
-                    <span class="w-px bg-white/30"></span>
-                    <span>Pembina</span>
-                    <span class="w-px bg-white/30"></span>
-                    <span>Ketua</span>
-                </div>
+                {{-- ==== BATAS AREA LOGO ==== --}}
             </div>
 
-            <!-- Panel kanan: konten form -->
-            <div class="flex-1 flex items-center justify-center p-8 bg-gray-50">
+            <!-- Panel kanan: form -->
+            <div class="flex items-center justify-center bg-bgsoft lg:bg-white px-6 py-12 sm:px-12">
                 <div class="w-full max-w-sm">
-                    <div class="lg:hidden mb-8 text-center">
-                        <h1 class="text-3xl font-bold text-periwinkle">Ekskul Sebelas</h1>
+                    <div class="lg:hidden mb-8 flex items-center gap-3">
+                        <img src="{{ asset('images/smkn11logo.png') }}" alt="Logo SMKN 11" class="w-11 h-11 object-contain shrink-0" />
+                        <div class="leading-tight">
+                            <p class="font-display font-bold text-ink text-sm">SMKN 11 Bandung</p>
+                            <p class="text-inksoft text-xs">Sistem Ekstrakurikuler</p>
+                        </div>
                     </div>
                     {{ $slot }}
                 </div>
