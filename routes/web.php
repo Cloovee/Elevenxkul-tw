@@ -3,6 +3,7 @@
 use App\Http\Controllers\Pembina\AbsensiPelatihController;
 use App\Http\Controllers\Pembina\AbsensiPesertaController;
 use App\Http\Controllers\Pembina\NilaiPesertaController;
+use App\Http\Controllers\Pembina\PelatihController as PembinaPelatihController;
 use App\Http\Controllers\Pembina\PembinaDashboardController;
 use App\Http\Controllers\Pembina\PembinaProfileController;
 use App\Http\Controllers\ProfileController;
@@ -24,7 +25,7 @@ Route::get('/', function () {
 require __DIR__.'/auth.php';
 
 // 3. Grup route khusus Pembina (wajib login)
-Route::prefix('pembina')->middleware('auth')->name('pembina.')->group(function () {
+Route::prefix('pembina')->middleware(['auth', 'role:Pembina'])->name('pembina.')->group(function () {
     Route::get('/dashboard', [PembinaDashboardController::class, 'index'])->name('dashboard');
 
     // ===== Profil Pembina (halaman khusus, terpisah dari /profile umum) =====
@@ -59,6 +60,18 @@ Route::prefix('pembina')->middleware('auth')->name('pembina.')->group(function (
         Route::get('/{nilaiPeserta}/edit', [NilaiPesertaController::class, 'edit'])->name('edit');
         Route::put('/{nilaiPeserta}', [NilaiPesertaController::class, 'update'])->name('update');
         Route::delete('/{nilaiPeserta}', [NilaiPesertaController::class, 'destroy'])->name('destroy');
+    });
+
+    // ===== CRUD: Kelola Pelatih (untuk ekskul yang dibina) =====
+    // Relasi: Admin menentukan pembina pemilik ekskul (CRUD Ekskul) -> Pembina di sini
+    // mengelola biodata pelatih ekskulnya -> Ketua memakai data pelatih ini saat input absensi.
+    Route::prefix('pelatih')->name('pelatih.')->group(function () {
+        Route::get('/', [PembinaPelatihController::class, 'index'])->name('index');
+        Route::get('/create', [PembinaPelatihController::class, 'create'])->name('create');
+        Route::post('/store', [PembinaPelatihController::class, 'store'])->name('store');
+        Route::get('/{id}/edit', [PembinaPelatihController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [PembinaPelatihController::class, 'update'])->name('update');
+        Route::delete('/{id}', [PembinaPelatihController::class, 'destroy'])->name('destroy');
     });
 });
 

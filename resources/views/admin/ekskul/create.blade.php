@@ -59,6 +59,28 @@
                     @enderror
                 </div>
 
+                <!-- Pembina -->
+                <div class="md:col-span-2">
+                    <label for="id_pembina" class="block text-xs font-bold text-[#2b3674] uppercase tracking-wider mb-2">
+                        Pembina Penanggung Jawab
+                    </label>
+                    <select name="id_pembina" id="id_pembina"
+                        class="w-full px-4 py-3 bg-[#f4f7fe] border @error('id_pembina') border-red-500 @else border-transparent @enderror rounded-xl text-sm text-[#2b3674] focus:outline-none focus:bg-white focus:border-[#868dfb] focus:ring-2 focus:ring-[#868dfb]/20 transition-all">
+                        <option value="">-- Belum ditentukan --</option>
+                        @foreach($pembinas as $p)
+                            <option value="{{ $p->id_pembina }}" {{ old('id_pembina') == $p->id_pembina ? 'selected' : '' }}>
+                                {{ $p->nama_pembina }}
+                            </option>
+                        @endforeach
+                    </select>
+                    <p class="mt-1.5 text-xs text-[#a3aed1]">Pembina yang dipilih akan bisa mengelola data pelatih untuk ekskul ini.</p>
+                    @error('id_pembina')
+                        <p class="mt-1.5 text-xs text-red-500 font-semibold flex items-center gap-1">
+                            <i class="fas fa-exclamation-circle"></i> {{ $message }}
+                        </p>
+                    @enderror
+                </div>
+
                 <!-- Deskripsi -->
                 <div class="md:col-span-2">
                     <label for="deskripsi" class="block text-xs font-bold text-[#2b3674] uppercase tracking-wider mb-2">

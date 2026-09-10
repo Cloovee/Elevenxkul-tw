@@ -207,6 +207,18 @@
                     </div>
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="text-inksoft/30 group-hover:text-inksoft/60 shrink-0 transition-colors"><path d="m9 18 6-6-6-6"/></svg>
                 </a>
+
+                <a href="{{ route('pembina.pelatih.index') }}"
+                   class="group bg-white rounded-3xl p-5 shadow-[0_10px_30px_-18px_rgba(46,43,85,0.35)] flex items-center gap-4 flex-1 hover:-translate-y-1 hover:shadow-[0_14px_34px_-16px_rgba(46,43,85,0.4)] transition-all">
+                    <div class="w-12 h-12 rounded-2xl bg-[#D9F9DF] flex items-center justify-center text-[#1F7A3D] shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23Z"/></svg>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <h3 class="font-display text-sm font-semibold">Kelola Pelatih</h3>
+                        <p class="text-xs text-inksoft mt-0.5">Kelola data pelatih ekskul kamu</p>
+                    </div>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="text-inksoft/30 group-hover:text-inksoft/60 shrink-0 transition-colors"><path d="m9 18 6-6-6-6"/></svg>
+                </a>
             </div>
 
             {{-- COL C: Riwayat Penilaian --}}

@@ -26,6 +26,24 @@
             </span>
         </div>
 
+        <div>
+            <label class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Pembina Penanggung Jawab</label>
+            @if($ekskul->pembina)
+                <p class="text-lg font-semibold text-ink">{{ $ekskul->pembina->nama_pembina }}</p>
+            @else
+                <span class="px-3 py-1 text-sm rounded-full bg-amber-50 text-amber-600">Belum ditentukan</span>
+            @endif
+        </div>
+
+        <div>
+            <label class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Pelatih</label>
+            @if($ekskul->pelatih)
+                <p class="text-lg font-semibold text-ink">{{ $ekskul->pelatih->nama_pelatih }}</p>
+            @else
+                <span class="px-3 py-1 text-sm rounded-full bg-bgsoft text-inksoft">Belum ada pelatih</span>
+            @endif
+        </div>
+
         <div class="md:col-span-2">
             <label class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Deskripsi</label>
             <p class="text-ink">{{ $ekskul->deskripsi ?: '-' }}</p>

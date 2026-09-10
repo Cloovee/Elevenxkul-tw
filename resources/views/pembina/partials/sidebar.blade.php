@@ -2,6 +2,7 @@
     Sidebar mengambang yang dipakai di semua halaman pembina.
     Gunakan: @include('pembina.partials.sidebar', ['active' => 'dashboard'])
     Nilai $active: dashboard | absensi | validasi | nilai | profile
+    (absensi = Absensi Peserta, validasi = Absensi Pelatih — sekarang dua tombol terpisah)
 --}}
 @php
     $navItem = function (string $key, string $route, string $title, string $icon) use ($active) {
@@ -38,9 +39,23 @@
 
     <a href="{{ route('pembina.absensi.index') }}"
        class="w-[46px] h-[46px] rounded-2xl flex items-center justify-center transition-all
-              {{ in_array($active, ['absensi', 'validasi']) ? 'bg-white text-lavender' : 'text-white/75 hover:bg-white/20 hover:text-white' }}"
-       title="Absensi &amp; Validasi">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.6-6.3"/><polyline points="21 3 21 9 15 9"/></svg>
+              {{ $active === 'absensi' ? 'bg-white text-lavender' : 'text-white/75 hover:bg-white/20 hover:text-white' }}"
+       title="Absensi Peserta">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    </a>
+
+    <a href="{{ route('pembina.validasi.index') }}"
+       class="w-[46px] h-[46px] rounded-2xl flex items-center justify-center transition-all
+              {{ $active === 'validasi' ? 'bg-white text-lavender' : 'text-white/75 hover:bg-white/20 hover:text-white' }}"
+       title="Absensi Pelatih">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>
+    </a>
+
+    <a href="{{ route('pembina.pelatih.index') }}"
+       class="w-[46px] h-[46px] rounded-2xl flex items-center justify-center transition-all
+              {{ $active === 'pelatih' ? 'bg-white text-lavender' : 'text-white/75 hover:bg-white/20 hover:text-white' }}"
+       title="Kelola Pelatih">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23Z"/></svg>
     </a>
 
     <a href="{{ route('pembina.nilai.index') }}"
@@ -73,8 +88,16 @@
         <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
     </a>
     <a href="{{ route('pembina.absensi.index') }}"
-       class="w-11 h-11 rounded-2xl flex items-center justify-center transition-all {{ in_array($active, ['absensi', 'validasi']) ? 'bg-white text-lavender' : 'text-white/75' }}" title="Absensi & Validasi">
-        <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.6-6.3"/><polyline points="21 3 21 9 15 9"/></svg>
+       class="w-11 h-11 rounded-2xl flex items-center justify-center transition-all {{ $active === 'absensi' ? 'bg-white text-lavender' : 'text-white/75' }}" title="Absensi Peserta">
+        <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    </a>
+    <a href="{{ route('pembina.validasi.index') }}"
+       class="w-11 h-11 rounded-2xl flex items-center justify-center transition-all {{ $active === 'validasi' ? 'bg-white text-lavender' : 'text-white/75' }}" title="Absensi Pelatih">
+        <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>
+    </a>
+    <a href="{{ route('pembina.pelatih.index') }}"
+       class="w-11 h-11 rounded-2xl flex items-center justify-center transition-all {{ $active === 'pelatih' ? 'bg-white text-lavender' : 'text-white/75' }}" title="Kelola Pelatih">
+        <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23Z"/></svg>
     </a>
     <a href="{{ route('pembina.nilai.index') }}"
        class="w-11 h-11 rounded-2xl flex items-center justify-center transition-all {{ $active === 'nilai' ? 'bg-white text-lavender' : 'text-white/75' }}" title="Nilai">

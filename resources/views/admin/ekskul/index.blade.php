@@ -46,6 +46,8 @@
                     <th class="px-3 py-3">No</th>
                     <th class="px-3 py-3">Nama Ekskul</th>
                     <th class="px-3 py-3">Kategori</th>
+                    <th class="px-3 py-3">Pembina</th>
+                    <th class="px-3 py-3">Pelatih</th>
                     <th class="px-3 py-3">Deskripsi</th>
                     <th class="px-3 py-3">Aksi</th>
                 </tr>
@@ -78,6 +80,18 @@
                         </span>
                     </td>
 
+                    <td class="px-3 py-3 text-[#a3aed1] whitespace-nowrap">
+                        @if($ekskul->pembina)
+                            <span class="text-[#2b3674] font-semibold">{{ $ekskul->pembina->nama_pembina }}</span>
+                        @else
+                            <span class="text-amber-600 text-xs font-bold bg-amber-50 px-2 py-1 rounded-full">Belum ada</span>
+                        @endif
+                    </td>
+
+                    <td class="px-3 py-3 text-[#a3aed1] whitespace-nowrap">
+                        {{ $ekskul->pelatih->nama_pelatih ?? '-' }}
+                    </td>
+
                     <td class="px-3 py-3 text-[#a3aed1] max-w-xs truncate" title="{{ $ekskul->deskripsi }}">
                         {{ $ekskul->deskripsi ?? '-' }}
                     </td>
@@ -101,7 +115,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="5" class="text-center py-12">
+                    <td colspan="7" class="text-center py-12">
                         <div class="flex flex-col items-center text-[#a3aed1]">
                             <i class="fas fa-inbox text-3xl mb-2"></i>
                             <p class="font-bold text-sm">Belum ada data ekskul.</p>
