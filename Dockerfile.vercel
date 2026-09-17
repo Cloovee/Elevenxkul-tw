@@ -1,0 +1,54 @@
+# ---- Stage 1: build asset Vite (Tailwind v4, JS, dst) ----
+FROM node:20-bookworm-slim AS assets
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci
+COPY resources ./resources
+COPY vite.config.js ./
+COPY public ./public
+RUN npm run build
+
+# ---- Stage 2: base PHP + FrankenPHP ----
+FROM dunglas/frankenphp:1-php8.2-bookworm AS base
+RUN cp "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" \
+    && install-php-extensions intl zip pdo_mysql pdo_pgsql
+WORKDIR /app
+
+# ---- Stage 3: install dependency Composer ----
+FROM base AS dependencies
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+COPY composer.json composer.lock ./
+RUN composer install \
+    --no-dev --no-interaction --no-progress \
+    --no-scripts --optimize-autoloader --prefer-dist
+
+COPY . .
+COPY --from=assets /app/public/build ./public/build
+RUN mkdir -p \
+        storage/framework/cache \
+        storage/framework/sessions \
+        storage/framework/views \
+        bootstrap/cache \
+    && composer dump-autoload --no-dev --classmap-authoritative \
+    && php artisan event:cache \
+    && php artisan view:cache
+
+# ---- Stage 4: runtime image final ----
+FROM base AS runtime
+COPY --from=dependencies --chown=www-data:www-data /app /app
+COPY --chown=www-data:www-data Caddyfile /etc/frankenphp/Caddyfile
+
+RUN setcap CAP_NET_BIND_SERVICE=+eip /usr/local/bin/frankenphp \
+    && chown -R www-data:www-data /config/caddy /data/caddy
+
+ENV PORT=80 \
+    APP_ENV=production \
+    APP_DEBUG=false \
+    LOG_CHANNEL=stderr \
+    CACHE_STORE=database \
+    SESSION_DRIVER=database \
+    QUEUE_CONNECTION=sync \
+    FILESYSTEM_DISK=s3
+
+USER www-data
+CMD ["frankenphp", "run", "--config", "/etc/frankenphp/Caddyfile"]
