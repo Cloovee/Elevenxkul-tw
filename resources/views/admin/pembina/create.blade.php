@@ -12,13 +12,13 @@
             <label class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Foto Profil</label>
             <div class="flex items-center gap-4">
                 <div class="relative w-16 h-16 shrink-0">
-                    <div id="foto-preview-fallback" class="w-16 h-16 rounded-2xl bg-gradient-to-br from-lavender to-sky flex items-center justify-center text-white font-bold text-lg">
+                    <div id="foto-preview-fallback" class="w-16 h-16 rounded-2xl bg-lavender flex items-center justify-center text-white font-bold text-lg">
                         <i class="fas fa-user"></i>
                     </div>
-                    <img id="foto-preview" src="" class="hidden w-16 h-16 rounded-2xl object-cover border border-[#E7E7F4]" alt="Pratinjau foto">
+                    <img id="foto-preview" src="" class="hidden w-16 h-16 rounded-2xl object-cover border border-[#DDE8FB]" alt="Pratinjau foto">
                 </div>
                 <div class="flex-1">
-                    <label for="foto" class="inline-flex items-center gap-2 cursor-pointer bg-bgsoft hover:bg-[#E9EAF9] text-ink text-xs font-bold px-4 py-2.5 rounded-xl border border-[#E7E7F4] transition">
+                    <label for="foto" class="inline-flex items-center gap-2 cursor-pointer bg-bgsoft hover:bg-[#DDE8FB] text-ink text-xs font-bold px-4 py-2.5 rounded-xl border border-[#DDE8FB] transition">
                         <i class="fas fa-upload"></i>
                         Unggah Foto Guru
                     </label>
@@ -37,7 +37,7 @@
                     Nama Lengkap <span class="text-red-500">*</span>
                 </label>
                 <input type="text" name="nama_pembina" id="nama_pembina" value="{{ old('nama_pembina') }}"
-                    class="w-full px-4 py-2 border border-[#E7E7F4] rounded-xl focus:ring-2 focus:ring-lavender focus:border-transparent @error('nama_pembina') border-red-500 @enderror">
+                    class="w-full px-4 py-2 border border-[#DDE8FB] rounded-xl focus:ring-2 focus:ring-lavender focus:border-transparent @error('nama_pembina') border-red-500 @enderror">
                 @error('nama_pembina')<p class="mt-1 text-sm text-red-500 font-medium">{{ $message }}</p>@enderror
             </div>
 
@@ -46,7 +46,7 @@
                     Email <span class="text-red-500">*</span>
                 </label>
                 <input type="email" name="email" id="email" value="{{ old('email') }}"
-                    class="w-full px-4 py-2 border border-[#E7E7F4] rounded-xl focus:ring-2 focus:ring-lavender focus:border-transparent @error('email') border-red-500 @enderror">
+                    class="w-full px-4 py-2 border border-[#DDE8FB] rounded-xl focus:ring-2 focus:ring-lavender focus:border-transparent @error('email') border-red-500 @enderror">
                 @error('email')<p class="mt-1 text-sm text-red-500 font-medium">{{ $message }}</p>@enderror
             </div>
 
@@ -55,19 +55,19 @@
                     Password <span class="text-red-500">*</span>
                 </label>
                 <input type="password" name="password" id="password"
-                    class="w-full px-4 py-2 border border-[#E7E7F4] rounded-xl focus:ring-2 focus:ring-lavender focus:border-transparent @error('password') border-red-500 @enderror">
+                    class="w-full px-4 py-2 border border-[#DDE8FB] rounded-xl focus:ring-2 focus:ring-lavender focus:border-transparent @error('password') border-red-500 @enderror">
                 @error('password')<p class="mt-1 text-sm text-red-500 font-medium">{{ $message }}</p>@enderror
             </div>
 
             <div>
                 <label for="nomor_hp" class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Nomor HP</label>
                 <input type="text" name="nomor_hp" id="nomor_hp" value="{{ old('nomor_hp') }}"
-                    class="w-full px-4 py-2 border border-[#E7E7F4] rounded-xl focus:ring-2 focus:ring-lavender focus:border-transparent">
+                    class="w-full px-4 py-2 border border-[#DDE8FB] rounded-xl focus:ring-2 focus:ring-lavender focus:border-transparent">
             </div>
 
             <div>
                 <label for="jk" class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Jenis Kelamin</label>
-                <select name="jk" id="jk" class="w-full px-4 py-2 border border-[#E7E7F4] rounded-xl focus:ring-2 focus:ring-lavender focus:border-transparent">
+                <select name="jk" id="jk" class="w-full px-4 py-2 border border-[#DDE8FB] rounded-xl focus:ring-2 focus:ring-lavender focus:border-transparent">
                     <option value="">Pilih</option>
                     <option value="L" {{ old('jk') == 'L' ? 'selected' : '' }}>Laki-laki</option>
                     <option value="P" {{ old('jk') == 'P' ? 'selected' : '' }}>Perempuan</option>
@@ -77,27 +77,27 @@
             <div>
                 <label for="agama" class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Agama</label>
                 <input type="text" name="agama" id="agama" value="{{ old('agama') }}"
-                    class="w-full px-4 py-2 border border-[#E7E7F4] rounded-xl focus:ring-2 focus:ring-lavender focus:border-transparent">
+                    class="w-full px-4 py-2 border border-[#DDE8FB] rounded-xl focus:ring-2 focus:ring-lavender focus:border-transparent">
             </div>
 
             <div class="md:col-span-2">
                 <label for="medsos" class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Media Sosial</label>
                 <input type="text" name="medsos" id="medsos" value="{{ old('medsos') }}"
-                    class="w-full px-4 py-2 border border-[#E7E7F4] rounded-xl focus:ring-2 focus:ring-lavender focus:border-transparent">
+                    class="w-full px-4 py-2 border border-[#DDE8FB] rounded-xl focus:ring-2 focus:ring-lavender focus:border-transparent">
             </div>
 
             <div class="md:col-span-2">
                 <label for="alamat" class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Alamat</label>
                 <textarea name="alamat" id="alamat" rows="3"
-                    class="w-full px-4 py-2 border border-[#E7E7F4] rounded-xl focus:ring-2 focus:ring-lavender focus:border-transparent">{{ old('alamat') }}</textarea>
+                    class="w-full px-4 py-2 border border-[#DDE8FB] rounded-xl focus:ring-2 focus:ring-lavender focus:border-transparent">{{ old('alamat') }}</textarea>
             </div>
         </div>
 
-        <div class="flex items-center gap-3 mt-6 pt-6 border-t border-[#EFEFF7]">
-            <button type="submit" class="px-6 py-2.5 bg-gradient-to-r from-lavender to-periwinkle text-white font-semibold rounded-xl hover:opacity-90 transition shadow-md shadow-periwinkle/30">
+        <div class="flex items-center gap-3 mt-6 pt-6 border-t border-[#E8F0FE]">
+            <button type="submit" class="px-6 py-2.5 bg-lavender text-white font-semibold rounded-xl hover:opacity-90 transition shadow-md shadow-periwinkle/30">
                 <i class="fas fa-save mr-2"></i>Simpan
             </button>
-            <a href="{{ route('admin.pembina.index') }}" class="px-6 py-2.5 bg-bgsoft text-ink font-semibold rounded-xl hover:bg-[#E9EAF9] transition">
+            <a href="{{ route('admin.pembina.index') }}" class="px-6 py-2.5 bg-bgsoft text-ink font-semibold rounded-xl hover:bg-[#DDE8FB] transition">
                 Batal
             </a>
         </div>

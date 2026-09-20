@@ -92,7 +92,7 @@
             @if (Route::has('password.request'))
                 <a
                     href="{{ route('password.request') }}"
-                    class="text-sm font-semibold text-periwinkle hover:text-[#7b84fc] hover:underline transition"
+                    class="text-sm font-semibold text-periwinkle hover:text-[#0B409C] hover:underline transition"
                 >
                     Lupa kata sandi?
                 </a>
@@ -103,7 +103,7 @@
         <button
             type="submit"
             :disabled="loading"
-            class="w-full py-3 rounded-xl bg-gradient-to-r from-[#7b84fc] to-periwinkle text-white font-semibold shadow-lg shadow-periwinkle/30 hover:shadow-xl hover:shadow-periwinkle/40 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-70 disabled:cursor-not-allowed disabled:translate-y-0 transition-all duration-200 flex items-center justify-center gap-2"
+            class="w-full py-3 rounded-xl bg-[#0B409C] text-white font-semibold shadow-lg shadow-periwinkle/30 hover:shadow-xl hover:shadow-periwinkle/40 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-70 disabled:cursor-not-allowed disabled:translate-y-0 transition-all duration-200 flex items-center justify-center gap-2"
         >
             <i class="fas fa-circle-notch fa-spin" x-show="loading" x-cloak></i>
             <span x-text="loading ? 'Memproses...' : 'Masuk'"></span>

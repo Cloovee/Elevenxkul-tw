@@ -9,14 +9,14 @@
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="font-sans antialiased bg-gray-100">
+<body class="font-sans antialiased bg-bgsoft text-ink">
 
     <div class="py-8 px-4 sm:px-6 lg:px-10 min-h-screen relative overflow-hidden">
 
-        <div class="absolute -top-20 right-0 w-96 h-96 rounded-full bg-periwinkle/15 blur-3xl pointer-events-none"></div>
-        <div class="absolute top-1/2 -left-20 w-72 h-72 rounded-full bg-mint/25 blur-3xl pointer-events-none"></div>
+        <div class="absolute -top-20 right-0 w-96 h-96 rounded-full bg-periwinkle/10 blur-3xl pointer-events-none"></div>
+        <div class="absolute top-1/2 -left-20 w-72 h-72 rounded-full bg-mint/20 blur-3xl pointer-events-none"></div>
 
-        <div class="max-w-7xl mx-auto relative z-10">
+        <div class="w-full relative z-10">
             <div class="flex flex-col lg:flex-row gap-6">
 
                 @include('partials.sidebar-ketua')
@@ -25,11 +25,11 @@
                 <div class="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6">
 
                     <!-- Data akun, read-only, 2 kolom -->
-                    <div class="lg:col-span-2 bg-gradient-to-br from-white to-periwinkle/10 rounded-3xl shadow-xl shadow-periwinkle/10 ring-1 ring-black/5 p-8 space-y-6">
+                    <div class="lg:col-span-2 bg-white rounded-3xl shadow-xl shadow-periwinkle/10 ring-1 ring-black/5 p-8 space-y-6">
 
                         <div>
                             <p class="text-xs text-gray-400 tracking-wide uppercase font-semibold">Pengaturan</p>
-                            <h1 class="text-2xl font-extrabold text-gray-800">Profil</h1>
+                            <h1 class="text-2xl font-extrabold text-ink">Profil</h1>
                             <p class="text-sm text-gray-500 mt-1">
                                 Data akun dikelola oleh Admin. Hubungi Admin untuk perubahan data.
                             </p>
@@ -65,10 +65,7 @@
                     </div>
 
                     <!-- Panel foto, 1 kolom -->
-                    <div class="bg-gradient-to-br from-sky to-periwinkle rounded-3xl shadow-xl shadow-periwinkle/20 p-8 flex flex-col items-center justify-center text-center relative overflow-hidden min-h-[400px]">
-                        <div class="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-white/10"></div>
-                        <div class="absolute -bottom-16 -left-10 w-48 h-48 rounded-full bg-white/10"></div>
-
+                    <div class="bg-sky rounded-3xl shadow-xl shadow-periwinkle/20 p-8 flex flex-col items-center justify-center text-center relative overflow-hidden min-h-[400px]">
                         <div class="relative z-10">
                             <div class="relative w-24 h-24 mx-auto mb-4">
                                 <div class="w-24 h-24 rounded-full bg-white/25 flex items-center justify-center ring-4 ring-white/30">

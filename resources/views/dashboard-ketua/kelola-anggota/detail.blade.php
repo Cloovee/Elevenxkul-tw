@@ -9,14 +9,14 @@
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="font-sans antialiased bg-gray-100">
+<body class="font-sans antialiased bg-bgsoft text-ink">
 
     <div class="py-8 px-4 sm:px-6 lg:px-10 min-h-screen relative overflow-hidden">
 
-        <div class="absolute -top-20 right-0 w-96 h-96 rounded-full bg-periwinkle/15 blur-3xl pointer-events-none"></div>
-        <div class="absolute top-1/2 -left-20 w-72 h-72 rounded-full bg-mint/25 blur-3xl pointer-events-none"></div>
+        <div class="absolute -top-20 right-0 w-96 h-96 rounded-full bg-periwinkle/10 blur-3xl pointer-events-none"></div>
+        <div class="absolute top-1/2 -left-20 w-72 h-72 rounded-full bg-mint/20 blur-3xl pointer-events-none"></div>
 
-        <div class="max-w-7xl mx-auto relative z-10">
+        <div class="w-full relative z-10">
             <div class="flex flex-col lg:flex-row gap-6">
 
                 @include('partials.sidebar-ketua')
@@ -32,16 +32,16 @@
                         </a>
                         <div>
                             <p class="text-xs text-gray-400 tracking-wide uppercase font-semibold">Ketua</p>
-                            <h1 class="text-2xl font-extrabold text-gray-800">Kelola Anggota</h1>
+                            <h1 class="text-2xl font-extrabold text-ink">Kelola Anggota</h1>
                         </div>
                     </div>
 
-                    <div class="bg-gradient-to-br from-white to-periwinkle/10 rounded-3xl shadow-xl shadow-periwinkle/10 ring-1 ring-black/5 p-8">
+                    <div class="bg-white rounded-3xl shadow-xl shadow-periwinkle/10 ring-1 ring-black/5 p-8">
                         <div class="flex flex-col md:flex-row gap-8">
 
                             <!-- Foto -->
                             <div class="shrink-0 flex flex-col items-center gap-3">
-                                <div class="w-40 h-40 rounded-full bg-gradient-to-br from-periwinkle to-sky flex items-center justify-center text-white text-5xl font-extrabold shadow-lg shadow-periwinkle/30">
+                                <div class="w-40 h-40 rounded-full bg-periwinkle flex items-center justify-center text-white text-5xl font-extrabold shadow-lg shadow-periwinkle/30">
                                     {{ strtoupper(substr($anggota['nama'], 0, 1)) }}
                                 </div>
                             </div>
@@ -82,7 +82,7 @@
                                 </div>
 
                                 <button type="submit"
-                                    class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-periwinkle to-sky text-white font-semibold hover:opacity-90 transition"
+                                    class="px-6 py-2.5 rounded-xl bg-periwinkle text-white font-semibold hover:opacity-90 transition"
                                 >
                                     Simpan Status
                                 </button>

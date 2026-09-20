@@ -14,14 +14,14 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="font-sans antialiased bg-gray-100">
+<body class="font-sans antialiased bg-bgsoft text-ink">
 
     <div class="py-8 px-4 sm:px-6 lg:px-10 min-h-screen relative overflow-hidden">
 
-        <div class="absolute -top-20 right-0 w-96 h-96 rounded-full bg-periwinkle/15 blur-3xl pointer-events-none"></div>
-        <div class="absolute top-1/2 -left-20 w-72 h-72 rounded-full bg-mint/25 blur-3xl pointer-events-none"></div>
+        <div class="absolute -top-20 right-0 w-96 h-96 rounded-full bg-periwinkle/10 blur-3xl pointer-events-none"></div>
+        <div class="absolute top-1/2 -left-20 w-72 h-72 rounded-full bg-mint/20 blur-3xl pointer-events-none"></div>
 
-        <div class="max-w-7xl mx-auto relative z-10">
+        <div class="w-full relative z-10">
 
             <div class="flex flex-col lg:flex-row gap-6">
 
@@ -35,14 +35,14 @@
                             Ketua
                         </p>
 
-                        <h1 class="text-2xl font-extrabold text-gray-800">
+                        <h1 class="text-2xl font-extrabold text-ink">
                             Tambah Anggota
                         </h1>
                     </div>
 
-                    <div class="bg-gradient-to-br from-white to-periwinkle/10 rounded-3xl shadow-xl shadow-periwinkle/10 ring-1 ring-black/5 p-6">
+                    <div class="bg-white rounded-3xl shadow-xl shadow-periwinkle/10 ring-1 ring-black/5 p-6">
 
-                        <h2 class="font-semibold text-gray-800 border-b border-gray-100 pb-3 mb-6">
+                        <h2 class="font-semibold text-ink border-b border-gray-100 pb-3 mb-6">
                             Data Anggota Baru
                         </h2>
 
@@ -72,13 +72,9 @@
                                     Nama Siswa
                                 </label>
 
-                                <input
-                                    type="text"
-                                    id="nama"
-                                    name="nama"
-                                    placeholder="Masukkan nama siswa"
-                                    class="w-full rounded-xl border-gray-300 focus:border-periwinkle focus:ring-periwinkle"
-                                >
+                                <input type="text" name="kegiatan" value="{{ old('kegiatan') }}" placeholder="Masukan nama siswa"
+                                        class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-periwinkle focus:border-periwinkle transition"
+                                    />
                             </div>
 
                             <!-- NIS -->
@@ -87,13 +83,9 @@
                                     NIS
                                 </label>
 
-                                <input
-                                    type="text"
-                                    id="nis"
-                                    name="nis"
-                                    placeholder="Masukkan NIS siswa"
-                                    class="w-full rounded-xl border-gray-300 focus:border-periwinkle focus:ring-periwinkle"
-                                >
+                                <input type="text" name="kegiatan" value="{{ old('kegiatan') }}" placeholder="Masukan NIS siswa"
+                                        class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-periwinkle focus:border-periwinkle transition"
+                                    />
                             </div>
 
                             <!-- Tombol -->
@@ -108,7 +100,7 @@
 
                                 <button
                                     type="submit"
-                                    class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-periwinkle to-sky text-white font-semibold shadow-lg shadow-periwinkle/30 hover:opacity-90 transition"
+                                    class="px-5 py-2.5 rounded-xl bg-periwinkle text-white font-semibold shadow-lg shadow-periwinkle/30 hover:opacity-90 transition"
                                 >
                                     Tambah Anggota
                                 </button>

@@ -120,7 +120,7 @@
             <!-- Tombol Masuk -->
             <button
                 type="submit"
-                class="w-full py-3 rounded-2xl bg-periwinkle text-white font-semibold shadow-lg shadow-periwinkle/30 hover:bg-[#9FA1FF] hover:-translate-y-0.5 transition-all"
+                class="w-full py-3 rounded-2xl bg-periwinkle text-white font-semibold shadow-lg shadow-periwinkle/30 hover:bg-[#5B7FC7] hover:-translate-y-0.5 transition-all"
             >
                 Masuk
             </button>

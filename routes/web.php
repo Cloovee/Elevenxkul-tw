@@ -82,7 +82,7 @@ Route::get('/dashboard', function () {
     return match ($user->role) {
         'Admin'    => redirect()->route('admin.dashboard'),
         'Pembina'  => redirect()->route('pembina.dashboard'),
-        'Ketua'    => redirect()->route('ketua.dashboard'),
+        'Ketua'    => redirect()->route('dashboard.ketua'),
         default    => redirect('/'),
     };
 })->middleware(['auth', 'verified'])->name('dashboard');
@@ -154,14 +154,9 @@ Route::prefix('/admin')
 | KETUA ROUTES
 |--------------------------------------------------------------------------
 */
-Route::prefix('/ketua')
-    ->middleware(['auth', 'verified', 'role:Ketua'])
-    ->name('ketua.')
-    ->group(function () {
-        Route::get('/dashboard', function () {
-            return view('ketua.dashboard');
-        })->name('dashboard');
-    });
+// Catatan: route stub 'ketua.dashboard' dihapus karena memanggil
+// view('ketua.dashboard') yang tidak pernah dibuat. Dashboard ketua yang
+// dipakai adalah route 'dashboard.ketua' di bawah (dashboard-ketua.index).
 
 // 5. Dashboard Ketua
 Route::get('/dashboard-ketua', function () {

@@ -10,14 +10,14 @@
             <h3 class="font-display text-lg font-semibold text-ink">Daftar Pembina</h3>
             <p class="text-sm text-inksoft">Kelola akun & profil pembina (guru pendamping ekskul)</p>
         </div>
-        <a href="{{ route('admin.pembina.create') }}" class="px-4 py-2.5 bg-gradient-to-r from-lavender to-periwinkle text-white text-sm font-semibold rounded-xl hover:opacity-90 transition shadow-md shadow-periwinkle/30">
+        <a href="{{ route('admin.pembina.create') }}" class="px-4 py-2.5 bg-lavender text-white text-sm font-semibold rounded-xl hover:opacity-90 transition shadow-md shadow-periwinkle/30">
             <i class="fas fa-plus mr-2"></i>Tambah Pembina
         </a>
     </div>
 
     <div class="overflow-x-auto">
         <table class="w-full">
-            <thead class="bg-bgsoft border-b border-[#EFEFF7]">
+            <thead class="bg-bgsoft border-b border-[#E8F0FE]">
                 <tr>
                     <th class="px-4 py-3 text-left text-xs font-bold text-inksoft uppercase tracking-wide">Foto</th>
                     <th class="px-4 py-3 text-left text-xs font-bold text-inksoft uppercase tracking-wide">Nama</th>
@@ -26,14 +26,14 @@
                     <th class="px-4 py-3 text-left text-xs font-bold text-inksoft uppercase tracking-wide">Aksi</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-[#F0F0F8]">
+            <tbody class="divide-y divide-[#E8F0FE]">
                 @forelse($pembinas as $pembina)
                 <tr class="hover:bg-bgsoft/60 transition">
                     <td class="px-4 py-3">
                         @if($pembina->foto_url)
                             <img src="{{ $pembina->foto_url }}" class="w-10 h-10 rounded-xl object-cover" alt="{{ $pembina->nama_pembina }}">
                         @else
-                            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-lavender to-sky flex items-center justify-center text-white font-bold text-xs">
+                            <div class="w-10 h-10 rounded-xl bg-lavender flex items-center justify-center text-white font-bold text-xs">
                                 {{ $pembina->inisial }}
                             </div>
                         @endif
@@ -43,7 +43,7 @@
                     <td class="px-4 py-3 text-sm text-inksoft">{{ $pembina->nomor_hp ?: '-' }}</td>
                     <td class="px-4 py-3">
                         <div class="flex items-center gap-3">
-                            <a href="{{ route('admin.pembina.edit', $pembina->id_pembina) }}" class="text-[#5E5CC7] hover:opacity-70" title="Edit">
+                            <a href="{{ route('admin.pembina.edit', $pembina->id_pembina) }}" class="text-[#10316B] hover:opacity-70" title="Edit">
                                 <i class="fas fa-edit"></i>
                             </a>
                             <form action="{{ route('admin.pembina.destroy', $pembina->id_pembina) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus pembina ini? Akun login-nya juga akan terhapus.')">

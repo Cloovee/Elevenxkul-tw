@@ -8,17 +8,17 @@
 
     <div class="grid grid-cols-1 gap-5">
         <div>
-            <label for="name" class="block text-xs font-bold text-[#a3aed1] uppercase tracking-wider mb-2">Nama</label>
+            <label for="name" class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Nama</label>
             <input id="name" name="name" type="text"
-                class="w-full px-4 py-2.5 bg-[#f4f7fe] border-none rounded-xl text-sm text-[#2b3674] focus:ring-2 focus:ring-[#868dfb] @error('name') ring-2 ring-red-400 @enderror"
+                class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C] @error('name') ring-2 ring-red-400 @enderror"
                 value="{{ old('name', $user->name) }}" required autofocus autocomplete="name">
             @error('name')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
         </div>
 
         <div>
-            <label for="email" class="block text-xs font-bold text-[#a3aed1] uppercase tracking-wider mb-2">Email</label>
+            <label for="email" class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Email</label>
             <input id="email" name="email" type="email"
-                class="w-full px-4 py-2.5 bg-[#f4f7fe] border-none rounded-xl text-sm text-[#2b3674] focus:ring-2 focus:ring-[#868dfb] @error('email') ring-2 ring-red-400 @enderror"
+                class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C] @error('email') ring-2 ring-red-400 @enderror"
                 value="{{ old('email', $user->email) }}" required autocomplete="username">
             @error('email')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
 
@@ -41,7 +41,7 @@
     </div>
 
     <div class="mt-6 flex items-center gap-3">
-        <button type="submit" class="inline-flex items-center gap-2 px-6 py-2.5 bg-gradient-to-tr from-[#868dfb] to-[#4318FF] text-white rounded-full text-sm font-bold shadow-md shadow-[#868dfb]/30 hover:opacity-90 transition-opacity">
+        <button type="submit" class="inline-flex items-center gap-2 px-6 py-2.5 bg-[#0B409C] text-white rounded-full text-sm font-bold shadow-md shadow-[#0B409C]/30 hover:opacity-90 transition-opacity">
             <i class="fas fa-save"></i> Simpan
         </button>
 

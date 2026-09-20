@@ -10,14 +10,14 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>[x-cloak] { display: none !important; }</style>
 </head>
-<body class="font-sans antialiased bg-gray-100">
+<body class="font-sans antialiased bg-bgsoft text-ink">
 
     <div class="py-8 px-4 sm:px-6 lg:px-10 min-h-screen relative overflow-hidden">
 
-        <div class="absolute -top-20 right-0 w-96 h-96 rounded-full bg-periwinkle/15 blur-3xl pointer-events-none"></div>
-        <div class="absolute top-1/2 -left-20 w-72 h-72 rounded-full bg-mint/25 blur-3xl pointer-events-none"></div>
+        <div class="absolute -top-20 right-0 w-96 h-96 rounded-full bg-periwinkle/10 blur-3xl pointer-events-none"></div>
+        <div class="absolute top-1/2 -left-20 w-72 h-72 rounded-full bg-mint/20 blur-3xl pointer-events-none"></div>
 
-        <div class="max-w-7xl mx-auto relative z-10">
+        <div class="w-full relative z-10">
             <div class="flex flex-col lg:flex-row gap-6">
 
                 @include('partials.sidebar-ketua')
@@ -27,12 +27,12 @@
 
                     <div>
                         <p class="text-xs text-gray-400 tracking-wide uppercase font-semibold">Ketua</p>
-                        <h1 class="text-2xl font-extrabold text-gray-800">Absensi Peserta</h1>
+                        <h1 class="text-2xl font-extrabold text-ink">Absensi Peserta</h1>
                         <p class="text-sm text-gray-500 mt-1">Data yang kamu simpan di sini langsung tampil di halaman Absensi Peserta milik pembina.</p>
                     </div>
 
                     @if (session('success'))
-                        <div class="bg-mint/40 text-[#1F7A3D] text-sm font-semibold px-4 py-3 rounded-2xl">
+                        <div class="bg-emerald-50 text-emerald-700 text-sm font-semibold px-4 py-3 rounded-2xl">
                             {{ session('success') }}
                         </div>
                     @endif
@@ -53,8 +53,8 @@
                             <input type="hidden" name="ids[]" value="{{ $p->id_anggota }}">
                         @endforeach
 
-                        <div class="bg-gradient-to-br from-white to-periwinkle/10 rounded-3xl shadow-xl shadow-periwinkle/10 ring-1 ring-black/5 p-6 space-y-5">
-                            <h2 class="font-semibold text-gray-800 border-b border-gray-100 pb-3">Data Absensi</h2>
+                        <div class="bg-white rounded-3xl shadow-xl shadow-periwinkle/10 ring-1 ring-black/5 p-6 space-y-5">
+                            <h2 class="font-semibold text-ink border-b border-gray-100 pb-3">Data Absensi</h2>
 
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1.5">Tanggal Kegiatan</label>
@@ -136,7 +136,7 @@
                         </div>
 
                         <button type="submit"
-                            class="w-full py-3 rounded-xl bg-gradient-to-r from-periwinkle to-sky text-white font-semibold hover:opacity-90 transition shadow-lg shadow-periwinkle/30"
+                            class="w-full py-3 rounded-xl bg-periwinkle text-white font-semibold hover:opacity-90 transition shadow-lg shadow-periwinkle/30"
                         >
                             Kirim Absensi
                         </button>

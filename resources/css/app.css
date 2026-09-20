@@ -13,16 +13,30 @@
     --font-body: 'Plus Jakarta Sans', sans-serif;
     --font-display: 'Fredoka', sans-serif;
 
-    --color-lavender: #9FA1FF;
-    --color-periwinkle: #B5BAFF;
-    --color-sky: #AEE2FF;
-    --color-mint: #D9F9DF;
-    --color-ink: #2E2B55;
-    --color-inksoft: #6B6795;
-    --color-bgsoft: #F3F4FC;
+    /* ================== PALET WARNA BARU ==================
+       #F2F7FF  cloud   - background halaman
+       #0B409C  blue    - warna utama (primary)
+       #10316B  navy    - warna gelap / teks
+       #FFE867  gold    - aksen
+       Nama token lama tetap dipakai supaya class di semua Blade
+       tidak perlu diubah satu-satu.
+    ======================================================== */
 
-    --color-panelnight: #262450;
-    --color-panelnight-soft: #34317A;
+    --color-cloud: #F2F7FF;
+    --color-blue: #0B409C;
+    --color-navy: #10316B;
+    --color-gold: #FFE867;
+
+    --color-lavender: #0B409C;
+    --color-periwinkle: #0B409C;
+    --color-sky: #10316B;
+    --color-mint: #FFE867;
+    --color-ink: #10316B;
+    --color-inksoft: #5B6E96;
+    --color-bgsoft: #F2F7FF;
+
+    --color-panelnight: #10316B;
+    --color-panelnight-soft: #0B409C;
 }
 
 @keyframes fadeInUp {
@@ -59,7 +73,7 @@ input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
     -webkit-box-shadow: 0 0 0 1000px #FFFFFF inset;
     box-shadow: 0 0 0 1000px #FFFFFF inset;
-    -webkit-text-fill-color: #2E2B55;
-    caret-color: #2E2B55;
+    -webkit-text-fill-color: #10316B;
+    caret-color: #10316B;
     transition: background-color 9999s ease-in-out 0s;
 }
