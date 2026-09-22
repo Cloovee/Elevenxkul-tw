@@ -255,7 +255,28 @@ Route::get('/kelola-anggota', function () {
 
 
 Route::get('/kelola-anggota/tambah', function () {
-    return view('dashboard-ketua.kelola-anggota.tambah');
+
+    $idEkskul = optional(optional(auth()->user()->siswa)->ekskulDipimpin)->id_ekskul;
+
+    // Siswa yang sudah jadi anggota ekskul ini gak usah muncul lagi di pilihan
+    $idSiswaSudahAnggota = $idEkskul
+        ? \App\Models\Peserta::where('id_ekskul', $idEkskul)->pluck('id_siswa')
+        : collect();
+
+    $daftarSiswa = \App\Models\Siswa::with('kelas')
+        ->whereNotIn('id_siswa', $idSiswaSudahAnggota)
+        ->orderBy('nama_siswa')
+        ->get()
+        ->map(fn ($s) => [
+            'id_siswa'   => $s->id_siswa,
+            'nama_siswa' => $s->nama_siswa,
+            'nis'        => $s->NIS,
+            'nama_kelas' => $s->nama_kelas,
+        ]);
+
+    $daftarKelas = \App\Models\Kelas::orderBy('tingkat')->orderBy('jurusan')->orderBy('rombel')->get();
+
+    return view('dashboard-ketua.kelola-anggota.tambah', compact('daftarSiswa', 'daftarKelas'));
 })->middleware(['auth', 'verified', 'role:Ketua'])
   ->name('ketua.kelola-anggota.tambah');
 
@@ -263,8 +284,10 @@ Route::get('/kelola-anggota/tambah', function () {
 Route::post('/kelola-anggota/tambah', function (\Illuminate\Http\Request $request) {
 
     $request->validate([
-        'nama' => ['required', 'string'],
-        'nis' => ['required', 'string'],
+        'id_siswa' => ['required', 'array', 'min:1'],
+        'id_siswa.*' => ['integer', 'exists:siswa,id_siswa'],
+    ], [
+        'id_siswa.required' => 'Pilih minimal 1 siswa dulu.',
     ]);
 
     $idEkskul = optional(optional(auth()->user()->siswa)->ekskulDipimpin)->id_ekskul;
@@ -274,40 +297,46 @@ Route::post('/kelola-anggota/tambah', function (\Illuminate\Http\Request $reques
             ->with('error', 'Akun kamu belum ditugaskan sebagai ketua ekskul manapun. Hubungi admin untuk menugaskanmu dulu.');
     }
 
-    // Cari siswa berdasarkan nama dan NIS
-    $siswa = \App\Models\Siswa::where('nama_siswa', $request->nama)
-        ->where('NIS', $request->nis)
-        ->first();
+    $idSiswaDipilih = collect($request->id_siswa)->unique()->values();
 
-    // Jika siswa tidak ditemukan
-    if (!$siswa) {
+    // Siswa yang udah jadi anggota ekskul ini dilewati, biar gak dobel / kena unique constraint
+    $idSudahAnggota = \App\Models\Peserta::where('id_ekskul', $idEkskul)
+        ->whereIn('id_siswa', $idSiswaDipilih)
+        ->pluck('id_siswa');
+
+    $idBaru = $idSiswaDipilih->diff($idSudahAnggota)->values();
+
+    if ($idBaru->isEmpty()) {
         return back()
-            ->withInput()
-            ->with('error', 'Siswa dengan nama dan NIS tersebut tidak ditemukan.');
+            ->with('error', 'Semua siswa yang dipilih sudah jadi anggota ekskul ini.');
     }
 
-    // Cek apakah siswa sudah menjadi anggota ekskul ini
-    $sudahAnggota = \App\Models\Peserta::where('id_siswa', $siswa->id_siswa)
-        ->where('id_ekskul', $idEkskul)
-        ->exists();
+    $now = now();
+    $rows = $idBaru->map(fn ($id) => [
+        'id_siswa'          => $id,
+        'id_ekskul'         => $idEkskul,
+        'tanggal_bergabung' => $now->toDateString(),
+        'status'            => 'aktif',
+        'created_at'        => $now,
+        'updated_at'        => $now,
+    ])->all();
 
-    if ($sudahAnggota) {
-        return back()
-            ->withInput()
-            ->with('error', 'Siswa tersebut sudah menjadi anggota ekskul ini.');
+    \App\Models\Peserta::insert($rows);
+
+    $jumlahBerhasil  = count($rows);
+    $jumlahDilewati  = $idSiswaDipilih->count() - $jumlahBerhasil;
+
+    $pesan = $jumlahBerhasil > 1
+        ? "{$jumlahBerhasil} anggota berhasil ditambahkan."
+        : 'Anggota berhasil ditambahkan.';
+
+    if ($jumlahDilewati > 0) {
+        $pesan .= " {$jumlahDilewati} siswa dilewati karena sudah jadi anggota.";
     }
-
-    // Simpan anggota baru
-    \App\Models\Peserta::create([
-        'id_siswa' => $siswa->id_siswa,
-        'id_ekskul' => $idEkskul,
-        'tanggal_bergabung' => now(),
-        'status' => 'aktif',
-    ]);
 
     return redirect()
         ->route('ketua.kelola-anggota')
-        ->with('success', 'Anggota berhasil ditambahkan.');
+        ->with('success', $pesan);
 
 })->middleware(['auth', 'verified', 'role:Ketua'])
   ->name('ketua.kelola-anggota.store');
@@ -334,6 +363,37 @@ Route::get('/kelola-anggota/{id}', function ($id) {
 
 })->middleware(['auth', 'verified', 'role:Ketua'])
   ->name('ketua.kelola-anggota.detail');
+
+Route::delete('/kelola-anggota/{id}', function ($id) {
+
+    $idEkskul = optional(optional(auth()->user()->siswa)->ekskulDipimpin)->id_ekskul;
+
+    if (! $idEkskul) {
+        return redirect()->route('dashboard.ketua')
+            ->with('error', 'Akun kamu belum ditugaskan sebagai ketua ekskul manapun. Hubungi admin untuk menugaskanmu dulu.');
+    }
+
+    // Cuma boleh hapus anggota yang emang ada di ekskul yang dia pimpin
+    $anggota = \App\Models\Peserta::where('id_anggota', $id)
+        ->where('id_ekskul', $idEkskul)
+        ->first();
+
+    if (! $anggota) {
+        return redirect()
+            ->route('ketua.kelola-anggota')
+            ->with('error', 'Anggota tidak ditemukan.');
+    }
+
+    $namaSiswa = $anggota->nama;
+
+    $anggota->delete();
+
+    return redirect()
+        ->route('ketua.kelola-anggota')
+        ->with('success', "{$namaSiswa} berhasil dihapus dari anggota.");
+
+})->middleware(['auth', 'verified', 'role:Ketua'])
+  ->name('ketua.kelola-anggota.destroy');
 
 /*
 |--------------------------------------------------------------------------

@@ -88,6 +88,26 @@
                                 </button>
                             </form>
                         </div>
+
+                        <!-- Hapus anggota -->
+                        <div class="mt-8 pt-6 border-t border-gray-100 flex justify-end">
+                            <form action="{{ route('ketua.kelola-anggota.destroy', $anggota->id_anggota) }}"
+                                  method="POST"
+                                  onsubmit="return confirm('Yakin mau hapus {{ addslashes($anggota->nama) }} dari anggota ekskul ini? Tindakan ini tidak bisa dibatalkan.')"
+                            >
+                                @csrf
+                                @method('DELETE')
+
+                                <button type="submit"
+                                    class="px-5 py-2.5 rounded-xl border border-red-200 text-red-600 font-semibold hover:bg-red-50 transition inline-flex items-center gap-2"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9.5 4h5a1 1 0 011 1v2h-7V5a1 1 0 011-1z" />
+                                    </svg>
+                                    Hapus Anggota
+                                </button>
+                            </form>
+                        </div>
                     </div>
 
                 </div>

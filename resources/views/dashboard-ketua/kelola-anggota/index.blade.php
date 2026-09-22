@@ -32,25 +32,58 @@
                     <div class="bg-white rounded-3xl shadow-xl shadow-periwinkle/10 ring-1 ring-black/5 p-6 relative min-h-[420px]">
                         <h2 class="font-semibold text-ink border-b border-gray-100 pb-3 mb-4">Daftar Anggota</h2>
 
+                        @if (session('success'))
+                            <div class="rounded-xl bg-emerald-50 text-emerald-700 text-sm px-4 py-3 mb-4">
+                                {{ session('success') }}
+                            </div>
+                        @endif
+
+                        @if (session('error'))
+                            <div class="rounded-xl bg-red-50 text-red-600 text-sm px-4 py-3 mb-4">
+                                {{ session('error') }}
+                            </div>
+                        @endif
+
                         <div class="space-y-2">
                             @forelse ($anggota as $item)
-                                <a href="{{ route('ketua.kelola-anggota.detail', $item->id_anggota) }}"
-                                   class="flex items-center justify-between gap-4 bg-white rounded-2xl px-4 py-3 shadow-sm ring-1 ring-black/5 hover:shadow-md transition"
-                                >
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-10 h-10 rounded-full bg-periwinkle flex items-center justify-center text-white font-semibold text-sm">
+                                <div class="flex items-center justify-between gap-4 bg-white rounded-2xl px-4 py-3 shadow-sm ring-1 ring-black/5 hover:shadow-md transition">
+
+                                    <a href="{{ route('ketua.kelola-anggota.detail', $item->id_anggota) }}"
+                                       class="flex items-center gap-3 flex-1 min-w-0"
+                                    >
+                                        <div class="w-10 h-10 rounded-full bg-periwinkle flex items-center justify-center text-white font-semibold text-sm shrink-0">
                                             {{ strtoupper(substr($item->siswa->nama_siswa, 0, 1)) }}
                                         </div>
 
-                                        <p class="font-medium text-ink">
+                                        <p class="font-medium text-ink truncate">
                                             {{ $item->siswa->nama_siswa }}
                                         </p>
+                                    </a>
+
+                                    <div class="flex items-center gap-2 shrink-0">
+                                        <span class="text-xs font-medium px-3 py-1 rounded-full {{ $item->status === 'aktif' ? 'bg-emerald-50 text-emerald-700' : 'bg-gray-100 text-gray-500' }}">
+                                            {{ ucfirst($item->status) }}
+                                        </span>
+
+                                        <form action="{{ route('ketua.kelola-anggota.destroy', $item->id_anggota) }}"
+                                              method="POST"
+                                              onsubmit="return confirm('Yakin mau hapus {{ addslashes($item->siswa->nama_siswa) }} dari anggota ekskul ini?')"
+                                        >
+                                            @csrf
+                                            @method('DELETE')
+
+                                            <button type="submit"
+                                                title="Hapus anggota"
+                                                class="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 transition"
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                                </svg>
+                                            </button>
+                                        </form>
                                     </div>
 
-                                    <span class="text-xs font-medium px-3 py-1 rounded-full {{ $item->status === 'aktif' ? 'bg-emerald-50 text-emerald-700' : 'bg-gray-100 text-gray-500' }}">
-                                        {{ ucfirst($item->status) }}
-                                    </span>
-                                </a>
+                                </div>
                             @empty
                                 <div class="text-center py-10 text-gray-400">
                                     Belum ada anggota.
