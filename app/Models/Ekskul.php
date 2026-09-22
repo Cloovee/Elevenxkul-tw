@@ -13,6 +13,7 @@ class Ekskul extends Model
     protected $fillable = [
         'id_pembina',
         'id_pelatih',
+        'id_ketua',
         'nama_ekskul',
         'kategori',
         'deskripsi',
@@ -32,6 +33,14 @@ class Ekskul extends Model
     public function pelatih()
     {
         return $this->belongsTo(Pelatih::class, 'id_pelatih', 'id_pelatih');
+    }
+
+    /**
+     * Siswa yang jadi Ketua ekskul ini (diisi oleh Admin di CRUD Ekskul).
+     */
+    public function ketua()
+    {
+        return $this->belongsTo(Siswa::class, 'id_ketua', 'id_siswa');
     }
 
     /**

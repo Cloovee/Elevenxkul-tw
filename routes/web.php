@@ -13,7 +13,6 @@ use App\Http\Controllers\Admin\SiswaController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\PembinaController;
 use App\Http\Controllers\Admin\EkskulController;
-use App\Http\Controllers\Admin\PembinaController as AdminPembinaController;
 use App\Http\Controllers\Admin\KelasController;
 use Illuminate\Support\Facades\Route;
 use App\Models\Peserta;
@@ -154,9 +153,14 @@ Route::prefix('/admin')
 | KETUA ROUTES
 |--------------------------------------------------------------------------
 */
-// Catatan: route stub 'ketua.dashboard' dihapus karena memanggil
-// view('ketua.dashboard') yang tidak pernah dibuat. Dashboard ketua yang
-// dipakai adalah route 'dashboard.ketua' di bawah (dashboard-ketua.index).
+Route::prefix('/ketua')
+    ->middleware(['auth', 'verified', 'role:Ketua'])
+    ->name('ketua.')
+    ->group(function () {
+        Route::get('/dashboard', function () {
+            return view('ketua.dashboard');
+        })->name('dashboard');
+    });
 
 // 5. Dashboard Ketua
 Route::get('/dashboard-ketua', function () {
@@ -230,21 +234,15 @@ Route::post('/absensi-peserta', [App\Http\Controllers\Ketua\AbsensiPesertaContro
 
 Route::get('/kelola-anggota', function () {
 
-    $anggota = Peserta::with('siswa')->get();
+    $idEkskul = optional(optional(auth()->user()->siswa)->ekskulDipimpin)->id_ekskul;
 
-    return view(
-        'dashboard-ketua.kelola-anggota.index',
-        compact('anggota')
-    );
-
-})->middleware(['auth', 'verified', 'role:Ketua'])
-  ->name('ketua.kelola-anggota');
-
-
-Route::get('/kelola-anggota', function () {
+    if (! $idEkskul) {
+        return redirect()->route('dashboard.ketua')
+            ->with('error', 'Akun kamu belum ditugaskan sebagai ketua ekskul manapun. Hubungi admin untuk menugaskanmu dulu.');
+    }
 
     $anggota = Peserta::with('siswa')
-        ->where('id_ekskul', 1)
+        ->where('id_ekskul', $idEkskul)
         ->get();
 
     return view(
@@ -269,6 +267,13 @@ Route::post('/kelola-anggota/tambah', function (\Illuminate\Http\Request $reques
         'nis' => ['required', 'string'],
     ]);
 
+    $idEkskul = optional(optional(auth()->user()->siswa)->ekskulDipimpin)->id_ekskul;
+
+    if (! $idEkskul) {
+        return redirect()->route('dashboard.ketua')
+            ->with('error', 'Akun kamu belum ditugaskan sebagai ketua ekskul manapun. Hubungi admin untuk menugaskanmu dulu.');
+    }
+
     // Cari siswa berdasarkan nama dan NIS
     $siswa = \App\Models\Siswa::where('nama_siswa', $request->nama)
         ->where('NIS', $request->nis)
@@ -281,10 +286,7 @@ Route::post('/kelola-anggota/tambah', function (\Illuminate\Http\Request $reques
             ->with('error', 'Siswa dengan nama dan NIS tersebut tidak ditemukan.');
     }
 
-    // Sementara: Ketua mengelola Basket
-    $idEkskul = 1;
-
-    // Cek apakah siswa sudah menjadi anggota Basket
+    // Cek apakah siswa sudah menjadi anggota ekskul ini
     $sudahAnggota = \App\Models\Peserta::where('id_siswa', $siswa->id_siswa)
         ->where('id_ekskul', $idEkskul)
         ->exists();
@@ -313,9 +315,16 @@ Route::post('/kelola-anggota/tambah', function (\Illuminate\Http\Request $reques
 
 Route::get('/kelola-anggota/{id}', function ($id) {
 
+    $idEkskul = optional(optional(auth()->user()->siswa)->ekskulDipimpin)->id_ekskul;
+
+    if (! $idEkskul) {
+        return redirect()->route('dashboard.ketua')
+            ->with('error', 'Akun kamu belum ditugaskan sebagai ketua ekskul manapun. Hubungi admin untuk menugaskanmu dulu.');
+    }
+
     $anggota = \App\Models\Peserta::with('siswa')
         ->where('id_anggota', $id)
-        ->where('id_ekskul', 1)
+        ->where('id_ekskul', $idEkskul)
         ->firstOrFail();
 
     return view(

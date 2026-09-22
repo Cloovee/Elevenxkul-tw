@@ -6,14 +6,21 @@ use App\Http\Controllers\Controller;
 use App\Models\AbsensiPeserta;
 use App\Models\Peserta;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AbsensiPesertaController extends Controller
 {
     /**
-     * Sementara: Ketua mengelola ekskul dengan id_ekskul = 1
-     * (samain kayak halaman Kelola Anggota).
+     * Id ekskul yang dipimpin oleh Ketua yang sedang login, diambil dari
+     * relasi Siswa->ekskulDipimpin (diisi Admin lewat CRUD Ekskul).
+     * Null kalau akun ini belum ditugaskan memimpin ekskul manapun.
      */
-    private const ID_EKSKUL = 1;
+    private function idEkskulAktif(): ?int
+    {
+        $siswa = Auth::user()->siswa;
+
+        return optional(optional($siswa)->ekskulDipimpin)->id_ekskul;
+    }
 
     /**
      * Use case: Ketua mengisi absensi SEMUA peserta sekaligus untuk satu
@@ -21,8 +28,15 @@ class AbsensiPesertaController extends Controller
      */
     public function index()
     {
+        $idEkskul = $this->idEkskulAktif();
+
+        if (! $idEkskul) {
+            return redirect()->route('dashboard.ketua')
+                ->with('error', 'Akun kamu belum ditugaskan sebagai ketua ekskul manapun. Hubungi admin untuk menugaskanmu dulu.');
+        }
+
         $pesertas = Peserta::with(['siswa.kelas', 'ekskul'])
-            ->where('id_ekskul', self::ID_EKSKUL)
+            ->where('id_ekskul', $idEkskul)
             ->where('status', 'aktif')
             ->get();
 
@@ -39,11 +53,30 @@ class AbsensiPesertaController extends Controller
      */
     public function store(Request $request)
     {
+        $idEkskul = $this->idEkskulAktif();
+
+        if (! $idEkskul) {
+            return redirect()->route('dashboard.ketua')
+                ->with('error', 'Akun kamu belum ditugaskan sebagai ketua ekskul manapun. Hubungi admin untuk menugaskanmu dulu.');
+        }
+
         $validated = $request->validate([
             'tanggal_absensi' => ['required', 'date'],
             'deskripsi_kegiatan' => ['nullable', 'string', 'max:1000'],
             'ids' => ['required', 'array', 'min:1'],
-            'ids.*' => ['exists:data_anggota,id_anggota'],
+            // Batasi id_anggota yang boleh dikirim cuma yang beneran anggota ekskul ini,
+            // biar Ketua nggak bisa isi absensi buat anggota ekskul lain.
+            'ids.*' => [
+                'exists:data_anggota,id_anggota',
+                function ($attribute, $value, $fail) use ($idEkskul) {
+                    $milikEkskulIni = Peserta::where('id_anggota', $value)
+                        ->where('id_ekskul', $idEkskul)
+                        ->exists();
+                    if (! $milikEkskulIni) {
+                        $fail('Salah satu peserta bukan anggota ekskul kamu.');
+                    }
+                },
+            ],
             'status' => ['nullable', 'array'],
             'status.*' => ['in:hadir,sakit,izin'],
             'catatan' => ['nullable', 'array'],

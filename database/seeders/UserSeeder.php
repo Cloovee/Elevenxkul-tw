@@ -33,7 +33,7 @@ class UserSeeder extends Seeder
         $pembinaUser = User::firstOrCreate(
             ['email' => 'pembina@test.com'],
             [
-                'name' => 'Pembina OSIS',
+                 'name' => 'Pembina OSIS',
                 'password' => bcrypt('password123'),
                 'role' => 'Pembina',
                 'email_verified_at' => now(),
