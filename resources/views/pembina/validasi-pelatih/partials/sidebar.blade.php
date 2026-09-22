@@ -2,29 +2,13 @@
     Sidebar rail role PEMBINA — format disamakan dengan sidebar ketua.
     Gunakan: @include('pembina.partials.sidebar', ['active' => 'dashboard'])
     Nilai $active: dashboard | absensi | validasi | pelatih | nilai | profile
-
-    Catatan: posisi "fixed" ditulis sebagai CSS mentah (bukan class Tailwind)
-    supaya tidak bergantung pada proses build/compile Tailwind — jadi selalu
-    aktif walau aset belum di-rebuild.
 --}}
 @php($sidebarPembina = auth()->user()?->pembina)
 
-<style>
-    @media (min-width: 1024px) {
-        .ekk-sidebar-rail {
-            position: fixed;
-            top: 2rem;      /* selaras dengan py-8 pada wrapper halaman */
-            left: 2.5rem;   /* selaras dengan lg:px-10 pada wrapper halaman */
-            width: 5rem;    /* setara w-20 */
-            min-height: 33.75rem; /* setara min-h-[540px] */
-            z-index: 30;
-        }
-    }
-</style>
-
 <aside class="lg:w-20 shrink-0">
-    <div class="ekk-sidebar-rail bg-periwinkle rounded-3xl p-3
+    <div class="bg-periwinkle rounded-3xl p-3
                 flex lg:flex-col items-center gap-2 overflow-x-auto lg:overflow-visible
+                lg:sticky lg:top-6 lg:min-h-[540px]
                 shadow-2xl shadow-periwinkle/30 ring-1 ring-white/20">
 
         <a href="{{ route('pembina.profile.index') }}"

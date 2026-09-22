@@ -7,9 +7,9 @@
 <div class="animate-fade-in-up bg-white/90 rounded-3xl shadow-[0_10px_30px_-18px_rgba(46,43,85,0.35)] p-6">
     @php
         $colors = [
-            'organisasi' => 'bg-periwinkle/20 text-[#7B77E0]',
-            'ekstrakulikuler' => 'bg-mint/60 text-emerald-700',
-            'komunitas' => 'bg-lavender/25 text-[#7B77E0]'
+            'organisasi' => 'bg-periwinkle/20 text-[#10316B]',
+            'ekstrakulikuler' => 'bg-emerald-50 text-emerald-700',
+            'komunitas' => 'bg-lavender/25 text-[#10316B]'
         ];
     @endphp
 
@@ -60,11 +60,11 @@
         </div>
     </div>
 
-    <div class="flex items-center gap-3 mt-6 pt-6 border-t border-[#F3F4FC]">
-        <a href="{{ route('admin.ekskul.edit', $ekskul->id_ekskul) }}" class="px-6 py-2.5 bg-gradient-to-r from-sky to-periwinkle text-white font-semibold rounded-xl hover:opacity-90 transition shadow-md shadow-periwinkle/30">
+    <div class="flex items-center gap-3 mt-6 pt-6 border-t border-[#E8F0FE]">
+        <a href="{{ route('admin.ekskul.edit', $ekskul->id_ekskul) }}" class="px-6 py-2.5 bg-sky text-white font-semibold rounded-xl hover:opacity-90 transition shadow-md shadow-periwinkle/30">
             <i class="fas fa-edit mr-2"></i>Edit
         </a>
-        <a href="{{ route('admin.ekskul.index') }}" class="px-6 py-2.5 bg-bgsoft text-ink font-semibold rounded-xl hover:bg-[#EEF0FD] transition">
+        <a href="{{ route('admin.ekskul.index') }}" class="px-6 py-2.5 bg-bgsoft text-ink font-semibold rounded-xl hover:bg-[#DDE8FB] transition">
             <i class="fas fa-arrow-left mr-2"></i>Kembali
         </a>
     </div>

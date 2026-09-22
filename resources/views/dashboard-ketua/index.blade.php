@@ -12,15 +12,15 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="font-body bg-bgsoft text-ink antialiased">
+<body class="font-sans antialiased bg-bgsoft text-ink">
 
     <div class="py-8 px-4 sm:px-6 lg:px-10 pb-24 md:pb-8 min-h-screen relative overflow-hidden">
 
-        <div class="absolute -top-20 right-0 w-96 h-96 rounded-full bg-periwinkle/15 blur-3xl pointer-events-none"></div>
-        <div class="absolute top-1/2 -left-20 w-72 h-72 rounded-full bg-mint/25 blur-3xl pointer-events-none"></div>
-        <div class="absolute bottom-0 right-1/4 w-64 h-64 rounded-full bg-sky/20 blur-3xl pointer-events-none"></div>
+        <div class="absolute -top-20 right-0 w-96 h-96 rounded-full bg-periwinkle/10 blur-3xl pointer-events-none"></div>
+        <div class="absolute top-1/2 -left-20 w-72 h-72 rounded-full bg-mint/20 blur-3xl pointer-events-none"></div>
+        <div class="absolute bottom-0 right-1/4 w-64 h-64 rounded-full bg-sky/10 blur-3xl pointer-events-none"></div>
 
-        <div class="max-w-7xl mx-auto relative z-10">
+        <div class="w-full relative z-10">
             <div class="flex flex-col lg:flex-row gap-6">
 
                 @include('partials.sidebar-ketua')
@@ -30,25 +30,23 @@
                     <!-- Judul halaman + identitas user -->
                     <div class="flex items-center justify-between flex-wrap gap-3">
                         <div>
-                            <p class="text-xs text-inksoft tracking-wide uppercase font-semibold">Dashboard</p>
-                            <h1 class="text-2xl font-display font-bold text-ink">Ekskul Sebelas</h1>
+                            <p class="text-xs text-gray-400 tracking-wide uppercase font-semibold">Dashboard</p>
+                            <h1 class="text-2xl font-extrabold text-ink">Ekskul Sebelas</h1>
                         </div>
 
                         <div class="flex items-center gap-3 bg-white/90 backdrop-blur rounded-2xl pl-4 pr-2 py-2 shadow-lg shadow-black/5 ring-1 ring-black/5">
                             <div class="text-right">
                                 <p class="text-sm font-semibold text-ink leading-none">{{ auth()->user()->name }}</p>
-                                <p class="text-xs text-inksoft mt-0.5">Ketua Ekskul</p>
+                                <p class="text-xs text-gray-400 mt-0.5">Ketua Ekskul</p>
                             </div>
-                            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-periwinkle to-sky flex items-center justify-center text-white font-semibold text-sm shadow-md shadow-periwinkle/40">
+                            <div class="w-9 h-9 rounded-xl bg-periwinkle flex items-center justify-center text-white font-semibold text-sm shadow-md shadow-periwinkle/30">
                                 {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
                             </div>
                         </div>
                     </div>
 
                     <!-- Sapaan -->
-                    <div class="bg-gradient-to-br from-periwinkle to-sky rounded-3xl shadow-xl shadow-periwinkle/20 p-6 sm:p-8 relative overflow-hidden">
-                        <div class="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-white/10"></div>
-                        <div class="absolute -bottom-14 right-24 w-28 h-28 rounded-full bg-white/10"></div>
+                    <div class="bg-periwinkle rounded-3xl shadow-xl shadow-periwinkle/20 p-6 sm:p-8 relative overflow-hidden">
                         <div class="relative z-10 flex items-center gap-4">
                             <div>
                                 <h3 class="text-xl sm:text-2xl font-display font-bold text-white">
@@ -68,7 +66,7 @@
                         <div class="bg-white rounded-2xl shadow-sm ring-1 ring-black/5 p-5 w-full">
                             <div class="w-10 h-10 rounded-xl bg-mint/60 flex items-center justify-center mb-3">
                                 <svg xmlns="http://www.w3.org/2000/svg"
-                                    class="w-5 h-5 text-emerald-700"
+                                    class="w-5 h-5 text-navy-700"
                                     fill="none"
                                     viewBox="0 0 24 24"
                                     stroke="currentColor"
@@ -78,7 +76,7 @@
                                 </svg>
                             </div>
 
-                            <p class="text-3xl font-display font-bold text-ink">
+                            <p class="text-3xl font-extrabold text-ink">
                                 {{ $jumlahPeserta }}
                             </p>
 
@@ -89,9 +87,9 @@
 
                         <!-- Peserta Aktif -->
                         <div class="bg-white rounded-2xl shadow-sm ring-1 ring-black/5 p-5 w-full">
-                            <div class="w-10 h-10 rounded-xl bg-sky/60 flex items-center justify-center mb-3">
+                            <div class="w-10 h-10 rounded-xl bg-mint/60 flex items-center justify-center mb-3">
                                 <svg xmlns="http://www.w3.org/2000/svg"
-                                    class="w-5 h-5 text-ink"
+                                    class="w-5 h-5 text-navy"
                                     fill="none"
                                     viewBox="0 0 24 24"
                                     stroke="currentColor"
@@ -101,7 +99,7 @@
                                 </svg>
                             </div>
 
-                            <p class="text-3xl font-display font-bold text-ink">
+                            <p class="text-3xl font-extrabold text-ink">
                                 {{ $totalPeserta }}
                             </p>
 
@@ -124,31 +122,31 @@
                                 </div>
                                 <div>
                                     <p class="text-sm font-semibold text-ink">Absensi Pelatih</p>
-                                    <p class="text-xs text-inksoft">Catat kehadiran pelatih</p>
+                                    <p class="text-xs text-gray-500">Catat kehadiran pelatih</p>
                                 </div>
                             </a>
 
-                            <a href="{{ route('ketua.absensi-peserta') }}" class="flex items-center gap-3 p-4 rounded-2xl bg-sky/20 hover:bg-sky/30 transition">
+                            <a href="{{ route('ketua.absensi-peserta') }}" class="flex items-center gap-3 p-4 rounded-2xl bg-mint/50 hover:bg-mint/70 transition">
                                 <div class="w-10 h-10 rounded-xl bg-sky flex items-center justify-center shrink-0">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-ink" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-2.13a4 4 0 10-4-4 4 4 0 004 4zm6 0a4 4 0 10-4-4" />
                                     </svg>
                                 </div>
                                 <div>
                                     <p class="text-sm font-semibold text-ink">Absensi Peserta</p>
-                                    <p class="text-xs text-inksoft">Catat kehadiran anggota</p>
+                                    <p class="text-xs text-gray-500">Catat kehadiran anggota</p>
                                 </div>
                             </a>
 
-                            <a href="{{ route('ketua.kelola-anggota') }}" class="flex items-center gap-3 p-4 rounded-2xl bg-mint/40 hover:bg-mint/60 transition">
-                                <div class="w-10 h-10 rounded-xl bg-emerald-400 flex items-center justify-center shrink-0">
+                            <a href="{{ route('ketua.kelola-anggota') }}" class="flex items-center gap-3 p-4 rounded-2xl bg-periwinkle/10 hover:bg-periwinkle/20 transition">
+                                <div class="w-10 h-10 rounded-xl bg-navy flex items-center justify-center shrink-0">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                                     </svg>
                                 </div>
                                 <div>
                                     <p class="text-sm font-semibold text-ink">Kelola Anggota</p>
-                                    <p class="text-xs text-inksoft">Lihat & tambah anggota</p>
+                                    <p class="text-xs text-gray-500">Lihat & tambah anggota</p>
                                 </div>
                             </a>
                         </div>
