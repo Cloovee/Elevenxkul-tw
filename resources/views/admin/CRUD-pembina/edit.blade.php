@@ -28,9 +28,35 @@
         </a>
     </div>
 
-    <form action="{{ route('admin.pembina.update', $pembina->id_pembina) }}" method="POST">
+    <form action="{{ route('admin.pembina.update', $pembina->id_pembina) }}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')
+
+        <div class="mb-6">
+            <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Foto Profil</label>
+            <div class="flex items-center gap-4">
+                <div id="foto-preview" class="w-16 h-16 rounded-2xl bg-[#F2F7FF] border-2 border-dashed border-[#DDE8FB] flex items-center justify-center overflow-hidden shrink-0 text-[#7C8DB5]">
+                    @if($pembina->foto_url)
+                        <img src="{{ $pembina->foto_url }}" class="w-full h-full object-cover" alt="Foto {{ $pembina->nama_pembina }}">
+                    @else
+                        <i class="fas fa-user text-xl"></i>
+                    @endif
+                </div>
+                <div class="flex-1">
+                    <input type="file" name="foto" id="foto-input" accept="image/png,image/jpeg,image/webp"
+                           class="w-full text-sm text-[#10316B] file:mr-3 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-[#0B409C] file:text-white file:text-xs file:font-bold file:cursor-pointer hover:file:opacity-90 @error('foto') ring-2 ring-red-400 rounded-xl @enderror">
+                    <p class="text-[11px] text-[#7C8DB5] mt-1.5">JPG, PNG, atau WEBP. Maks 2MB. Kosongkan jika tidak ingin mengganti foto.</p>
+                    @error('foto')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+
+                    @if($pembina->foto_url)
+                        <label class="inline-flex items-center gap-1.5 mt-2 text-xs font-semibold text-red-500 cursor-pointer">
+                            <input type="checkbox" name="hapus_foto" value="1" class="rounded border-red-300 text-red-500 focus:ring-red-400">
+                            Hapus foto (kembali ke avatar inisial)
+                        </label>
+                    @endif
+                </div>
+            </div>
+        </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
@@ -90,4 +116,18 @@
         </div>
     </form>
 </div>
+
+<script>
+    document.getElementById('foto-input')?.addEventListener('change', function (e) {
+        const file = e.target.files[0];
+        const preview = document.getElementById('foto-preview');
+        if (!file || !preview) return;
+
+        const reader = new FileReader();
+        reader.onload = function (ev) {
+            preview.innerHTML = '<img src="' + ev.target.result + '" class="w-full h-full object-cover" alt="Preview foto">';
+        };
+        reader.readAsDataURL(file);
+    });
+</script>
 @endsection

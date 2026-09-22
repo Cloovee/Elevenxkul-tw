@@ -63,8 +63,12 @@
 
                     <td class="px-3 py-3">
                         <div class="flex items-center gap-3">
-                            <div class="w-9 h-9 rounded-full bg-teal-50 text-teal-600 flex items-center justify-center font-display font-bold text-sm ring-2 ring-teal-100 flex-shrink-0">
-                                {{ $initial }}
+                            <div class="w-9 h-9 rounded-full bg-teal-50 text-teal-600 flex items-center justify-center font-display font-bold text-sm ring-2 ring-teal-100 flex-shrink-0 overflow-hidden">
+                                @if($p->foto_url)
+                                    <img src="{{ $p->foto_url }}" class="w-full h-full object-cover" alt="Foto {{ $p->nama_pembina }}">
+                                @else
+                                    {{ $initial }}
+                                @endif
                             </div>
                             <p class="text-[#10316B] font-bold whitespace-nowrap">{{ $p->nama_pembina }}</p>
                         </div>

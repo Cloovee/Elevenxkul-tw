@@ -12,6 +12,7 @@ class Pembina extends Model
     protected $fillable = [
         'id_user',
         'nama_pembina',
+        'foto',
         'jk',
         'agama',
         'nomor_hp',
@@ -19,6 +20,46 @@ class Pembina extends Model
         'medsos',
         'alamat',
     ];
+
+    protected $appends = ['foto_url', 'inisial'];
+
+    /**
+     * URL foto profil pembina (disimpan admin lewat storage disk "public").
+     * Dipakai di navbar/sidebar & halaman profil untuk menggantikan huruf
+     * inisial ("P") begitu admin mengunggah foto.
+     */
+    public function getFotoUrlAttribute(): ?string
+    {
+        if (! $this->foto) {
+            return null;
+        }
+
+        // Sudah berupa URL lengkap (mis. disimpan sebagai link eksternal)
+        if (str_starts_with($this->foto, 'http://') || str_starts_with($this->foto, 'https://')) {
+            return $this->foto;
+        }
+
+        return asset('storage/' . ltrim($this->foto, '/'));
+    }
+
+    /**
+     * Inisial dari nama pembina, dipakai sebagai fallback avatar
+     * selama admin belum mengunggah foto.
+     */
+    public function getInisialAttribute(): string
+    {
+        $nama = trim((string) $this->nama_pembina);
+
+        if ($nama === '') {
+            return 'P';
+        }
+
+        return collect(explode(' ', $nama))
+            ->filter()
+            ->map(fn ($s) => strtoupper($s[0]))
+            ->take(2)
+            ->implode('');
+    }
 
     // Akun login milik pembina ini
     public function user()

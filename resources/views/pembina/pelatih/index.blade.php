@@ -28,17 +28,17 @@
         @endif
 
         {{-- HERO --}}
-        <div class="animate-fade-in-up rounded-3xl p-7 bg-gradient-to-br from-[#D9F9DF] via-[#F0FDF3] to-white shadow-[0_10px_30px_-18px_rgba(30,168,111,0.35)] relative overflow-hidden">
+        <div class="animate-fade-in-up rounded-3xl p-7 bg-gradient-to-br from-[#B5BAFF] via-[#E4E5FF] to-white shadow-[0_10px_30px_-18px_rgba(63,65,176,0.35)] relative overflow-hidden">
             <div class="absolute top-0 right-0 w-56 h-56 rounded-full bg-white/40 -translate-y-1/3 translate-x-1/4 pointer-events-none"></div>
             <div class="flex items-center justify-between flex-wrap gap-4 relative">
                 <div>
-                    <p class="text-xs font-bold uppercase tracking-wide text-[#1F7A3D]">Data Pelatih</p>
+                    <p class="text-xs font-bold uppercase tracking-wide text-[#3F41B0]">Data Pelatih</p>
                     <h1 class="font-display text-2xl font-semibold mt-1">Kelola Pelatih</h1>
                     <p class="text-sm text-inksoft mt-1 max-w-md">Tambah, ubah, atau hapus data pelatih untuk ekskul yang kamu bina.</p>
                 </div>
                 <div class="flex items-center gap-3">
                     <div class="bg-white/70 rounded-2xl px-4 py-2.5 text-center">
-                        <div class="font-display text-xl font-bold text-[#1F7A3D]">{{ $pelatih->total() }}</div>
+                        <div class="font-display text-xl font-bold text-[#3F41B0]">{{ $pelatih->total() }}</div>
                         <div class="text-[11px] text-inksoft">Pelatih terdaftar</div>
                     </div>
                 </div>
@@ -73,7 +73,7 @@
                 </form>
 
                 <a href="{{ route('pembina.pelatih.create') }}"
-                   class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-tr from-[#57C785] to-[#1F9D5E] text-white rounded-full text-sm font-bold shadow-md shadow-[#57C785]/30 hover:opacity-90 transition-opacity">
+                   class="inline-flex items-center gap-2 px-4 py-2 bg-lavender text-white rounded-full text-sm font-bold shadow-md shadow-lavender/30 hover:bg-[#8385f0] transition-colors">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                     Tambah Pelatih
                 </a>
@@ -101,7 +101,7 @@
 
                             <td class="px-3 py-3">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-9 h-9 rounded-full bg-mint text-[#1F7A3D] flex items-center justify-center font-extrabold text-sm flex-shrink-0">
+                                    <div class="w-9 h-9 rounded-full bg-lavender text-white flex items-center justify-center font-extrabold text-sm flex-shrink-0">
                                         {{ $initial }}
                                     </div>
                                     <p class="text-ink font-bold whitespace-nowrap">{{ $p->nama_pelatih }}</p>

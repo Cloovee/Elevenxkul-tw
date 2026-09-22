@@ -120,7 +120,7 @@
                         <div class="flex items-center justify-between mt-1 pt-4 border-t border-[#EFEFF7]">
                             <p class="text-xs text-inksoft">Perubahan tersimpan otomatis ke akunmu.</p>
                             <button type="submit"
-                                    class="bg-gradient-to-r from-lavender to-mint text-white font-bold text-sm px-6 py-2.5 rounded-xl hover:opacity-90 hover:-translate-y-0.5 transition-all shrink-0">
+                                    class="bg-lavender text-white font-bold text-sm px-6 py-2.5 rounded-xl hover:bg-[#8385f0] hover:-translate-y-0.5 transition-all shrink-0">
                                 Simpan Perubahan
                             </button>
                         </div>
