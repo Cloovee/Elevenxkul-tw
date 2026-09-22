@@ -73,7 +73,7 @@
                     <th class="px-3 py-3">Aksi</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-50">
+            <tbody class="divide-y divide-ink/5">
                 @forelse($siswa as $key => $s)
                 <tr class="hover:bg-[#F2F7FF]/60 transition-colors">
                     <td class="px-3 py-3 text-[#7C8DB5] font-medium">{{ $siswa->firstItem() + $key }}</td>
@@ -81,7 +81,7 @@
                     <td class="px-3 py-3 text-[#10316B] whitespace-nowrap">{{ $s->NIS }}</td>
                     <td class="px-3 py-3 text-[#10316B] font-bold whitespace-nowrap">{{ $s->nama_siswa }}</td>
                     <td class="px-3 py-3">
-                        <span class="px-2 py-1 rounded-full text-[10px] font-bold {{ $s->jk == 'L' ? 'bg-blue-50 text-blue-500' : 'bg-pink-50 text-pink-500' }}">
+                        <span class="px-2 py-1 rounded-full text-[10px] font-bold {{ $s->jk == 'L' ? 'bg-sky/15 text-sky-500' : 'bg-pink-50 text-pink-500' }}">
                             {{ $s->jk }}
                         </span>
                     </td>

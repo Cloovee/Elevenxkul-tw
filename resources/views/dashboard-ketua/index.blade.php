@@ -4,18 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
 
     <title>Dashboard Ketua - Ekskul Sebelas</title>
 
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" />
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
 <body class="font-sans antialiased bg-bgsoft text-ink">
 
-    <div class="py-8 px-4 sm:px-6 lg:px-10 min-h-screen relative overflow-hidden">
+    <div class="py-8 px-4 sm:px-6 lg:px-10 pb-24 md:pb-8 min-h-screen relative overflow-hidden">
 
         <div class="absolute -top-20 right-0 w-96 h-96 rounded-full bg-periwinkle/10 blur-3xl pointer-events-none"></div>
         <div class="absolute top-1/2 -left-20 w-72 h-72 rounded-full bg-mint/20 blur-3xl pointer-events-none"></div>
@@ -50,7 +49,7 @@
                     <div class="bg-periwinkle rounded-3xl shadow-xl shadow-periwinkle/20 p-6 sm:p-8 relative overflow-hidden">
                         <div class="relative z-10 flex items-center gap-4">
                             <div>
-                                <h3 class="text-xl sm:text-2xl font-extrabold text-white">
+                                <h3 class="text-xl sm:text-2xl font-display font-bold text-white">
                                     Halo, {{ auth()->user()->name }}
                                 </h3>
                                 <p class="text-white/85 text-sm mt-1">
@@ -81,7 +80,7 @@
                                 {{ $jumlahPeserta }}
                             </p>
 
-                            <p class="text-xs text-gray-500 mt-1 font-medium">
+                            <p class="text-xs text-inksoft mt-1 font-medium">
                                 Total Peserta
                             </p>
                         </div>
@@ -104,7 +103,7 @@
                                 {{ $totalPeserta }}
                             </p>
 
-                            <p class="text-xs text-gray-500 mt-1 font-medium">
+                            <p class="text-xs text-inksoft mt-1 font-medium">
                                 Peserta Aktif
                             </p>
                         </div>
@@ -158,14 +157,14 @@
                         <h2 class="font-semibold text-ink mb-4">Aktivitas Terbaru</h2>
 
                         @if ($riwayat->isEmpty())
-                            <p class="text-sm text-gray-400 text-center py-6">Belum ada aktivitas tercatat.</p>
+                            <p class="text-sm text-inksoft text-center py-6">Belum ada aktivitas tercatat.</p>
                         @else
                             <div class="space-y-2.5">
                                 @foreach ($riwayat as $item)
-                                    <div class="flex items-center gap-3 bg-gray-50 rounded-2xl px-4 py-3">
+                                    <div class="flex items-center gap-3 bg-bgsoft rounded-2xl px-4 py-3">
                                         <span class="w-2.5 h-2.5 rounded-full bg-{{ $item['warna'] }} shrink-0"></span>
-                                        <p class="text-sm text-gray-700 flex-1">{{ $item['teks'] }}</p>
-                                        <p class="text-xs text-gray-400 shrink-0">{{ $item['waktu']->diffForHumans() }}</p>
+                                        <p class="text-sm text-ink flex-1">{{ $item['teks'] }}</p>
+                                        <p class="text-xs text-inksoft shrink-0">{{ $item['waktu']->diffForHumans() }}</p>
                                     </div>
                                 @endforeach
                             </div>

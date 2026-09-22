@@ -41,10 +41,10 @@
 
         <!-- Ringkasan mini per role, biar keliatan sebaran akunnya -->
         <div class="ml-auto flex gap-2">
-            <span class="inline-flex items-center gap-1.5 px-3 py-2 bg-purple-50 text-purple-600 rounded-full text-xs font-bold">
+            <span class="inline-flex items-center gap-1.5 px-3 py-2 bg-periwinkle/10 text-periwinkle rounded-full text-xs font-bold">
                 <i class="fas fa-user-shield"></i> {{ $users->where('role', 'Admin')->count() }} Admin
             </span>
-            <span class="inline-flex items-center gap-1.5 px-3 py-2 bg-blue-50 text-blue-600 rounded-full text-xs font-bold">
+            <span class="inline-flex items-center gap-1.5 px-3 py-2 bg-sky/15 text-sky-500 rounded-full text-xs font-bold">
                 <i class="fas fa-user-tie"></i> {{ $users->where('role', 'Pembina')->count() }} Pembina
             </span>
             <span class="inline-flex items-center gap-1.5 px-3 py-2 bg-green-50 text-green-600 rounded-full text-xs font-bold">
@@ -71,14 +71,14 @@
                     <th class="px-3 py-3">Aksi</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-50">
+            <tbody class="divide-y divide-ink/5">
                 @forelse($users as $key => $u)
                 @php
                     $roleStyle = match($u->role) {
-                        'Admin' => ['bg' => 'bg-purple-50', 'text' => 'text-purple-600', 'ring' => 'ring-purple-100', 'icon' => 'fa-user-shield'],
-                        'Pembina' => ['bg' => 'bg-blue-50', 'text' => 'text-blue-600', 'ring' => 'ring-blue-100', 'icon' => 'fa-user-tie'],
+                        'Admin' => ['bg' => 'bg-periwinkle/10', 'text' => 'text-periwinkle', 'ring' => 'ring-periwinkle/20', 'icon' => 'fa-user-shield'],
+                        'Pembina' => ['bg' => 'bg-sky/15', 'text' => 'text-sky-500', 'ring' => 'ring-sky/25', 'icon' => 'fa-user-tie'],
                         'Ketua' => ['bg' => 'bg-green-50', 'text' => 'text-green-600', 'ring' => 'ring-green-100', 'icon' => 'fa-user-graduate'],
-                        default => ['bg' => 'bg-gray-50', 'text' => 'text-gray-600', 'ring' => 'ring-gray-100', 'icon' => 'fa-user'],
+                        default => ['bg' => 'bg-bgsoft', 'text' => 'text-inksoft', 'ring' => 'ring-ink/5', 'icon' => 'fa-user'],
                     };
                     $initial = strtoupper(substr($u->name, 0, 1));
                 @endphp
@@ -88,7 +88,7 @@
                     <!-- Kolom Akun: avatar inisial + nama + email -->
                     <td class="px-3 py-3">
                         <div class="flex items-center gap-3">
-                            <div class="w-9 h-9 rounded-full {{ $roleStyle['bg'] }} {{ $roleStyle['text'] }} flex items-center justify-center font-extrabold text-sm ring-2 {{ $roleStyle['ring'] }} flex-shrink-0">
+                            <div class="w-9 h-9 rounded-full {{ $roleStyle['bg'] }} {{ $roleStyle['text'] }} flex items-center justify-center font-display font-bold text-sm ring-2 {{ $roleStyle['ring'] }} flex-shrink-0">
                                 {{ $initial }}
                             </div>
                             <div>

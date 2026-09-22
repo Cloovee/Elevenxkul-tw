@@ -52,7 +52,7 @@
                     <th class="px-3 py-3">Aksi</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-50">
+            <tbody class="divide-y divide-ink/5">
                 @forelse($ekskuls as $key => $ekskul)
                 @php $initial = strtoupper(substr($ekskul->nama_ekskul, 0, 1)); @endphp
                 <tr class="hover:bg-[#F2F7FF]/60 transition-colors">
@@ -60,7 +60,7 @@
 
                     <td class="px-3 py-3">
                         <div class="flex items-center gap-3">
-                            <div class="w-9 h-9 rounded-full bg-teal-50 text-teal-600 flex items-center justify-center font-extrabold text-sm ring-2 ring-teal-100 flex-shrink-0">
+                            <div class="w-9 h-9 rounded-full bg-teal-50 text-teal-600 flex items-center justify-center font-display font-bold text-sm ring-2 ring-teal-100 flex-shrink-0">
                                 {{ $initial }}
                             </div>
                             <p class="text-[#10316B] font-bold whitespace-nowrap">{{ $ekskul->nama_ekskul }}</p>
@@ -70,12 +70,12 @@
                     <td class="px-3 py-3">
                         @php
                             $colors = [
-                                'organisasi' => 'bg-blue-50 text-blue-500',
+                                'organisasi' => 'bg-sky/15 text-sky-500',
                                 'ekstrakulikuler' => 'bg-green-50 text-green-500',
-                                'komunitas' => 'bg-purple-50 text-purple-500',
+                                'komunitas' => 'bg-periwinkle/10 text-periwinkle',
                             ];
                         @endphp
-                        <span class="px-2 py-1 rounded-full text-[10px] font-bold {{ $colors[$ekskul->kategori] ?? 'bg-gray-100 text-gray-500' }}">
+                        <span class="px-2 py-1 rounded-full text-[10px] font-bold {{ $colors[$ekskul->kategori] ?? 'bg-bgsoft text-inksoft' }}">
                             {{ ucfirst($ekskul->kategori) }}
                         </span>
                     </td>
@@ -98,7 +98,7 @@
 
                     <td class="px-3 py-3">
                         <div class="flex gap-2">
-                            <a href="{{ route('admin.ekskul.show', $ekskul->id_ekskul) }}" class="w-8 h-8 flex items-center justify-center rounded-lg bg-blue-50 text-blue-500 hover:bg-blue-500 hover:text-white transition-colors" title="Detail">
+                            <a href="{{ route('admin.ekskul.show', $ekskul->id_ekskul) }}" class="w-8 h-8 flex items-center justify-center rounded-lg bg-sky/15 text-sky-500 hover:bg-sky-500 hover:text-white transition-colors" title="Detail">
                                 <i class="fas fa-eye text-xs"></i>
                             </a>
                             <a href="{{ route('admin.ekskul.edit', $ekskul->id_ekskul) }}" class="w-8 h-8 flex items-center justify-center rounded-lg bg-amber-50 text-amber-500 hover:bg-amber-500 hover:text-white transition-colors" title="Edit">

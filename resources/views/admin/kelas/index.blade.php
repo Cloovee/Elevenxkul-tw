@@ -56,14 +56,14 @@
                     <th class="px-3 py-3">Aksi</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-50">
+            <tbody class="divide-y divide-ink/5">
                 @forelse($kelas as $key => $k)
                 <tr class="hover:bg-[#F2F7FF]/60 transition-colors">
                     <td class="px-3 py-3 text-[#7C8DB5] font-medium">{{ $kelas->firstItem() + $key }}</td>
                     <td class="px-3 py-3 text-[#10316B] font-semibold">{{ $k->tingkat }}</td>
                     <td class="px-3 py-3">
                         <div class="flex items-center gap-3">
-                            <div class="w-9 h-9 rounded-full bg-orange-50 text-orange-500 flex items-center justify-center font-extrabold text-sm ring-2 ring-orange-100 flex-shrink-0">
+                            <div class="w-9 h-9 rounded-full bg-orange-50 text-orange-500 flex items-center justify-center font-display font-bold text-sm ring-2 ring-orange-100 flex-shrink-0">
                                 <i class="fas fa-school text-xs"></i>
                             </div>
                             <p class="text-[#10316B] font-bold">{{ $k->jurusan }}</p>
@@ -71,7 +71,7 @@
                     </td>
                     <td class="px-3 py-3 text-[#10316B] font-semibold">{{ $k->rombel }}</td>
                     <td class="px-3 py-3">
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 text-indigo-600">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-lavender/10 text-lavender">
                             <i class="fas fa-user-graduate text-[10px]"></i> {{ $k->siswa_count }} siswa
                         </span>
                     </td>

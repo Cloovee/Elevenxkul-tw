@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Pembina;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class PembinaController extends Controller
@@ -40,6 +41,7 @@ class PembinaController extends Controller
         $validator = Validator::make($request->all(), [
             'id_user' => 'required|exists:users,id',
             'nama_pembina' => 'required|string|max:100',
+            'foto' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'jk' => 'nullable|in:L,P',
             'agama' => 'nullable|string|max:20',
             'nomor_hp' => 'nullable|string|max:15',
@@ -61,9 +63,14 @@ class PembinaController extends Controller
             return back()->withErrors(['id_user' => 'Akun ini sudah punya biodata pembina.'])->withInput();
         }
 
+        $fotoPath = $request->hasFile('foto')
+            ? $request->file('foto')->store('pembina-photos', 'public')
+            : null;
+
         Pembina::create([
             'id_user' => $request->id_user,
             'nama_pembina' => $request->nama_pembina,
+            'foto' => $fotoPath,
             'jk' => $request->jk,
             'agama' => $request->agama,
             'nomor_hp' => $request->nomor_hp,
@@ -89,6 +96,8 @@ class PembinaController extends Controller
         // Akun (id_user) tidak diubah lewat sini -- cuma biodata
         $validator = Validator::make($request->all(), [
             'nama_pembina' => 'required|string|max:100',
+            'foto' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'hapus_foto' => 'nullable|boolean',
             'jk' => 'nullable|in:L,P',
             'agama' => 'nullable|string|max:20',
             'nomor_hp' => 'nullable|string|max:15',
@@ -101,9 +110,30 @@ class PembinaController extends Controller
             return back()->withErrors($validator)->withInput();
         }
 
-        $pembina->update($request->only([
+        $data = $request->only([
             'nama_pembina', 'jk', 'agama', 'nomor_hp', 'email', 'medsos', 'alamat',
-        ]));
+        ]);
+
+        if ($request->hasFile('foto')) {
+            // Ganti foto lama: unggah yang baru, baru hapus file lama supaya aman
+            // kalau proses upload gagal di tengah jalan.
+            $newPath = $request->file('foto')->store('pembina-photos', 'public');
+
+            if ($pembina->foto && Storage::disk('public')->exists($pembina->foto)) {
+                Storage::disk('public')->delete($pembina->foto);
+            }
+
+            $data['foto'] = $newPath;
+        } elseif ($request->boolean('hapus_foto')) {
+            // Admin secara eksplisit ingin menghapus foto (kembali ke avatar inisial)
+            if ($pembina->foto && Storage::disk('public')->exists($pembina->foto)) {
+                Storage::disk('public')->delete($pembina->foto);
+            }
+
+            $data['foto'] = null;
+        }
+
+        $pembina->update($data);
 
         return redirect()->route('admin.pembina.index')
             ->with('success', 'Biodata pembina berhasil diupdate!');
@@ -112,6 +142,10 @@ class PembinaController extends Controller
     public function destroy(int $id)
     {
         $pembina = Pembina::findOrFail($id);
+
+        if ($pembina->foto && Storage::disk('public')->exists($pembina->foto)) {
+            Storage::disk('public')->delete($pembina->foto);
+        }
 
         // Cuma hapus biodatanya. Akun user TETAP ada (masih bisa login dengan role Pembina),
         // cuma statusnya balik jadi "belum ada biodata" di CRUD User.

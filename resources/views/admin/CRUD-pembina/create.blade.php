@@ -13,8 +13,23 @@
         <h3 class="text-xl font-extrabold text-[#10316B]">Tambah Biodata Pembina</h3>
     </div>
 
-    <form action="{{ route('admin.pembina.store') }}" method="POST">
+    <form action="{{ route('admin.pembina.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
+
+        <div class="mb-6">
+            <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Foto Profil</label>
+            <div class="flex items-center gap-4">
+                <div id="foto-preview" class="w-16 h-16 rounded-2xl bg-[#F2F7FF] border-2 border-dashed border-[#DDE8FB] flex items-center justify-center overflow-hidden shrink-0 text-[#7C8DB5]">
+                    <i class="fas fa-user text-xl"></i>
+                </div>
+                <div class="flex-1">
+                    <input type="file" name="foto" id="foto-input" accept="image/png,image/jpeg,image/webp"
+                           class="w-full text-sm text-[#10316B] file:mr-3 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-[#0B409C] file:text-white file:text-xs file:font-bold file:cursor-pointer hover:file:opacity-90 @error('foto') ring-2 ring-red-400 rounded-xl @enderror">
+                    <p class="text-[11px] text-[#7C8DB5] mt-1.5">JPG, PNG, atau WEBP. Maks 2MB. Foto ini yang akan tampil menggantikan inisial di navbar pembina.</p>
+                    @error('foto')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                </div>
+            </div>
+        </div>
 
         <div class="mb-6">
             <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Akun Login <span class="text-red-500">*</span></label>
@@ -96,4 +111,18 @@
         </div>
     </form>
 </div>
+
+<script>
+    document.getElementById('foto-input')?.addEventListener('change', function (e) {
+        const file = e.target.files[0];
+        const preview = document.getElementById('foto-preview');
+        if (!file || !preview) return;
+
+        const reader = new FileReader();
+        reader.onload = function (ev) {
+            preview.innerHTML = '<img src="' + ev.target.result + '" class="w-full h-full object-cover" alt="Preview foto">';
+        };
+        reader.readAsDataURL(file);
+    });
+</script>
 @endsection

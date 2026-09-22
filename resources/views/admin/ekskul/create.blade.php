@@ -9,7 +9,7 @@
     <div class="bg-white rounded-[1.5rem] shadow-[0_4px_24px_-8px_rgba(0,0,0,0.05)] border border-gray-50 p-6 lg:p-8">
         
         <!-- Header Form -->
-        <div class="flex justify-between items-center mb-6 pb-4 border-b border-gray-100">
+        <div class="flex justify-between items-center mb-6 pb-4 border-b border-ink/10">
             <div>
                 <h3 class="text-xl font-extrabold text-[#2b3674]">Tambah Ekskul Baru</h3>
                 <p class="text-xs font-medium text-[#a3aed1] mt-1">Lengkapi formulir di bawah untuk menambahkan ekstrakurikuler baru.</p>

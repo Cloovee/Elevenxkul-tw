@@ -55,7 +55,7 @@
                     <th class="px-3 py-3">Aksi</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-50">
+            <tbody class="divide-y divide-ink/5">
                 @forelse($pembina as $key => $p)
                 @php $initial = strtoupper(substr($p->nama_pembina, 0, 1)); @endphp
                 <tr class="hover:bg-[#F2F7FF]/60 transition-colors">
@@ -63,8 +63,12 @@
 
                     <td class="px-3 py-3">
                         <div class="flex items-center gap-3">
-                            <div class="w-9 h-9 rounded-full bg-teal-50 text-teal-600 flex items-center justify-center font-extrabold text-sm ring-2 ring-teal-100 flex-shrink-0">
-                                {{ $initial }}
+                            <div class="w-9 h-9 rounded-full bg-teal-50 text-teal-600 flex items-center justify-center font-display font-bold text-sm ring-2 ring-teal-100 flex-shrink-0 overflow-hidden">
+                                @if($p->foto_url)
+                                    <img src="{{ $p->foto_url }}" class="w-full h-full object-cover" alt="Foto {{ $p->nama_pembina }}">
+                                @else
+                                    {{ $initial }}
+                                @endif
                             </div>
                             <p class="text-[#10316B] font-bold whitespace-nowrap">{{ $p->nama_pembina }}</p>
                         </div>
@@ -83,7 +87,7 @@
 
                     <td class="px-3 py-3">
                         @if($p->jk)
-                        <span class="px-2 py-1 rounded-full text-[10px] font-bold {{ $p->jk == 'L' ? 'bg-blue-50 text-blue-500' : 'bg-pink-50 text-pink-500' }}">
+                        <span class="px-2 py-1 rounded-full text-[10px] font-bold {{ $p->jk == 'L' ? 'bg-sky/15 text-sky-500' : 'bg-pink-50 text-pink-500' }}">
                             {{ $p->jk }}
                         </span>
                         @else

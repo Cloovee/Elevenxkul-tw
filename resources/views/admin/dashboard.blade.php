@@ -17,7 +17,7 @@
                     Pantau kehadiran, kelola data pengguna, validasi laporan pembina, dan cek tren aktivitas — semua dari satu layar.
                 </p>
 
-                <!-- 5 Card Total, menyesuaikan lebar layar -->
+                <!-- 5 Card Total — layout vertikal supaya label tidak pernah kepotong -->
                 <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
                     <div class="bg-white rounded-2xl px-4 sm:px-5 py-3 sm:py-4 shadow-sm border border-gray-50 flex items-center gap-3">
                         <div class="w-9 h-9 sm:w-10 sm:h-10 bg-[#F2F7FF] rounded-xl flex items-center justify-center text-[#0B409C] flex-shrink-0">

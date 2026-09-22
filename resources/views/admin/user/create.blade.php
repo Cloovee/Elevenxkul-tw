@@ -71,7 +71,7 @@
             </div>
 
             @if(old('role') == 'Pembina')
-                <div class="md:col-span-2 flex items-start gap-2 p-4 bg-blue-50 border-l-4 border-blue-400 rounded-2xl text-sm text-blue-700">
+                <div class="md:col-span-2 flex items-start gap-2 p-4 bg-sky/15 border-l-4 border-sky-400 rounded-2xl text-sm text-sky-600">
                     <i class="fas fa-circle-info mt-0.5"></i>
                     <p>Biodata Pembina (nama, agama, alamat, dll) diisi terpisah nanti di menu <strong>Kelola Pembina</strong>, setelah akun ini dibuat.</p>
                 </div>

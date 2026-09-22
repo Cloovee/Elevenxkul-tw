@@ -6,6 +6,22 @@
     Catatan: posisi "fixed" ditulis sebagai CSS mentah (bukan class Tailwind)
     supaya tidak bergantung pada proses build/compile Tailwind — jadi selalu
     aktif walau aset belum di-rebuild.
+
+    PENTING soal jarak & floating:
+    - Wrapper halaman selalu memakai "flex gap-5 p-5" (gap 1.25rem, padding 1.25rem).
+    - Rail di-set fixed persis di top/left 1.25rem (=p-5) supaya sejajar 1:1 dengan
+      <aside> placeholder di bawah ini. Kalau nilainya beda (mis. 2rem/2.5rem),
+      rail akan "menempel" ke konten karena jarak gap-5 ikut kepakai untuk
+      menggeser rail, bukan jadi jarak kosong ke konten. Jaga supaya top/left
+      di sini SELALU sama dengan padding wrapper (p-5) di setiap halaman pembina.
+    - position: fixed + satuan rem membuat rail terkunci ke viewport: ia tidak
+      ikut scroll dan tidak "loncat" posisi saat browser di-zoom, karena zoom
+      men-scale seluruh viewport (termasuk konten) secara seragam.
+    - Tinggi rail SENGAJA tidak dipatok pakai angka (min-height/height tetap),
+      tapi pakai "top" + "bottom" sekaligus supaya browser yang menghitung
+      tingginya = 100% tinggi layar dikurangi margin atas-bawah. Jadi rail
+      selalu penuh dari atas sampai bawah layar, di ukuran/zoom berapa pun —
+      tidak akan pernah menyisakan ruang kosong di bawahnya.
 --}}
 @php($sidebarPembina = auth()->user()?->pembina)
 
@@ -13,10 +29,10 @@
     @media (min-width: 1024px) {
         .ekk-sidebar-rail {
             position: fixed;
-            top: 2rem;      /* selaras dengan py-8 pada wrapper halaman */
-            left: 2.5rem;   /* selaras dengan lg:px-10 pada wrapper halaman */
-            width: 5rem;    /* setara w-20 */
-            min-height: 33.75rem; /* setara min-h-[540px] */
+            top: 1.25rem;     /* = p-5 pada wrapper halaman */
+            bottom: 1.25rem;  /* = p-5 pada wrapper halaman -> rail selalu full-height */
+            left: 1.25rem;    /* = p-5 pada wrapper halaman */
+            width: 5rem;      /* setara w-20 */
             z-index: 30;
         }
     }
@@ -33,7 +49,7 @@
             @if($sidebarPembina?->foto_url)
                 <img src="{{ $sidebarPembina->foto_url }}" class="w-full h-full object-cover" alt="Foto Profil">
             @else
-                P
+                {{ $sidebarPembina?->inisial ?? 'P' }}
             @endif
         </a>
 

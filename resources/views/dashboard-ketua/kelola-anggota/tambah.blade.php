@@ -5,11 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
 
     <title>Tambah Anggota - Ekskul Sebelas</title>
 
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" />
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>[x-cloak] { display: none !important; }</style>
@@ -17,7 +16,7 @@
 
 <body class="font-sans antialiased bg-bgsoft text-ink">
 
-    <div class="py-8 px-4 sm:px-6 lg:px-10 min-h-screen relative overflow-hidden">
+    <div class="py-8 px-4 sm:px-6 lg:px-10 pb-24 md:pb-8 min-h-screen relative overflow-hidden">
 
         <div class="absolute -top-20 right-0 w-96 h-96 rounded-full bg-periwinkle/10 blur-3xl pointer-events-none"></div>
         <div class="absolute top-1/2 -left-20 w-72 h-72 rounded-full bg-mint/20 blur-3xl pointer-events-none"></div>
@@ -32,7 +31,7 @@
                 <div class="flex-1 space-y-6">
 
                     <div>
-                        <p class="text-xs text-gray-400 tracking-wide uppercase font-semibold">
+                        <p class="text-xs text-inksoft tracking-wide uppercase font-semibold">
                             Ketua
                         </p>
 
@@ -106,7 +105,7 @@
                                 @click.away="open = false"
                                 class="relative"
                             >
-                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <label class="block text-sm font-medium text-ink mb-2">
                                     Nama Siswa
                                 </label>
 
@@ -222,7 +221,7 @@
 
                                 <a
                                     href="{{ route('ketua.kelola-anggota') }}"
-                                    class="px-5 py-2.5 rounded-xl border border-gray-300 text-gray-600 hover:bg-gray-50 transition"
+                                    class="px-5 py-2.5 rounded-xl border border-ink/15 text-inksoft hover:bg-bgsoft transition"
                                 >
                                     Batal
                                 </a>
