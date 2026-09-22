@@ -4,14 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
     <title>Kelola Anggota - Ekskul Sebelas</title>
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="font-sans antialiased bg-gray-100">
+<body class="font-body bg-bgsoft text-ink antialiased">
 
-    <div class="py-8 px-4 sm:px-6 lg:px-10 min-h-screen relative overflow-hidden">
+    <div class="py-8 px-4 sm:px-6 lg:px-10 pb-24 md:pb-8 min-h-screen relative overflow-hidden">
 
         <div class="absolute -top-20 right-0 w-96 h-96 rounded-full bg-periwinkle/15 blur-3xl pointer-events-none"></div>
         <div class="absolute top-1/2 -left-20 w-72 h-72 rounded-full bg-mint/25 blur-3xl pointer-events-none"></div>
@@ -25,12 +24,12 @@
                 <div class="flex-1 space-y-6">
 
                     <div>
-                        <p class="text-xs text-gray-400 tracking-wide uppercase font-semibold">Ketua</p>
-                        <h1 class="text-2xl font-extrabold text-gray-800">Kelola Anggota</h1>
+                        <p class="text-xs text-inksoft tracking-wide uppercase font-semibold">Ketua</p>
+                        <h1 class="text-2xl font-display font-bold text-ink">Kelola Anggota</h1>
                     </div>
 
                     <div class="bg-gradient-to-br from-white to-periwinkle/10 rounded-3xl shadow-xl shadow-periwinkle/10 ring-1 ring-black/5 p-6 relative min-h-[420px]">
-                        <h2 class="font-semibold text-gray-800 border-b border-gray-100 pb-3 mb-4">Daftar Anggota</h2>
+                        <h2 class="font-semibold text-ink border-b border-ink/10 pb-3 mb-4">Daftar Anggota</h2>
 
                         <div class="space-y-2">
                             @forelse ($anggota as $item)
@@ -42,17 +41,17 @@
                                             {{ strtoupper(substr($item->siswa->nama_siswa, 0, 1)) }}
                                         </div>
 
-                                        <p class="font-medium text-gray-800">
+                                        <p class="font-medium text-ink">
                                             {{ $item->siswa->nama_siswa }}
                                         </p>
                                     </div>
 
-                                    <span class="text-xs font-medium px-3 py-1 rounded-full {{ $item->status === 'aktif' ? 'bg-mint/50 text-emerald-700' : 'bg-gray-100 text-gray-500' }}">
+                                    <span class="text-xs font-medium px-3 py-1 rounded-full {{ $item->status === 'aktif' ? 'bg-mint/50 text-emerald-700' : 'bg-bgsoft text-inksoft' }}">
                                         {{ ucfirst($item->status) }}
                                     </span>
                                 </a>
                             @empty
-                                <div class="text-center py-10 text-gray-400">
+                                <div class="text-center py-10 text-inksoft">
                                     Belum ada anggota.
                                 </div>
                             @endforelse

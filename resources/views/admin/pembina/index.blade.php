@@ -17,7 +17,7 @@
 
     <div class="overflow-x-auto">
         <table class="w-full">
-            <thead class="bg-bgsoft border-b border-[#EFEFF7]">
+            <thead class="bg-bgsoft border-b border-[#F3F4FC]">
                 <tr>
                     <th class="px-4 py-3 text-left text-xs font-bold text-inksoft uppercase tracking-wide">Foto</th>
                     <th class="px-4 py-3 text-left text-xs font-bold text-inksoft uppercase tracking-wide">Nama</th>
@@ -26,7 +26,7 @@
                     <th class="px-4 py-3 text-left text-xs font-bold text-inksoft uppercase tracking-wide">Aksi</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-[#F0F0F8]">
+            <tbody class="divide-y divide-[#F3F4FC]">
                 @forelse($pembinas as $pembina)
                 <tr class="hover:bg-bgsoft/60 transition">
                     <td class="px-4 py-3">
@@ -43,7 +43,7 @@
                     <td class="px-4 py-3 text-sm text-inksoft">{{ $pembina->nomor_hp ?: '-' }}</td>
                     <td class="px-4 py-3">
                         <div class="flex items-center gap-3">
-                            <a href="{{ route('admin.pembina.edit', $pembina->id_pembina) }}" class="text-[#5E5CC7] hover:opacity-70" title="Edit">
+                            <a href="{{ route('admin.pembina.edit', $pembina->id_pembina) }}" class="text-[#7B77E0] hover:opacity-70" title="Edit">
                                 <i class="fas fa-edit"></i>
                             </a>
                             <form action="{{ route('admin.pembina.destroy', $pembina->id_pembina) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus pembina ini? Akun login-nya juga akan terhapus.')">

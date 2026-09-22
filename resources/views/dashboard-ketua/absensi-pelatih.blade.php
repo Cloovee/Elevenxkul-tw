@@ -4,14 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
     <title>Absensi Pelatih - Ekskul Sebelas</title>
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="font-sans antialiased bg-gray-100">
+<body class="font-body bg-bgsoft text-ink antialiased">
 
-    <div class="py-8 px-4 sm:px-6 lg:px-10 min-h-screen relative overflow-hidden">
+    <div class="py-8 px-4 sm:px-6 lg:px-10 pb-24 md:pb-8 min-h-screen relative overflow-hidden">
 
         <div class="absolute -top-20 right-0 w-96 h-96 rounded-full bg-periwinkle/15 blur-3xl pointer-events-none"></div>
         <div class="absolute top-1/2 -left-20 w-72 h-72 rounded-full bg-mint/25 blur-3xl pointer-events-none"></div>
@@ -25,9 +24,9 @@
                 <div class="flex-1 space-y-6">
 
                     <div>
-                        <p class="text-xs text-gray-400 tracking-wide uppercase font-semibold">Ketua</p>
-                        <h1 class="text-2xl font-extrabold text-gray-800">Absensi Pelatih</h1>
-                        <p class="text-sm text-gray-500 mt-1">Catat apakah pelatih hadir/melatih hari ini. Laporan akan divalidasi oleh pembina ekskul terkait.</p>
+                        <p class="text-xs text-inksoft tracking-wide uppercase font-semibold">Ketua</p>
+                        <h1 class="text-2xl font-display font-bold text-ink">Absensi Pelatih</h1>
+                        <p class="text-sm text-inksoft mt-1">Catat apakah pelatih hadir/melatih hari ini. Laporan akan divalidasi oleh pembina ekskul terkait.</p>
                     </div>
 
                     @if (session('success'))
@@ -52,7 +51,7 @@
 
                         <!-- Foto bukti absensi -->
                         <div class="bg-gradient-to-br from-white to-periwinkle/10 rounded-3xl shadow-xl shadow-periwinkle/10 ring-1 ring-black/5 p-6">
-                            <h2 class="font-semibold text-gray-800 border-b border-gray-100 pb-3 mb-4">Foto Bukti Absensi (opsional)</h2>
+                            <h2 class="font-semibold text-ink border-b border-ink/10 pb-3 mb-4">Foto Bukti Absensi (opsional)</h2>
 
                             <label
                                 class="block w-full aspect-[4/3] rounded-2xl border-2 border-dashed border-periwinkle/30 bg-periwinkle/5 flex items-center justify-center cursor-pointer overflow-hidden hover:bg-periwinkle/10 transition"
@@ -64,8 +63,8 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14M14 8h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                             </svg>
                                         </div>
-                                        <p class="text-sm font-medium text-gray-600">Upload foto absen</p>
-                                        <p class="text-xs text-gray-400 mt-1">PNG atau JPG, maks 2MB</p>
+                                        <p class="text-sm font-medium text-inksoft">Upload foto absen</p>
+                                        <p class="text-xs text-inksoft mt-1">PNG atau JPG, maks 2MB</p>
                                     </div>
                                 </template>
                                 <template x-if="preview">
@@ -85,13 +84,13 @@
 
                         <!-- Data absensi -->
                         <div class="bg-gradient-to-br from-white to-sky/10 rounded-3xl shadow-xl shadow-sky/10 ring-1 ring-black/5 p-6">
-                            <h2 class="font-semibold text-gray-800 border-b border-gray-100 pb-3 mb-4">Data Absensi</h2>
+                            <h2 class="font-semibold text-ink border-b border-ink/10 pb-3 mb-4">Data Absensi</h2>
 
                             <div class="space-y-4">
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Pelatih</label>
+                                    <label class="block text-sm font-medium text-ink mb-1.5">Pelatih</label>
                                     <select name="id_pelatih" required
-                                        class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-periwinkle focus:border-periwinkle transition"
+                                        class="w-full px-4 py-2.5 rounded-xl border border-ink/15 bg-white focus:outline-none focus:ring-2 focus:ring-periwinkle focus:border-periwinkle transition"
                                     >
                                         <option value="">Pilih pelatih</option>
                                         @foreach ($pelatihs as $p)
@@ -101,23 +100,23 @@
                                 </div>
 
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Tanggal</label>
+                                    <label class="block text-sm font-medium text-ink mb-1.5">Tanggal</label>
                                     <input type="date" name="tanggal_absensi" required value="{{ old('tanggal_absensi', now()->toDateString()) }}"
-                                        class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-periwinkle focus:border-periwinkle transition"
+                                        class="w-full px-4 py-2.5 rounded-xl border border-ink/15 bg-white focus:outline-none focus:ring-2 focus:ring-periwinkle focus:border-periwinkle transition"
                                     />
                                 </div>
 
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Kegiatan</label>
+                                    <label class="block text-sm font-medium text-ink mb-1.5">Kegiatan</label>
                                     <input type="text" name="kegiatan" value="{{ old('kegiatan') }}" placeholder="Contoh: Latihan rutin Futsal"
-                                        class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-periwinkle focus:border-periwinkle transition"
+                                        class="w-full px-4 py-2.5 rounded-xl border border-ink/15 bg-white focus:outline-none focus:ring-2 focus:ring-periwinkle focus:border-periwinkle transition"
                                     />
                                 </div>
 
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Status Kehadiran</label>
+                                    <label class="block text-sm font-medium text-ink mb-1.5">Status Kehadiran</label>
                                     <select name="status_kehadiran" required
-                                        class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-periwinkle focus:border-periwinkle transition"
+                                        class="w-full px-4 py-2.5 rounded-xl border border-ink/15 bg-white focus:outline-none focus:ring-2 focus:ring-periwinkle focus:border-periwinkle transition"
                                     >
                                         <option value="">Pilih status</option>
                                         <option value="hadir" @selected(old('status_kehadiran') === 'hadir')>Hadir / Melatih</option>
