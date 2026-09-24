@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Absensi Peserta — Elevenxkul</title>
+    <link rel="icon" href="{{ asset('images/smkn11logo.png') }}" type="image/png">
+    <title>Absensi Peserta — ElevenXkul</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>[x-cloak] { display: none !important; }</style>
 </head>

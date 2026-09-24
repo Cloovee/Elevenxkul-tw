@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profil Pembina — Elevenxkul</title>
+    <link rel="icon" href="{{ asset('images/smkn11logo.png') }}" type="image/png">
+    <title>Profil Pembina — ElevenXkul</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         @keyframes profIn {

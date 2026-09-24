@@ -3,6 +3,7 @@
 use App\Http\Controllers\Pembina\AbsensiPelatihController;
 use App\Http\Controllers\Pembina\AbsensiPesertaController;
 use App\Http\Controllers\Pembina\NilaiPesertaController;
+use App\Http\Controllers\Pembina\KetuaController as PembinaKetuaController;
 use App\Http\Controllers\Pembina\PelatihController as PembinaPelatihController;
 use App\Http\Controllers\Pembina\PembinaDashboardController;
 use App\Http\Controllers\Pembina\PembinaProfileController;
@@ -71,6 +72,19 @@ Route::prefix('pembina')->middleware(['auth', 'role:Pembina'])->name('pembina.')
         Route::get('/{id}/edit', [PembinaPelatihController::class, 'edit'])->name('edit');
         Route::put('/{id}', [PembinaPelatihController::class, 'update'])->name('update');
         Route::delete('/{id}', [PembinaPelatihController::class, 'destroy'])->name('destroy');
+    });
+
+    // ===== CRUD: Kelola Ketua (untuk ekskul yang dibina) =====
+    // Berbeda dari CRUD User milik Admin: di sini Pembina mendaftarkan Ketua
+    // BARU dari nol (biodata siswa + akun login role Ketua) dalam satu form,
+    // dan akun user-nya dibuat otomatis.
+    Route::prefix('ketua')->name('ketua.')->group(function () {
+        Route::get('/', [PembinaKetuaController::class, 'index'])->name('index');
+        Route::get('/create', [PembinaKetuaController::class, 'create'])->name('create');
+        Route::post('/store', [PembinaKetuaController::class, 'store'])->name('store');
+        Route::get('/{id}/edit', [PembinaKetuaController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [PembinaKetuaController::class, 'update'])->name('update');
+        Route::delete('/{id}', [PembinaKetuaController::class, 'destroy'])->name('destroy');
     });
 });
 

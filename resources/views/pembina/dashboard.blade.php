@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
-    <title>Dashboard Pembina — Elevenxkul</title>
+    <link rel="icon" href="{{ asset('images/smkn11logo.png') }}" type="image/png">
+    <title>Dashboard Pembina — ElevenXkul</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         @keyframes dashIn {
@@ -110,7 +110,7 @@
                 <div class="max-w-sm">
                     <p class="text-inksoft text-xs font-semibold uppercase tracking-[0.14em]">{{ now()->translatedFormat('l, d F Y') }}</p>
                     <h2 class="font-display text-2xl md:text-3xl font-bold mt-2 leading-snug text-ink">
-                        Program Pembinaan Elevenxkul
+                        Program Pembinaan ElevenXkul
                     </h2>
                     <p class="text-inksoft text-sm mt-2 leading-relaxed">
                         Pantau kehadiran, validasi laporan pelatih, dan beri nilai peserta — semua dari satu layar.

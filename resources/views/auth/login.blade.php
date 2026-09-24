@@ -2,7 +2,7 @@
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
     <h2 class="text-3xl font-display font-bold text-ink mb-1.5">Masuk</h2>
-    <p class="text-inksoft mb-8">Masukkan email dan kata sandi akunmu.</p>
+    <p class="text-inksoft mb-8">Masukkan email/username dan kata sandi akunmu.</p>
 
     <div class="bg-white rounded-3xl ring-1 ring-ink/[0.06] shadow-[0_2px_24px_-4px_rgba(46,43,85,0.08)] p-6 sm:p-8">
         <form method="POST" action="{{ route('login') }}" class="space-y-5">
@@ -11,7 +11,7 @@
             <!-- Email -->
             <div>
                 <label for="email" class="block text-sm font-medium text-ink mb-1.5">
-                    Email
+                    Email / Username
                 </label>
 
                 <div class="relative">
@@ -23,13 +23,13 @@
 
                     <input
                         id="email"
-                        type="email"
+                        type="text"
                         name="email"
                         :value="old('email')"
                         required
                         autofocus
                         autocomplete="username"
-                        placeholder="nama@sekolah.sch.id"
+                        placeholder="nama@sekolah.sch.id atau username"
                         class="w-full pl-11 pr-4 py-3.5 rounded-2xl border border-ink/10 bg-bgsoft/60 text-ink placeholder:text-inksoft/60 focus:outline-none focus:ring-2 focus:ring-periwinkle/60 focus:border-periwinkle focus:bg-white transition-all"
                     />
                 </div>
