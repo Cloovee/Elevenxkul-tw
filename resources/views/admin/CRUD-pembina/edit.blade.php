@@ -1,32 +1,18 @@
 @extends('layouts.admin')
 
-@section('title', 'Edit Pembina')
+@section('title', 'Edit Data Pembina')
 @section('page-title', 'Data Pembina')
 
 @section('content')
 <div class="bg-white rounded-3xl shadow-[0_4px_24px_-8px_rgba(0,0,0,0.05)] border border-gray-50 p-8 max-w-3xl mx-auto">
 
-    <div class="flex items-center gap-3 mb-6">
+    <div class="flex items-center gap-3 mb-2">
         <div class="w-11 h-11 bg-[#0B409C] rounded-xl flex items-center justify-center text-white">
             <i class="fas fa-user-tie"></i>
         </div>
-        <h3 class="text-xl font-extrabold text-[#10316B]">Edit Biodata Pembina</h3>
+        <h3 class="text-xl font-extrabold text-[#10316B]">Edit Data Pembina</h3>
     </div>
-
-    <!-- Info akun, read-only -->
-    <div class="mb-6 p-4 bg-[#F2F7FF] rounded-xl flex items-center justify-between">
-        <div>
-            <p class="text-[10px] font-bold text-[#7C8DB5] uppercase tracking-wider mb-1">Akun Login Terkait</p>
-            @if($pembina->user)
-                <p class="text-sm text-[#10316B] font-bold">{{ $pembina->user->name }} <span class="font-normal text-[#7C8DB5]">({{ $pembina->user->email }})</span></p>
-            @else
-                <p class="text-sm text-amber-600 font-bold"><i class="fas fa-triangle-exclamation mr-1"></i> Akun sudah dihapus</p>
-            @endif
-        </div>
-        <a href="{{ route('admin.user.index') }}" class="text-xs font-bold text-[#0B409C] hover:underline whitespace-nowrap">
-            Kelola di User &rarr;
-        </a>
-    </div>
+    <p class="text-xs text-[#7C8DB5] mb-6">Data biodata dan akun login pembina diisi dalam satu form. Keduanya tersimpan otomatis (tabel <strong>pembina</strong> &amp; <strong>users</strong>).</p>
 
     <form action="{{ route('admin.pembina.update', $pembina->id_pembina) }}" method="POST" enctype="multipart/form-data">
         @csrf
@@ -47,7 +33,6 @@
                            class="w-full text-sm text-[#10316B] file:mr-3 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-[#0B409C] file:text-white file:text-xs file:font-bold file:cursor-pointer hover:file:opacity-90 @error('foto') ring-2 ring-red-400 rounded-xl @enderror">
                     <p class="text-[11px] text-[#7C8DB5] mt-1.5">JPG, PNG, atau WEBP. Maks 2MB. Kosongkan jika tidak ingin mengganti foto.</p>
                     @error('foto')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
-
                     @if($pembina->foto_url)
                         <label class="inline-flex items-center gap-1.5 mt-2 text-xs font-semibold text-red-500 cursor-pointer">
                             <input type="checkbox" name="hapus_foto" value="1" class="rounded border-red-300 text-red-500 focus:ring-red-400">
@@ -58,53 +43,65 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <p class="text-[11px] font-bold text-[#0B409C] uppercase tracking-wider mb-3">Biodata</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
             <div>
-                <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Nama Pembina <span class="text-red-500">*</span></label>
+                <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Nama Lengkap <span class="text-red-500">*</span></label>
                 <input type="text" name="nama_pembina" class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C] @error('nama_pembina') ring-2 ring-red-400 @enderror" value="{{ old('nama_pembina', $pembina->nama_pembina) }}" required>
                 @error('nama_pembina')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
-
             <div>
-                <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Jenis Kelamin</label>
-                <select name="jk" class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C] @error('jk') ring-2 ring-red-400 @enderror">
+                <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Jenis Kelamin <span class="text-red-500">*</span></label>
+                <select name="jk" class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C] @error('jk') ring-2 ring-red-400 @enderror" required>
                     <option value="">-- Pilih --</option>
                     <option value="L" {{ old('jk', $pembina->jk) == 'L' ? 'selected' : '' }}>Laki-laki</option>
                     <option value="P" {{ old('jk', $pembina->jk) == 'P' ? 'selected' : '' }}>Perempuan</option>
                 </select>
                 @error('jk')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
-
             <div>
                 <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Agama</label>
                 <input type="text" name="agama" class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C] @error('agama') ring-2 ring-red-400 @enderror" value="{{ old('agama', $pembina->agama) }}">
                 @error('agama')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
-
             <div>
                 <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Nomor HP</label>
                 <input type="text" name="nomor_hp" class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C] @error('nomor_hp') ring-2 ring-red-400 @enderror" value="{{ old('nomor_hp', $pembina->nomor_hp) }}">
                 @error('nomor_hp')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
-
             <div>
-                <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Email <span class="text-xs normal-case font-normal text-[#7C8DB5]">(kontak, boleh beda dari email akun)</span></label>
-                <input type="email" name="email" class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C] @error('email') ring-2 ring-red-400 @enderror" value="{{ old('email', $pembina->email) }}">
+                <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Email <span class="text-red-500">*</span></label>
+                <input type="email" name="email" class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C] @error('email') ring-2 ring-red-400 @enderror" value="{{ old('email', $pembina->email ?? optional($pembina->user)->email) }}" required>
                 @error('email')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
-
             <div>
-                <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">MedSos</label>
+                <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Media Sosial</label>
                 <input type="text" name="medsos" class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C] @error('medsos') ring-2 ring-red-400 @enderror" value="{{ old('medsos', $pembina->medsos) }}">
                 @error('medsos')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
-
             <div class="md:col-span-2">
                 <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Alamat</label>
                 <textarea name="alamat" rows="3" class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C] @error('alamat') ring-2 ring-red-400 @enderror">{{ old('alamat', $pembina->alamat) }}</textarea>
                 @error('alamat')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
         </div>
+
+        <p class="text-[11px] font-bold text-[#0B409C] uppercase tracking-wider mb-3 pt-4 border-t border-gray-100">Akun Login</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+            <div>
+                <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Username <span class="text-red-500">*</span> <span class="text-xs normal-case font-normal text-[#7C8DB5]">(dipakai untuk login)</span></label>
+                <input type="text" name="username" class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C] @error('username') ring-2 ring-red-400 @enderror" value="{{ old('username', optional($pembina->user)->username) }}" required>
+                @error('username')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Password <span class="text-xs normal-case font-normal text-[#7C8DB5]">(kosongkan jika tidak ingin mengganti)</span></label>
+                <input type="password" name="password" class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C] @error('password') ring-2 ring-red-400 @enderror" autocomplete="new-password">
+                @error('password')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+            </div>
+        </div>
+
+        <p class="text-[11px] font-bold text-[#0B409C] uppercase tracking-wider mb-3 pt-4 border-t border-gray-100">Pembinaan</p>
+        @include('admin.CRUD-pembina._ekskul-picker', ['ekskuls' => $ekskuls, 'terpilih' => old('ekskul', $pembina->ekskuls->pluck('id_ekskul')->all()), 'idPembinaSaatIni' => $pembina->id_pembina])
 
         <div class="mt-8 flex gap-3">
             <button type="submit" class="inline-flex items-center gap-2 px-6 py-2.5 bg-[#0B409C] text-white rounded-full text-sm font-bold shadow-md shadow-[#0B409C]/30 hover:opacity-90 transition-opacity">

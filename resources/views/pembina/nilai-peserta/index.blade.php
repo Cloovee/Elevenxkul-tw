@@ -38,6 +38,16 @@
             </div>
         </div>
 
+        {{-- FILTER EKSKUL --}}
+        <form method="GET" action="{{ route('pembina.nilai.index') }}"
+              class="animate-fade-in-up animate-delay-1 flex flex-wrap items-center gap-3 bg-white rounded-3xl px-6 py-4 shadow-[0_10px_30px_-18px_rgba(46,43,85,0.35)]">
+            <span class="text-xs font-bold uppercase tracking-wide text-inksoft">Filter ekskul</span>
+            @include('pembina.partials.filter-ekskul')
+            @if($filterEkskul)
+                <a href="{{ route('pembina.nilai.index') }}" class="px-4 py-2 bg-bgsoft hover:bg-[#e9edfb] text-inksoft rounded-full text-sm font-bold transition-colors">Reset</a>
+            @endif
+        </form>
+
         {{-- FORM BERI NILAI --}}
         <div class="animate-fade-in-up animate-delay-2 bg-white rounded-3xl p-6 shadow-[0_10px_30px_-18px_rgba(46,43,85,0.35)]">
             <h3 class="font-bold text-base mb-3">Beri Nilai Baru</h3>
@@ -71,6 +81,9 @@
                             <td class="py-2.5 px-2">
                                 <form method="POST" action="{{ route('pembina.nilai.simpan', $p) }}" class="flex items-center gap-2 flex-wrap">
                                     @csrf
+                                    @if($filterEkskul)
+                                        <input type="hidden" name="ekskul" value="{{ $filterEkskul }}">
+                                    @endif
                                     <input type="text" name="tahun_ajaran" placeholder="2026/2027" required
                                            value="{{ now()->month >= 7 ? now()->year.'/'.(now()->year+1) : (now()->year-1).'/'.now()->year }}"
                                            class="w-24 px-2.5 py-1.5 rounded-lg border border-[#E7E7F4] text-xs focus:outline-none focus:border-lavender">
@@ -94,7 +107,7 @@
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M15.5 13.5 17 22l-5-3-5 3 1.5-8.5"/></svg>
                                     </div>
                                     <p class="text-sm font-semibold text-ink">Belum ada data peserta aktif</p>
-                                    <p class="text-xs text-inksoft max-w-xs">Peserta aktif di ekskul yang kamu bina akan tampil di sini.</p>
+                                    <p class="text-xs text-inksoft max-w-xs">{{ $filterEkskul ? 'Belum ada peserta aktif di ekskul yang dipilih.' : 'Peserta aktif di ekskul yang kamu bina akan tampil di sini.' }}</p>
                                 </div>
                             </td>
                         </tr>
@@ -112,6 +125,7 @@
                 <thead>
                     <tr class="text-inksoft text-[11px] uppercase tracking-wide">
                         <th class="text-left py-2 px-2 border-b border-[#EFEFF7]">Peserta</th>
+                        <th class="text-left py-2 px-2 border-b border-[#EFEFF7]">Ekskul</th>
                         <th class="text-left py-2 px-2 border-b border-[#EFEFF7]">Tahun Ajaran</th>
                         <th class="text-left py-2 px-2 border-b border-[#EFEFF7]">Semester</th>
                         <th class="text-left py-2 px-2 border-b border-[#EFEFF7]">Nilai</th>
@@ -122,6 +136,7 @@
                     @forelse($riwayatNilai as $n)
                         <tr class="border-b border-[#F5F5FA] last:border-none hover:bg-bgsoft/60 transition-colors">
                             <td class="py-2.5 px-2 font-semibold">{{ $n->peserta->nama ?? '-' }}</td>
+                            <td class="py-2.5 px-2 text-inksoft">{{ $n->peserta->ekskul->nama_ekskul ?? '-' }}</td>
                             <td class="py-2.5 px-2 text-inksoft">{{ $n->tahun_ajaran }}</td>
                             <td class="py-2.5 px-2 text-inksoft">{{ $n->semester }}</td>
                             <td class="py-2.5 px-2">
@@ -148,7 +163,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="py-12">
+                            <td colspan="6" class="py-12">
                                 <div class="flex flex-col items-center justify-center text-center gap-2">
                                     <div class="w-14 h-14 rounded-2xl bg-lavender/30 text-[#3F41B0] flex items-center justify-center mb-1">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>

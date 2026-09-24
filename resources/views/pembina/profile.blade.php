@@ -54,7 +54,7 @@
             <div>
                 <span class="text-[11px] font-bold tracking-[0.14em] uppercase text-lavender">Pengaturan Akun</span>
                 <h1 class="font-display text-2xl md:text-[26px] font-bold tracking-tight leading-tight mt-0.5">Profil Saya</h1>
-                <p class="text-inksoft text-sm mt-1">Kelola nomor HP dan alamat kamu. Foto, nama, email, dan password hanya bisa diubah oleh admin.</p>
+                <p class="text-inksoft text-sm mt-1">Data diri kamu ditampilkan di bawah. Kamu hanya bisa mengubah nomor HP dan alamat; data lainnya diatur oleh admin.</p>
             </div>
 
             <div class="flex items-center gap-3 bg-white rounded-2xl pl-3.5 pr-5 py-2.5 shadow-[0_10px_30px_-18px_rgba(46,43,85,0.35)]">
@@ -79,6 +79,68 @@
             {{-- ================= KIRI: FORM ================= --}}
             <div class="order-2 lg:order-1 w-full lg:mr-[380px] flex flex-col gap-5">
 
+                {{-- Ekskul yang dibina (tag -> halaman penilaian) --}}
+                <div class="prof-in bg-white rounded-3xl p-7 shadow-[0_10px_30px_-18px_rgba(46,43,85,0.35)]" style="--d:30ms">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 rounded-2xl bg-mint text-[#1F7A3D] flex items-center justify-center shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41 13.42 20.58a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82Z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+                        </div>
+                        <div>
+                            <h2 class="font-display text-lg font-semibold">Ekskul yang Dibina</h2>
+                            <p class="text-xs text-inksoft mt-0.5">Klik salah satu untuk membuka halaman penilaian ekskul tersebut</p>
+                        </div>
+                    </div>
+
+                    @if ($ekskuls->isNotEmpty())
+                        <div class="flex flex-wrap gap-2">
+                            @foreach ($ekskuls as $e)
+                                <a href="{{ route('pembina.nilai.index', ['ekskul' => $e->id_ekskul]) }}"
+                                   title="Buka penilaian {{ $e->nama_ekskul }}"
+                                   class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-periwinkle/30 text-[#3F41B0] text-xs font-bold hover:bg-lavender hover:text-white transition-colors">
+                                    {{ $e->nama_ekskul }}
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                                </a>
+                            @endforeach
+                        </div>
+                    @else
+                        <p class="text-sm text-inksoft bg-bgsoft rounded-2xl px-4 py-3">Kamu belum ditugaskan membina ekskul manapun. Hubungi admin untuk dikaitkan ke sebuah ekskul.</p>
+                    @endif
+                </div>
+
+                {{-- Data diri (diisi oleh admin, hanya tampilan) --}}
+                @php
+                    $dataDiri = [
+                        ['Nama Lengkap',   $pembina->nama_pembina ?? $user->name],
+                        ['Jenis Kelamin',  match ($pembina->jk ?? null) { 'L' => 'Laki-laki', 'P' => 'Perempuan', default => null }],
+                        ['Agama',          $pembina->agama ?? null],
+                        ['Nomor HP',       $pembina->nomor_hp ?? null],
+                        ['Email',          $pembina->email ?? $user->email],
+                        ['Username',       $user->username ?? null],
+                        ['Media Sosial',   $pembina->medsos ?? null],
+                        ['Alamat',         $pembina->alamat ?? null],
+                    ];
+                @endphp
+                <div class="prof-in bg-white rounded-3xl p-7 shadow-[0_10px_30px_-18px_rgba(46,43,85,0.35)]" style="--d:45ms">
+                    <div class="flex items-center gap-3 mb-5">
+                        <div class="w-10 h-10 rounded-2xl bg-sky text-[#1E6FA8] flex items-center justify-center shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M15 8h2"/><path d="M15 12h2"/><path d="M7 16h10"/></svg>
+                        </div>
+                        <div>
+                            <h2 class="font-display text-lg font-semibold">Data Diri</h2>
+                            <p class="text-xs text-inksoft mt-0.5">Diisi oleh admin saat akun pembina dibuat</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        @foreach ($dataDiri as [$label, $nilai])
+                            <div class="bg-bgsoft rounded-2xl px-4 py-3 {{ $label === 'Alamat' ? 'sm:col-span-2' : '' }}">
+                                <div class="text-[11px] font-bold text-inksoft uppercase tracking-wide">{{ $label }}</div>
+                                <div class="text-sm font-semibold text-ink mt-0.5 break-words">{{ filled($nilai) ? $nilai : '-' }}</div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+
                 {{-- Informasi Akun --}}
                 <div class="prof-in bg-white rounded-3xl p-7 shadow-[0_10px_30px_-18px_rgba(46,43,85,0.35)]" style="--d:60ms">
                     <div class="flex items-center gap-3 mb-5">
@@ -86,8 +148,8 @@
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>
                         </div>
                         <div>
-                            <h2 class="font-display text-lg font-semibold">Informasi Kontak</h2>
-                            <p class="text-xs text-inksoft mt-0.5">Nama, foto, email & password dikelola oleh admin</p>
+                            <h2 class="font-display text-lg font-semibold">Ubah Kontak</h2>
+                            <p class="text-xs text-inksoft mt-0.5">Nomor HP & alamat bisa kamu perbarui sendiri</p>
                         </div>
                     </div>
 
@@ -160,7 +222,7 @@
                             Pembina Ekstrakulikuler
                         </span>
 
-                        <p class="text-[11px] text-inksoft mt-4">Foto & nama hanya bisa diubah oleh admin.</p>
+                        <p class="text-[11px] text-inksoft mt-4">Foto, nama & data diri lainnya hanya bisa diubah oleh admin.</p>
 
                         <div class="w-full mt-6 pt-6 border-t border-[#EFEFF7] flex flex-col gap-3 text-left">
                             <div class="flex items-center gap-3 bg-bgsoft rounded-2xl px-4 py-3">
@@ -169,7 +231,7 @@
                                 </div>
                                 <div class="text-xs min-w-0">
                                     <div class="text-inksoft">Email</div>
-                                    <div class="font-semibold truncate">{{ $user->email }}</div>
+                                    <div class="font-semibold truncate">{{ $pembina->email ?? $user->email }}</div>
                                 </div>
                             </div>
                             <div class="flex items-center gap-3 bg-bgsoft rounded-2xl px-4 py-3">

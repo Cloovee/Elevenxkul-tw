@@ -63,10 +63,11 @@
                         <input type="text" name="search" placeholder="Cari nama pelatih..." value="{{ request('search') }}"
                             class="pl-10 pr-4 py-2 bg-bgsoft border-none rounded-full text-sm text-ink placeholder-inksoft focus:ring-2 focus:ring-lavender w-56">
                     </div>
+                    @include('pembina.partials.filter-ekskul')
                     <button type="submit" class="px-4 py-2 bg-bgsoft hover:bg-[#e9edfb] text-ink rounded-full text-sm font-bold transition-colors">
                         Cari
                     </button>
-                    @if(request('search'))
+                    @if(request('search') || $filterEkskul)
                         <a href="{{ route('pembina.pelatih.index') }}" class="px-4 py-2 bg-bgsoft hover:bg-[#e9edfb] text-inksoft rounded-full text-sm font-bold transition-colors">
                             Reset
                         </a>

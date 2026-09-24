@@ -28,7 +28,7 @@
     <!-- Tombol Aksi -->
     <div class="flex flex-wrap gap-2 mb-6 pb-6 border-b border-gray-100">
         <a href="{{ route('admin.pembina.create') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-[#0B409C] text-white rounded-full text-sm font-bold shadow-md shadow-[#0B409C]/30 hover:opacity-90 transition-opacity">
-            <i class="fas fa-user-plus"></i> Tambah Biodata Pembina
+            <i class="fas fa-user-plus"></i> Tambah Pembina
         </a>
     </div>
 
@@ -45,13 +45,14 @@
                 <tr class="text-left text-[#7C8DB5] text-[11px] font-bold uppercase tracking-wider border-b border-gray-100">
                     <th class="px-3 py-3">No</th>
                     <th class="px-3 py-3">Pembina</th>
-                    <th class="px-3 py-3">Akun Login</th>
+                    <th class="px-3 py-3">Username</th>
                     <th class="px-3 py-3">JK</th>
                     <th class="px-3 py-3">Agama</th>
                     <th class="px-3 py-3">No. HP</th>
                     <th class="px-3 py-3">Email</th>
                     <th class="px-3 py-3">MedSos</th>
                     <th class="px-3 py-3">Alamat</th>
+                    <th class="px-3 py-3">Ekskul Dibina</th>
                     <th class="px-3 py-3">Aksi</th>
                 </tr>
             </thead>
@@ -76,8 +77,7 @@
 
                     <td class="px-3 py-3">
                         @if($p->user)
-                            <p class="text-[#10316B] text-xs font-semibold">{{ $p->user->name }}</p>
-                            <p class="text-[#7C8DB5] text-xs">{{ $p->user->email }}</p>
+                            <p class="text-[#10316B] text-xs font-semibold">{{ $p->user->username ?? '-' }}</p>
                         @else
                             <span class="inline-flex items-center gap-1 text-amber-600 text-xs font-bold bg-amber-50 px-2 py-1 rounded-full">
                                 <i class="fas fa-triangle-exclamation"></i> Akun terhapus
@@ -101,11 +101,21 @@
                     <td class="px-3 py-3 text-[#7C8DB5] max-w-xs truncate" title="{{ $p->alamat }}">{{ $p->alamat ?? '-' }}</td>
 
                     <td class="px-3 py-3">
+                        <div class="flex flex-wrap gap-1 max-w-[220px]">
+                            @forelse($p->ekskuls as $e)
+                                <span class="inline-block px-2 py-1 rounded-full text-[10px] font-bold bg-periwinkle/20 text-[#5E5CC7] whitespace-nowrap">{{ $e->nama_ekskul }}</span>
+                            @empty
+                                <span class="text-[#7C8DB5]">-</span>
+                            @endforelse
+                        </div>
+                    </td>
+
+                    <td class="px-3 py-3">
                         <div class="flex gap-2">
                             <a href="{{ route('admin.pembina.edit', $p->id_pembina) }}" class="w-8 h-8 flex items-center justify-center rounded-lg bg-amber-50 text-amber-500 hover:bg-amber-500 hover:text-white transition-colors" title="Edit">
                                 <i class="fas fa-pen text-xs"></i>
                             </a>
-                            <form action="{{ route('admin.pembina.destroy', $p->id_pembina) }}" method="POST" onsubmit="return confirm('Yakin hapus biodata ini? Akun login pembina tetap ada, cuma biodatanya yang hilang.')">
+                            <form action="{{ route('admin.pembina.destroy', $p->id_pembina) }}" method="POST" onsubmit="return confirm('Yakin hapus pembina ini? Biodata dan akun login-nya akan dihapus, ekskul yang dibina jadi tanpa pembina.')">
                                 @csrf @method('DELETE')
                                 <button type="submit" class="w-8 h-8 flex items-center justify-center rounded-lg bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-colors" title="Hapus">
                                     <i class="fas fa-trash text-xs"></i>
@@ -116,10 +126,10 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="10" class="text-center py-12">
+                    <td colspan="11" class="text-center py-12">
                         <div class="flex flex-col items-center text-[#7C8DB5]">
                             <i class="fas fa-user-tie text-3xl mb-2"></i>
-                            <p class="font-bold text-sm">Belum ada biodata pembina.</p>
+                            <p class="font-bold text-sm">Belum ada data pembina.</p>
                         </div>
                     </td>
                 </tr>
