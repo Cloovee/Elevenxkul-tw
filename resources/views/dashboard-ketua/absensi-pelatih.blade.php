@@ -89,9 +89,19 @@
                             <div class="space-y-4">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1.5">Pelatih</label>
-                                    <input type="text" name="kegiatan" value="{{ old('kegiatan') }}" placeholder="Contoh: Rizky Nazar"
+                                    <select name="id_pelatih" required
                                         class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-periwinkle focus:border-periwinkle transition"
-                                    />
+                                    >
+                                        <option value="">Pilih pelatih</option>
+                                        @foreach ($pelatihs as $pelatih)
+                                            <option value="{{ $pelatih->id_pelatih }}" @selected((string) old('id_pelatih') === (string) $pelatih->id_pelatih)>
+                                                {{ $pelatih->nama_pelatih }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @if ($pelatihs->isEmpty())
+                                        <p class="text-xs text-red-500 mt-1.5">Belum ada pelatih terdaftar untuk ekskul kamu. Hubungi pembina/admin.</p>
+                                    @endif
                                 </div>
 
                                 <div>
@@ -103,7 +113,7 @@
 
                                 <div>
                                     <label class="block text-sm font-medium text-ink mb-1.5">Kegiatan</label>
-                                    <input type="text" name="kegiatan" value="{{ old('kegiatan') }}" placeholder="Contoh: Latihan rutin Futsal"
+                                    <input type="text" name="kegiatan" value="{{ old('kegiatan') }}" placeholder="Contoh: Latihan rutin Futsal (opsional)"
                                         class="w-full px-4 py-2.5 rounded-xl border border-ink/15 bg-white focus:outline-none focus:ring-2 focus:ring-periwinkle focus:border-periwinkle transition"
                                     />
                                 </div>
