@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Ketua\RiwayatAbsensiController;
 use App\Http\Controllers\Pembina\AbsensiPelatihController;
 use App\Http\Controllers\Pembina\AbsensiPesertaController;
 use App\Http\Controllers\Pembina\NilaiPesertaController;
@@ -394,6 +395,10 @@ Route::delete('/kelola-anggota/{id}', function ($id) {
 
 })->middleware(['auth', 'verified', 'role:Ketua'])
   ->name('ketua.kelola-anggota.destroy');
+
+Route::get('/riwayat-absensi', [RiwayatAbsensiController::class, 'index'])
+    ->middleware(['auth', 'verified', 'role:Ketua'])
+    ->name('ketua.riwayat-absensi');
 
 /*
 |--------------------------------------------------------------------------
