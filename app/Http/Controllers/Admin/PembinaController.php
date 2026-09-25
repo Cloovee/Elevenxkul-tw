@@ -3,17 +3,32 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Ekskul;
 use App\Models\Pembina;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
+/**
+ * CRUD Pembina (sisi Admin).
+ *
+ * Format input dari Admin:
+ *   | nama | jk | agama | no hp | email | alamat | username | password | ekskul yang dibina (bisa > 1) |
+ *
+ * Satu kali submit otomatis mengisi 2 tabel sekaligus:
+ *   - users   : akun login (role "Pembina", username + password)
+ *   - pembina : biodata (nama, jk, agama, no hp, email, alamat) yang terhubung ke akun di atas
+ * dan menghubungkan pembina ke ekskul pilihan lewat kolom ekskuls.id_pembina.
+ */
 class PembinaController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Pembina::with('user');
+        $query = Pembina::with(['user', 'ekskuls']);
 
         if ($request->search) {
             $search = $request->search;
@@ -27,87 +42,120 @@ class PembinaController extends Controller
 
     public function create()
     {
-        // Cuma akun role Pembina yang BELUM punya biodata yang boleh dipilih
-        $availableUsers = User::where('role', 'Pembina')
-            ->whereDoesntHave('pembina')
-            ->orderBy('name')
-            ->get();
+        // Semua ekskul ditampilkan; yang sudah dibina pembina lain hanya tampil (disabled)
+        $ekskuls = Ekskul::with('pembina')->orderBy('nama_ekskul')->get();
 
-        return view('admin.CRUD-pembina.create', compact('availableUsers'));
+        return view('admin.CRUD-pembina.create', compact('ekskuls'));
     }
 
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'id_user' => 'required|exists:users,id',
             'nama_pembina' => 'required|string|max:100',
             'foto' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-            'jk' => 'nullable|in:L,P',
+            'jk' => 'required|in:L,P',
             'agama' => 'nullable|string|max:20',
             'nomor_hp' => 'nullable|string|max:15',
-            'email' => 'nullable|email|max:100',
+            'email' => 'required|email|max:100|unique:users,email',
             'medsos' => 'nullable|string|max:100',
             'alamat' => 'nullable|string',
-        ]);
+            'username' => 'required|string|max:50|alpha_dash|unique:users,username',
+            'password' => 'required|string|min:8',
+            'ekskul' => 'nullable|array',
+            'ekskul.*' => 'integer|exists:ekskuls,id_ekskul',
+        ], $this->pesan());
 
         if ($validator->fails()) {
             return back()->withErrors($validator)->withInput();
         }
 
-        // Jaga-jaga race condition: pastikan user itu masih role Pembina & belum ada biodata
-        $user = User::findOrFail($request->id_user);
-        if ($user->role !== 'Pembina') {
-            return back()->withErrors(['id_user' => 'Akun ini bukan role Pembina.'])->withInput();
-        }
-        if ($user->pembina) {
-            return back()->withErrors(['id_user' => 'Akun ini sudah punya biodata pembina.'])->withInput();
+        $ekskulIds = collect($request->input('ekskul', []))->unique()->values();
+
+        // Ekskul yang dipilih tidak boleh sedang dibina pembina lain
+        if ($this->adaEkskulMilikPembinaLain($ekskulIds, null)) {
+            return back()
+                ->withErrors(['ekskul' => 'Ada ekskul pilihan yang sudah dibina pembina lain.'])
+                ->withInput();
         }
 
         $fotoPath = $request->hasFile('foto')
             ? $request->file('foto')->store('pembina-photos', 'public')
             : null;
 
-        Pembina::create([
-            'id_user' => $request->id_user,
-            'nama_pembina' => $request->nama_pembina,
-            'foto' => $fotoPath,
-            'jk' => $request->jk,
-            'agama' => $request->agama,
-            'nomor_hp' => $request->nomor_hp,
-            'email' => $request->email,
-            'medsos' => $request->medsos,
-            'alamat' => $request->alamat,
-        ]);
+        DB::transaction(function () use ($request, $fotoPath, $ekskulIds) {
+            // 1) Akun login -> tabel users (role Pembina)
+            $user = User::create([
+                'name' => $request->nama_pembina,
+                'email' => $request->email,
+                'username' => $request->username,
+                'password' => Hash::make($request->password),
+                'role' => 'Pembina',
+            ]);
+
+            // 2) Biodata -> tabel pembina, langsung terhubung ke akun di atas
+            $pembina = Pembina::create([
+                'id_user' => $user->id,
+                'nama_pembina' => $request->nama_pembina,
+                'foto' => $fotoPath,
+                'jk' => $request->jk,
+                'agama' => $request->agama,
+                'nomor_hp' => $request->nomor_hp,
+                'email' => $request->email,
+                'medsos' => $request->medsos,
+                'alamat' => $request->alamat,
+            ]);
+
+            // 3) Ekskul yang dibina
+            if ($ekskulIds->isNotEmpty()) {
+                Ekskul::whereIn('id_ekskul', $ekskulIds)
+                    ->update(['id_pembina' => $pembina->id_pembina]);
+            }
+        });
 
         return redirect()->route('admin.pembina.index')
-            ->with('success', 'Biodata pembina berhasil ditambahkan!');
+            ->with('success', 'Pembina berhasil ditambahkan beserta akun login-nya!');
     }
 
     public function edit(int $id)
     {
-        $pembina = Pembina::with('user')->findOrFail($id);
-        return view('admin.CRUD-pembina.edit', compact('pembina'));
+        $pembina = Pembina::with(['user', 'ekskuls'])->findOrFail($id);
+        $ekskuls = Ekskul::with('pembina')->orderBy('nama_ekskul')->get();
+
+        return view('admin.CRUD-pembina.edit', compact('pembina', 'ekskuls'));
     }
 
     public function update(Request $request, int $id)
     {
-        $pembina = Pembina::findOrFail($id);
+        $pembina = Pembina::with('user')->findOrFail($id);
+        $user = $pembina->user;
 
-        // Akun (id_user) tidak diubah lewat sini -- cuma biodata
         $validator = Validator::make($request->all(), [
             'nama_pembina' => 'required|string|max:100',
             'foto' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'hapus_foto' => 'nullable|boolean',
-            'jk' => 'nullable|in:L,P',
+            'jk' => 'required|in:L,P',
             'agama' => 'nullable|string|max:20',
             'nomor_hp' => 'nullable|string|max:15',
-            'email' => 'nullable|email|max:100',
+            'email' => ['required', 'email', 'max:100', Rule::unique('users', 'email')->ignore(optional($user)->id)],
             'medsos' => 'nullable|string|max:100',
             'alamat' => 'nullable|string',
-        ]);
+            'username' => ['required', 'string', 'max:50', 'alpha_dash', Rule::unique('users', 'username')->ignore(optional($user)->id)],
+            // Kosongkan = password lama tidak berubah (wajib hanya jika akunnya sudah terhapus)
+            'password' => [$user ? 'nullable' : 'required', 'string', 'min:8'],
+            'ekskul' => 'nullable|array',
+            'ekskul.*' => 'integer|exists:ekskuls,id_ekskul',
+        ], $this->pesan());
 
         if ($validator->fails()) {
             return back()->withErrors($validator)->withInput();
+        }
+
+        $ekskulIds = collect($request->input('ekskul', []))->unique()->values();
+
+        if ($this->adaEkskulMilikPembinaLain($ekskulIds, $pembina->id_pembina)) {
+            return back()
+                ->withErrors(['ekskul' => 'Ada ekskul pilihan yang sudah dibina pembina lain.'])
+                ->withInput();
         }
 
         $data = $request->only([
@@ -115,8 +163,6 @@ class PembinaController extends Controller
         ]);
 
         if ($request->hasFile('foto')) {
-            // Ganti foto lama: unggah yang baru, baru hapus file lama supaya aman
-            // kalau proses upload gagal di tengah jalan.
             $newPath = $request->file('foto')->store('pembina-photos', 'public');
 
             if ($pembina->foto && Storage::disk('public')->exists($pembina->foto)) {
@@ -125,7 +171,6 @@ class PembinaController extends Controller
 
             $data['foto'] = $newPath;
         } elseif ($request->boolean('hapus_foto')) {
-            // Admin secara eksplisit ingin menghapus foto (kembali ke avatar inisial)
             if ($pembina->foto && Storage::disk('public')->exists($pembina->foto)) {
                 Storage::disk('public')->delete($pembina->foto);
             }
@@ -133,25 +178,94 @@ class PembinaController extends Controller
             $data['foto'] = null;
         }
 
-        $pembina->update($data);
+        DB::transaction(function () use ($request, $pembina, $user, $data, $ekskulIds) {
+            // Akun login (tabel users)
+            $userData = [
+                'name' => $request->nama_pembina,
+                'email' => $request->email,
+                'username' => $request->username,
+            ];
+
+            if ($request->filled('password')) {
+                $userData['password'] = Hash::make($request->password);
+            }
+
+            if ($user) {
+                $user->update($userData);
+            } else {
+                $userData['role'] = 'Pembina';
+                $userData['password'] = Hash::make($request->password);
+                $user = User::create($userData);
+                $data['id_user'] = $user->id;
+            }
+
+            // Biodata (tabel pembina)
+            $pembina->update($data);
+
+            // Sinkronkan ekskul yang dibina: lepas yang tidak dipilih, pasang yang dipilih
+            Ekskul::where('id_pembina', $pembina->id_pembina)
+                ->whereNotIn('id_ekskul', $ekskulIds)
+                ->update(['id_pembina' => null]);
+
+            if ($ekskulIds->isNotEmpty()) {
+                Ekskul::whereIn('id_ekskul', $ekskulIds)
+                    ->update(['id_pembina' => $pembina->id_pembina]);
+            }
+        });
 
         return redirect()->route('admin.pembina.index')
-            ->with('success', 'Biodata pembina berhasil diupdate!');
+            ->with('success', 'Data pembina berhasil diupdate!');
     }
 
     public function destroy(int $id)
     {
-        $pembina = Pembina::findOrFail($id);
+        $pembina = Pembina::with('user')->findOrFail($id);
 
         if ($pembina->foto && Storage::disk('public')->exists($pembina->foto)) {
             Storage::disk('public')->delete($pembina->foto);
         }
 
-        // Cuma hapus biodatanya. Akun user TETAP ada (masih bisa login dengan role Pembina),
-        // cuma statusnya balik jadi "belum ada biodata" di CRUD User.
-        $pembina->delete();
+        DB::transaction(function () use ($pembina) {
+            // Ekskul yang dibina dilepas (jadi "belum punya pembina")
+            Ekskul::where('id_pembina', $pembina->id_pembina)->update(['id_pembina' => null]);
+
+            $user = $pembina->user;
+            $pembina->delete();
+
+            // Akun login ikut dihapus karena dibuat otomatis bersama biodata ini
+            if ($user) {
+                $user->delete();
+            }
+        });
 
         return redirect()->route('admin.pembina.index')
-            ->with('success', 'Biodata pembina berhasil dihapus. Akun login pembina tetap ada.');
+            ->with('success', 'Pembina beserta akun login-nya berhasil dihapus. Ekskul yang dibina kini tanpa pembina.');
+    }
+
+    /**
+     * Apakah ada ekskul di daftar yang sedang dibina pembina LAIN?
+     */
+    private function adaEkskulMilikPembinaLain($ekskulIds, ?int $idPembinaSaatIni): bool
+    {
+        if ($ekskulIds->isEmpty()) {
+            return false;
+        }
+
+        return Ekskul::whereIn('id_ekskul', $ekskulIds)
+            ->whereNotNull('id_pembina')
+            ->when($idPembinaSaatIni, fn ($q) => $q->where('id_pembina', '!=', $idPembinaSaatIni))
+            ->exists();
+    }
+
+    private function pesan(): array
+    {
+        return [
+            'jk.required' => 'Pilih jenis kelamin.',
+            'email.unique' => 'Email ini sudah dipakai akun lain.',
+            'username.unique' => 'Username ini sudah dipakai akun lain.',
+            'username.alpha_dash' => 'Username hanya boleh huruf, angka, strip (-) dan underscore (_).',
+            'password.required' => 'Password wajib diisi.',
+            'password.min' => 'Password minimal 8 karakter.',
+        ];
     }
 }

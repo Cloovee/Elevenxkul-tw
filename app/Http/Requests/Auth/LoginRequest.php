@@ -28,7 +28,9 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => ['required', 'string', 'email'],
+            // Field ini tetap bernama "email" (biar tidak mengubah nama field di seluruh
+            // view/form login), tapi isinya boleh berupa alamat email ATAU username.
+            'email' => ['required', 'string'],
             'password' => ['required', 'string'],
         ];
     }
@@ -36,13 +38,27 @@ class LoginRequest extends FormRequest
     /**
      * Attempt to authenticate the request's credentials.
      *
+     * Akun Admin/Pembina lama tetap login pakai email seperti biasa.
+     * Akun Ketua yang dibuat lewat CRUD Ketua (sisi Pembina) login pakai
+     * username. Dideteksi otomatis dari format input: kalau berupa email
+     * yang valid -> dicocokkan ke kolom `email`, kalau bukan -> ke kolom
+     * `username`.
+     *
      * @throws ValidationException
      */
     public function authenticate(): void
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
+        $login = trim((string) $this->input('email'));
+        $field = filter_var($login, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+
+        $credentials = [
+            $field => $login,
+            'password' => $this->input('password'),
+        ];
+
+        if (! Auth::attempt($credentials, $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
