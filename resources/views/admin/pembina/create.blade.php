@@ -1,125 +1,141 @@
 @extends('layouts.admin')
 
 @section('title', 'Tambah Pembina')
-@section('page-title', 'Tambah Pembina')
+@section('page-title', 'Data Pembina')
 
 @section('content')
-<div class="animate-fade-in-up bg-white/90 rounded-3xl shadow-[0_10px_30px_-18px_rgba(46,43,85,0.35)] p-6">
+<div class="bg-white rounded-3xl shadow-[0_4px_24px_-8px_rgba(0,0,0,0.05)] border border-gray-50 p-8 max-w-3xl mx-auto">
+
+    <div class="flex items-center gap-3 mb-6">
+        <div class="w-11 h-11 bg-[#0B409C] rounded-xl flex items-center justify-center text-white">
+            <i class="fas fa-user-tie"></i>
+        </div>
+        <h3 class="text-xl font-extrabold text-[#10316B]">Tambah Biodata Pembina</h3>
+    </div>
+
     <form action="{{ route('admin.pembina.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
 
         <div class="mb-6">
-            <label class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Foto Profil</label>
+            <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Foto Profil</label>
             <div class="flex items-center gap-4">
-                <div class="relative w-16 h-16 shrink-0">
-                    <div id="foto-preview-fallback" class="w-16 h-16 rounded-2xl bg-lavender flex items-center justify-center text-white font-bold text-lg">
-                        <i class="fas fa-user"></i>
-                    </div>
-                    <img id="foto-preview" src="" class="hidden w-16 h-16 rounded-2xl object-cover border border-[#DDE8FB]" alt="Pratinjau foto">
+                <div id="foto-preview" class="w-16 h-16 rounded-2xl bg-[#F2F7FF] border-2 border-dashed border-[#DDE8FB] flex items-center justify-center overflow-hidden shrink-0 text-[#7C8DB5]">
+                    <i class="fas fa-user text-xl"></i>
                 </div>
                 <div class="flex-1">
-                    <label for="foto" class="inline-flex items-center gap-2 cursor-pointer bg-bgsoft hover:bg-[#DDE8FB] text-ink text-xs font-bold px-4 py-2.5 rounded-xl border border-[#DDE8FB] transition">
-                        <i class="fas fa-upload"></i>
-                        Unggah Foto Guru
-                    </label>
-                    <input type="file" id="foto" name="foto" accept="image/png, image/jpeg, image/webp" class="hidden">
-                    <p class="text-[11px] text-inksoft mt-1.5">JPG, PNG, atau WEBP. Maksimal 2MB.</p>
-                    @error('foto')
-                        <p class="text-[11px] text-red-500 font-semibold mt-1">{{ $message }}</p>
-                    @enderror
+                    <input type="file" name="foto" id="foto-input" accept="image/png,image/jpeg,image/webp"
+                           class="w-full text-sm text-[#10316B] file:mr-3 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-[#0B409C] file:text-white file:text-xs file:font-bold file:cursor-pointer hover:file:opacity-90 @error('foto') ring-2 ring-red-400 rounded-xl @enderror">
+                    <p class="text-[11px] text-[#7C8DB5] mt-1.5">JPG, PNG, atau WEBP. Maks 2MB. Foto ini yang akan tampil menggantikan inisial di navbar pembina.</p>
+                    @error('foto')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                 </div>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
             <div>
-                <label for="nama_pembina" class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">
-                    Nama Lengkap <span class="text-red-500">*</span>
-                </label>
-                <input type="text" name="nama_pembina" id="nama_pembina" value="{{ old('nama_pembina') }}"
-                    class="w-full px-4 py-2 border border-[#DDE8FB] rounded-xl focus:ring-2 focus:ring-lavender focus:border-transparent @error('nama_pembina') border-red-500 @enderror">
-                @error('nama_pembina')<p class="mt-1 text-sm text-red-500 font-medium">{{ $message }}</p>@enderror
+                <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Email (Username Login) <span class="text-red-500">*</span></label>
+                <input type="email" name="email" class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C] @error('email') ring-2 ring-red-400 @enderror" value="{{ old('email') }}" required>
+                @error('email')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                <p class="text-xs text-[#7C8DB5] mt-1.5">Email ini otomatis jadi akun login pembina (role Pembina).</p>
             </div>
 
             <div>
-                <label for="email" class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">
-                    Email <span class="text-red-500">*</span>
-                </label>
-                <input type="email" name="email" id="email" value="{{ old('email') }}"
-                    class="w-full px-4 py-2 border border-[#DDE8FB] rounded-xl focus:ring-2 focus:ring-lavender focus:border-transparent @error('email') border-red-500 @enderror">
-                @error('email')<p class="mt-1 text-sm text-red-500 font-medium">{{ $message }}</p>@enderror
+                <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Password <span class="text-red-500">*</span></label>
+                <input type="password" name="password" class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C] @error('password') ring-2 ring-red-400 @enderror" required>
+                @error('password')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
 
             <div>
-                <label for="password" class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">
-                    Password <span class="text-red-500">*</span>
-                </label>
-                <input type="password" name="password" id="password"
-                    class="w-full px-4 py-2 border border-[#DDE8FB] rounded-xl focus:ring-2 focus:ring-lavender focus:border-transparent @error('password') border-red-500 @enderror">
-                @error('password')<p class="mt-1 text-sm text-red-500 font-medium">{{ $message }}</p>@enderror
+                <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Konfirmasi Password <span class="text-red-500">*</span></label>
+                <input type="password" name="password_confirmation" class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C]" required>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div>
+                <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Nama Pembina <span class="text-red-500">*</span></label>
+                <input type="text" name="nama_pembina" class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C] @error('nama_pembina') ring-2 ring-red-400 @enderror" value="{{ old('nama_pembina') }}" required>
+                @error('nama_pembina')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
 
             <div>
-                <label for="nomor_hp" class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Nomor HP</label>
-                <input type="text" name="nomor_hp" id="nomor_hp" value="{{ old('nomor_hp') }}"
-                    class="w-full px-4 py-2 border border-[#DDE8FB] rounded-xl focus:ring-2 focus:ring-lavender focus:border-transparent">
-            </div>
-
-            <div>
-                <label for="jk" class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Jenis Kelamin</label>
-                <select name="jk" id="jk" class="w-full px-4 py-2 border border-[#DDE8FB] rounded-xl focus:ring-2 focus:ring-lavender focus:border-transparent">
-                    <option value="">Pilih</option>
+                <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Jenis Kelamin</label>
+                <select name="jk" class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C] @error('jk') ring-2 ring-red-400 @enderror">
+                    <option value="">-- Pilih --</option>
                     <option value="L" {{ old('jk') == 'L' ? 'selected' : '' }}>Laki-laki</option>
                     <option value="P" {{ old('jk') == 'P' ? 'selected' : '' }}>Perempuan</option>
                 </select>
+                @error('jk')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
 
             <div>
-                <label for="agama" class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Agama</label>
-                <input type="text" name="agama" id="agama" value="{{ old('agama') }}"
-                    class="w-full px-4 py-2 border border-[#DDE8FB] rounded-xl focus:ring-2 focus:ring-lavender focus:border-transparent">
+                <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Agama</label>
+                <input type="text" name="agama" class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C] @error('agama') ring-2 ring-red-400 @enderror" value="{{ old('agama') }}">
+                @error('agama')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Nomor HP</label>
+                <input type="text" name="nomor_hp" class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C] @error('nomor_hp') ring-2 ring-red-400 @enderror" value="{{ old('nomor_hp') }}">
+                @error('nomor_hp')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">MedSos</label>
+                <input type="text" name="medsos" class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C] @error('medsos') ring-2 ring-red-400 @enderror" value="{{ old('medsos') }}">
+                @error('medsos')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
 
             <div class="md:col-span-2">
-                <label for="medsos" class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Media Sosial</label>
-                <input type="text" name="medsos" id="medsos" value="{{ old('medsos') }}"
-                    class="w-full px-4 py-2 border border-[#DDE8FB] rounded-xl focus:ring-2 focus:ring-lavender focus:border-transparent">
-            </div>
-
-            <div class="md:col-span-2">
-                <label for="alamat" class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Alamat</label>
-                <textarea name="alamat" id="alamat" rows="3"
-                    class="w-full px-4 py-2 border border-[#DDE8FB] rounded-xl focus:ring-2 focus:ring-lavender focus:border-transparent">{{ old('alamat') }}</textarea>
+                <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Alamat</label>
+                <textarea name="alamat" rows="3" class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C] @error('alamat') ring-2 ring-red-400 @enderror">{{ old('alamat') }}</textarea>
+                @error('alamat')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
         </div>
 
-        <div class="flex items-center gap-3 mt-6 pt-6 border-t border-[#E8F0FE]">
-            <button type="submit" class="px-6 py-2.5 bg-lavender text-white font-semibold rounded-xl hover:opacity-90 transition shadow-md shadow-periwinkle/30">
-                <i class="fas fa-save mr-2"></i>Simpan
+        <div class="mt-6">
+            <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Ekskul yang Dibina</label>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-64 overflow-y-auto p-4 bg-[#F2F7FF] rounded-xl @error('ekskul_ids') ring-2 ring-red-400 @enderror">
+                @forelse($ekskuls as $ek)
+                    <label class="flex items-center gap-2 text-sm text-[#10316B] bg-white rounded-lg px-3 py-2 cursor-pointer">
+                        <input type="checkbox" name="ekskul_ids[]" value="{{ $ek->id_ekskul }}" class="rounded border-[#DDE8FB] text-[#0B409C] focus:ring-[#0B409C]" {{ in_array($ek->id_ekskul, old('ekskul_ids', [])) ? 'checked' : '' }}>
+                        <span>
+                            {{ $ek->nama_ekskul }}
+                            @if($ek->pembina)
+                                <span class="block text-[11px] text-amber-600">Sekarang: {{ $ek->pembina->nama_pembina }} (ambil alih kalau dicentang)</span>
+                            @endif
+                        </span>
+                    </label>
+                @empty
+                    <p class="text-sm text-[#7C8DB5] col-span-2">Belum ada data ekskul.</p>
+                @endforelse
+            </div>
+            @error('ekskul_ids')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+            @error('ekskul_ids.*')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+        </div>
+
+        <div class="mt-8 flex gap-3">
+            <button type="submit" class="inline-flex items-center gap-2 px-6 py-2.5 bg-[#0B409C] text-white rounded-full text-sm font-bold shadow-md shadow-[#0B409C]/30 hover:opacity-90 transition-opacity">
+                <i class="fas fa-save"></i> Simpan
             </button>
-            <a href="{{ route('admin.pembina.index') }}" class="px-6 py-2.5 bg-bgsoft text-ink font-semibold rounded-xl hover:bg-[#DDE8FB] transition">
-                Batal
+            <a href="{{ route('admin.pembina.index') }}" class="inline-flex items-center gap-2 px-6 py-2.5 bg-[#F2F7FF] hover:bg-[#DDE8FB] text-[#10316B] rounded-full text-sm font-bold transition-colors">
+                <i class="fas fa-arrow-left"></i> Kembali
             </a>
         </div>
     </form>
 </div>
 
 <script>
-    const inputFoto = document.getElementById('foto');
-    if (inputFoto) {
-        inputFoto.addEventListener('change', function (e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            const preview = document.getElementById('foto-preview');
-            const fallback = document.getElementById('foto-preview-fallback');
-            const reader = new FileReader();
-            reader.onload = function (ev) {
-                preview.src = ev.target.result;
-                preview.classList.remove('hidden');
-                fallback.classList.add('hidden');
-            };
-            reader.readAsDataURL(file);
-        });
-    }
+    document.getElementById('foto-input')?.addEventListener('change', function (e) {
+        const file = e.target.files[0];
+        const preview = document.getElementById('foto-preview');
+        if (!file || !preview) return;
+
+        const reader = new FileReader();
+        reader.onload = function (ev) {
+            preview.innerHTML = '<img src="' + ev.target.result + '" class="w-full h-full object-cover" alt="Preview foto">';
+        };
+        reader.readAsDataURL(file);
+    });
 </script>
 @endsection

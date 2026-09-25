@@ -30,7 +30,7 @@ class SiswaController extends Controller
             $query->where('id_kelas', $request->kelas);
         }
 
-        $siswa = $query->orderBy('nama_siswa')->paginate(20);
+        $siswa = $query->orderBy('nama_siswa')->paginate(20)->withQueryString();
         $kelas = Kelas::all();
 
         return view('admin.siswa.index', compact('siswa', 'kelas'));
@@ -163,17 +163,55 @@ class SiswaController extends Controller
 
     public function downloadTemplate()
     {
-        $data = [
-            ['NISN', 'NIS', 'Nama Siswa', 'Jenis Kelamin', 'Agama', 'Tingkat', 'Jurusan', 'Rombel', 'Nomor HP', 'Email', 'MedSos', 'Alamat'],
-            ['1234567890', '10001', 'Budi Santoso', 'L', 'Islam', 'X', 'IPA', '1', '08123456789', 'budi@email.com', '@budi', 'Jl. Merdeka No.1'],
-            ['1234567891', '10002', 'Siti Rahayu', 'P', 'Islam', 'X', 'IPA', '1', '08123456788', 'siti@email.com', '@siti', 'Jl. Merdeka No.2'],
+        $daftarKelas = Kelas::orderBy('tingkat')->orderBy('program_keahlian')->orderBy('rombel')->get();
+
+        // Contoh baris pakai ID Kelas asli kalau datanya sudah ada, biar guru
+        // langsung lihat contoh yang valid. Kalau belum ada kelas sama sekali,
+        // dikosongkan saja (kolom ID Kelas opsional, pakai kelas default form).
+        $contohId1 = $daftarKelas->get(0)?->id_kelas ?? '';
+        $contohId2 = $daftarKelas->get(1)?->id_kelas ?? $contohId1;
+
+        $dataSiswa = [
+            ['NISN', 'NIS', 'Nama Siswa', 'Jenis Kelamin', 'Agama', 'ID Kelas', 'Nomor HP', 'Email', 'MedSos', 'Alamat'],
+            ['1234567890', '10001', 'Budi Santoso', 'L', 'Islam', $contohId1, '08123456789', 'budi@email.com', '@budi', 'Jl. Merdeka No.1'],
+            ['1234567891', '10002', 'Siti Rahayu', 'P', 'Islam', $contohId2, '08123456788', 'siti@email.com', '@siti', 'Jl. Merdeka No.2'],
         ];
 
+        // Sheet referensi ID Kelas dipisah dari sheet data siswa, supaya tidak
+        // ikut ke-parse sebagai baris siswa kalau lupa dihapus sebelum diimport.
+        $dataKelas = [
+            ['ID Kelas', 'Tingkat', 'Program Keahlian', 'Rombel'],
+        ];
+        foreach ($daftarKelas as $k) {
+            $dataKelas[] = [$k->id_kelas, $k->tingkat, $k->program_keahlian, $k->rombel];
+        }
+
         return Excel::download(
-            new class($data) implements \Maatwebsite\Excel\Concerns\FromArray {
-                private array $data;
-                public function __construct(array $data) { $this->data = $data; }
-                public function array(): array { return $this->data; }
+            new class($dataSiswa, $dataKelas) implements \Maatwebsite\Excel\Concerns\WithMultipleSheets {
+                private array $dataSiswa;
+                private array $dataKelas;
+                public function __construct(array $dataSiswa, array $dataKelas)
+                {
+                    $this->dataSiswa = $dataSiswa;
+                    $this->dataKelas = $dataKelas;
+                }
+                public function sheets(): array
+                {
+                    return [
+                        new class($this->dataSiswa) implements \Maatwebsite\Excel\Concerns\FromArray, \Maatwebsite\Excel\Concerns\WithTitle {
+                            private array $data;
+                            public function __construct(array $data) { $this->data = $data; }
+                            public function array(): array { return $this->data; }
+                            public function title(): string { return 'Data Siswa'; }
+                        },
+                        new class($this->dataKelas) implements \Maatwebsite\Excel\Concerns\FromArray, \Maatwebsite\Excel\Concerns\WithTitle {
+                            private array $data;
+                            public function __construct(array $data) { $this->data = $data; }
+                            public function array(): array { return $this->data; }
+                            public function title(): string { return 'Daftar ID Kelas'; }
+                        },
+                    ];
+                }
             },
             'template_import_siswa.xlsx'
         );

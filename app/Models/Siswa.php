@@ -8,7 +8,22 @@ class Siswa extends Model
 {
     protected $table = 'siswa';
     protected $primaryKey = 'id_siswa';
-    
+
+    /**
+     * Status siswa saat ini. Ini murni "kondisi sekarang", BUKAN histori --
+     * logic perpindahan antar status (naik kelas, lulus, keluar) adalah
+     * bagian dari modul Tahun Ajaran (fase khusus terpisah), belum ada di sini.
+     */
+    public const STATUS_AKTIF = 'aktif';
+    public const STATUS_ALUMNI = 'alumni';
+    public const STATUS_TIDAK_AKTIF = 'tidak_aktif';
+
+    public const STATUSES = [
+        self::STATUS_AKTIF,
+        self::STATUS_ALUMNI,
+        self::STATUS_TIDAK_AKTIF,
+    ];
+
     protected $fillable = [
         'id_kelas',
         'NISN',
@@ -19,7 +34,8 @@ class Siswa extends Model
         'nomor_hp',
         'email',
         'alamat',
-        'medsos'
+        'medsos',
+        'status',
     ];
 
     public function kelas()

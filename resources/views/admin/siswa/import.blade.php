@@ -51,7 +51,7 @@
             <select name="id_kelas" class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C]">
                 <option value="">-- Gunakan dari file --</option>
                 @foreach($kelas as $k)
-                    <option value="{{ $k->id_kelas }}">{{ $k->jurusan }} - {{ $k->rombel }}</option>
+                    <option value="{{ $k->id_kelas }}">{{ $k->program_keahlian }} - {{ $k->rombel }}</option>
                 @endforeach
             </select>
             <p class="text-xs text-[#7C8DB5] mt-2">Kalau jurusan/rombel tidak ditemukan di database, akan pakai kelas ini.</p>

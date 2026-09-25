@@ -21,7 +21,7 @@
                 <option value="">Semua Kelas</option>
                 @foreach($kelas as $k)
                     <option value="{{ $k->id_kelas }}" {{ request('kelas') == $k->id_kelas ? 'selected' : '' }}>
-                        {{ $k->jurusan }} - {{ $k->rombel }}
+                        {{ $k->program_keahlian }} - {{ $k->rombel }}
                     </option>
                 @endforeach
             </select>

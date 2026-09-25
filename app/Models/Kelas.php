@@ -14,7 +14,7 @@ class Kelas extends Model
 
     protected $fillable = [
         'tingkat',
-        'jurusan',
+        'program_keahlian',
         'rombel',
     ];
 
@@ -25,6 +25,6 @@ class Kelas extends Model
 
     public function getNamaKelasAttribute(): string
     {
-        return trim("{$this->tingkat} {$this->jurusan} - {$this->rombel}");
+        return trim("{$this->tingkat} {$this->program_keahlian} - {$this->rombel}");
     }
 }

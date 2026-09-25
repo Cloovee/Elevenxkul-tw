@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\Ketua\RiwayatAbsensiController;
 use App\Http\Controllers\Pembina\AbsensiPelatihController;
 use App\Http\Controllers\Pembina\AbsensiPesertaController;
 use App\Http\Controllers\Pembina\NilaiPesertaController;
@@ -119,8 +118,6 @@ Route::prefix('/admin')
 
         Route::prefix('/user')->name('user.')->group(function () {
             Route::get('/', [UserController::class, 'index'])->name('index');
-            Route::get('/create', [UserController::class, 'create'])->name('create');
-            Route::post('/store', [UserController::class, 'store'])->name('store');
             Route::get('/{id}/edit', [UserController::class, 'edit'])->name('edit');
             Route::put('/{id}', [UserController::class, 'update'])->name('update');
             Route::delete('/{id}', [UserController::class, 'destroy'])->name('destroy');
@@ -275,7 +272,7 @@ Route::get('/kelola-anggota/tambah', function () {
             'nama_kelas' => $s->nama_kelas,
         ]);
 
-    $daftarKelas = \App\Models\Kelas::orderBy('tingkat')->orderBy('jurusan')->orderBy('rombel')->get();
+    $daftarKelas = \App\Models\Kelas::orderBy('tingkat')->orderBy('program_keahlian')->orderBy('rombel')->get();
 
     return view('dashboard-ketua.kelola-anggota.tambah', compact('daftarSiswa', 'daftarKelas'));
 })->middleware(['auth', 'verified', 'role:Ketua'])
@@ -395,10 +392,6 @@ Route::delete('/kelola-anggota/{id}', function ($id) {
 
 })->middleware(['auth', 'verified', 'role:Ketua'])
   ->name('ketua.kelola-anggota.destroy');
-
-Route::get('/riwayat-absensi', [RiwayatAbsensiController::class, 'index'])
-    ->middleware(['auth', 'verified', 'role:Ketua'])
-    ->name('ketua.riwayat-absensi');
 
 /*
 |--------------------------------------------------------------------------

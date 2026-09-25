@@ -66,7 +66,7 @@
                             <div class="w-9 h-9 rounded-full bg-orange-50 text-orange-500 flex items-center justify-center font-display font-bold text-sm ring-2 ring-orange-100 flex-shrink-0">
                                 <i class="fas fa-school text-xs"></i>
                             </div>
-                            <p class="text-[#10316B] font-bold">{{ $k->jurusan }}</p>
+                            <p class="text-[#10316B] font-bold">{{ $k->program_keahlian }}</p>
                         </div>
                     </td>
                     <td class="px-3 py-3 text-[#10316B] font-semibold">{{ $k->rombel }}</td>

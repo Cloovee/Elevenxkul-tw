@@ -25,8 +25,8 @@
 
         <div class="mb-5">
             <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Jurusan <span class="text-red-500">*</span></label>
-            <input type="text" name="jurusan" class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C] @error('jurusan') ring-2 ring-red-400 @enderror" value="{{ old('jurusan', $kelas->jurusan) }}" required>
-            @error('jurusan')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+            <input type="text" name="program_keahlian" class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C] @error('program_keahlian') ring-2 ring-red-400 @enderror" value="{{ old('program_keahlian', $kelas->program_keahlian) }}" required>
+            @error('program_keahlian')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
         </div>
 
         <div class="mb-6">

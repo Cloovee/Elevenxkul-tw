@@ -18,12 +18,12 @@ class KelasController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('tingkat', 'LIKE', "%{$search}%")
-                  ->orWhere('jurusan', 'LIKE', "%{$search}%")
+                  ->orWhere('program_keahlian', 'LIKE', "%{$search}%")
                   ->orWhere('rombel', 'LIKE', "%{$search}%");
             });
         }
 
-        $kelas = $query->orderBy('tingkat')->orderBy('jurusan')->orderBy('rombel')->paginate(20);
+        $kelas = $query->orderBy('tingkat')->orderBy('program_keahlian')->orderBy('rombel')->paginate(20)->withQueryString();
 
         return view('admin.kelas.index', compact('kelas'));
     }
@@ -39,21 +39,21 @@ class KelasController extends Controller
             'tingkat' => [
                 'required', 'string', 'max:10',
                 Rule::unique('kelas')->where(function ($q) use ($request) {
-                    return $q->where('jurusan', $request->jurusan)
+                    return $q->where('program_keahlian', $request->program_keahlian)
                              ->where('rombel', $request->rombel);
                 }),
             ],
-            'jurusan' => 'required|string|max:50',
+            'program_keahlian' => 'required|string|max:50',
             'rombel' => 'required|string|max:20',
         ], [
-            'tingkat.unique' => 'Kelas dengan tingkat, jurusan, dan rombel yang sama sudah ada.',
+            'tingkat.unique' => 'Kelas dengan tingkat, program keahlian, dan rombel yang sama sudah ada.',
         ]);
 
         if ($validator->fails()) {
             return back()->withErrors($validator)->withInput();
         }
 
-        Kelas::create($request->only('tingkat', 'jurusan', 'rombel'));
+        Kelas::create($request->only('tingkat', 'program_keahlian', 'rombel'));
 
         return redirect()->route('admin.kelas.index')
             ->with('success', 'Kelas berhasil ditambahkan!');
@@ -73,21 +73,21 @@ class KelasController extends Controller
             'tingkat' => [
                 'required', 'string', 'max:10',
                 Rule::unique('kelas')->ignore($kelas->id_kelas, 'id_kelas')->where(function ($q) use ($request) {
-                    return $q->where('jurusan', $request->jurusan)
+                    return $q->where('program_keahlian', $request->program_keahlian)
                              ->where('rombel', $request->rombel);
                 }),
             ],
-            'jurusan' => 'required|string|max:50',
+            'program_keahlian' => 'required|string|max:50',
             'rombel' => 'required|string|max:20',
         ], [
-            'tingkat.unique' => 'Kelas dengan tingkat, jurusan, dan rombel yang sama sudah ada.',
+            'tingkat.unique' => 'Kelas dengan tingkat, program keahlian, dan rombel yang sama sudah ada.',
         ]);
 
         if ($validator->fails()) {
             return back()->withErrors($validator)->withInput();
         }
 
-        $kelas->update($request->only('tingkat', 'jurusan', 'rombel'));
+        $kelas->update($request->only('tingkat', 'program_keahlian', 'rombel'));
 
         return redirect()->route('admin.kelas.index')
             ->with('success', 'Kelas berhasil diupdate!');

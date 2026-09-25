@@ -31,26 +31,24 @@
             </div>
         </div>
 
-        <div class="mb-6">
-            <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Akun Login <span class="text-red-500">*</span></label>
-            <select name="id_user" class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C] @error('id_user') ring-2 ring-red-400 @enderror" required>
-                <option value="">-- Pilih Akun --</option>
-                @foreach($availableUsers as $u)
-                    <option value="{{ $u->id }}" {{ old('id_user') == $u->id ? 'selected' : '' }}>
-                        {{ $u->name }} ({{ $u->email }})
-                    </option>
-                @endforeach
-            </select>
-            @error('id_user')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+            <div>
+                <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Email (Username Login) <span class="text-red-500">*</span></label>
+                <input type="email" name="email" class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C] @error('email') ring-2 ring-red-400 @enderror" value="{{ old('email') }}" required>
+                @error('email')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                <p class="text-xs text-[#7C8DB5] mt-1.5">Email ini otomatis jadi akun login pembina (role Pembina).</p>
+            </div>
 
-            @if($availableUsers->isEmpty())
-                <p class="text-amber-600 text-xs mt-2 bg-amber-50 px-3 py-2 rounded-lg">
-                    <i class="fas fa-triangle-exclamation mr-1"></i>
-                    Belum ada akun role Pembina yang tersedia. Buat dulu akunnya lewat menu <strong>Kelola Users</strong>.
-                </p>
-            @else
-                <p class="text-xs text-[#7C8DB5] mt-2">Cuma akun role Pembina yang belum ada biodatanya yang muncul di sini.</p>
-            @endif
+            <div>
+                <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Password <span class="text-red-500">*</span></label>
+                <input type="password" name="password" class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C] @error('password') ring-2 ring-red-400 @enderror" required>
+                @error('password')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Konfirmasi Password <span class="text-red-500">*</span></label>
+                <input type="password" name="password_confirmation" class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C]" required>
+            </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -83,12 +81,6 @@
             </div>
 
             <div>
-                <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Email <span class="text-xs normal-case font-normal text-[#7C8DB5]">(kontak, boleh beda dari email akun)</span></label>
-                <input type="email" name="email" class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C] @error('email') ring-2 ring-red-400 @enderror" value="{{ old('email') }}">
-                @error('email')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
-            </div>
-
-            <div>
                 <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">MedSos</label>
                 <input type="text" name="medsos" class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C] @error('medsos') ring-2 ring-red-400 @enderror" value="{{ old('medsos') }}">
                 @error('medsos')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
@@ -99,6 +91,27 @@
                 <textarea name="alamat" rows="3" class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C] @error('alamat') ring-2 ring-red-400 @enderror">{{ old('alamat') }}</textarea>
                 @error('alamat')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
+        </div>
+
+        <div class="mt-6">
+            <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Ekskul yang Dibina</label>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-64 overflow-y-auto p-4 bg-[#F2F7FF] rounded-xl @error('ekskul_ids') ring-2 ring-red-400 @enderror">
+                @forelse($ekskuls as $ek)
+                    <label class="flex items-center gap-2 text-sm text-[#10316B] bg-white rounded-lg px-3 py-2 cursor-pointer">
+                        <input type="checkbox" name="ekskul_ids[]" value="{{ $ek->id_ekskul }}" class="rounded border-[#DDE8FB] text-[#0B409C] focus:ring-[#0B409C]" {{ in_array($ek->id_ekskul, old('ekskul_ids', [])) ? 'checked' : '' }}>
+                        <span>
+                            {{ $ek->nama_ekskul }}
+                            @if($ek->pembina)
+                                <span class="block text-[11px] text-amber-600">Sekarang: {{ $ek->pembina->nama_pembina }} (ambil alih kalau dicentang)</span>
+                            @endif
+                        </span>
+                    </label>
+                @empty
+                    <p class="text-sm text-[#7C8DB5] col-span-2">Belum ada data ekskul.</p>
+                @endforelse
+            </div>
+            @error('ekskul_ids')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+            @error('ekskul_ids.*')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
         </div>
 
         <div class="mt-8 flex gap-3">

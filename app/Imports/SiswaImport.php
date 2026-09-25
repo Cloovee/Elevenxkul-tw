@@ -73,8 +73,10 @@ class SiswaImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnFai
         }
 
         if ($lengkap) {
+            // Catatan: header kolom Excel tetap "jurusan" (baca App\Http\Controllers\Admin\SiswaController::downloadTemplate)
+            // supaya template yang sudah beredar tidak rusak. Yang berubah cuma nama kolom di tabel kelas.
             $kelas = Kelas::where('tingkat', $tingkat)
-                           ->where('jurusan', $jurusan)
+                           ->where('program_keahlian', $jurusan)
                            ->where('rombel', $rombel)
                            ->first();
 
