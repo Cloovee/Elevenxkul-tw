@@ -7,6 +7,7 @@ use App\Models\Ekskul;
 use App\Models\Pembina;
 use App\Models\Siswa;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class EkskulController extends Controller
 {
@@ -43,7 +44,19 @@ class EkskulController extends Controller
             // Dari sinilah nanti fitur sisi Ketua (kelola anggota, absensi peserta)
             // tahu ekskul mana yang boleh dia kelola.
             'id_ketua' => 'nullable|exists:siswa,id_siswa',
+            'poster' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
+            'hapus_poster' => 'nullable|boolean',
+        ], [
+            'poster.image' => 'Poster harus berupa gambar.',
+            'poster.mimes' => 'Poster harus berformat JPG, PNG, atau WEBP.',
+            'poster.max' => 'Ukuran poster maksimal 4 MB.',
         ]);
+
+        unset($validated['hapus_poster']);
+
+        if ($request->hasFile('poster')) {
+            $validated['poster'] = $request->file('poster')->store('poster-ekskul', 'public');
+        }
 
         Ekskul::create($validated);
 
@@ -74,12 +87,32 @@ class EkskulController extends Controller
             'deskripsi' => 'nullable|string',
             'id_pembina' => 'nullable|exists:pembina,id_pembina',
             'id_ketua' => 'nullable|exists:siswa,id_siswa',
+            'poster' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
+            'hapus_poster' => 'nullable|boolean',
+        ], [
+            'poster.image' => 'Poster harus berupa gambar.',
+            'poster.mimes' => 'Poster harus berformat JPG, PNG, atau WEBP.',
+            'poster.max' => 'Ukuran poster maksimal 4 MB.',
         ]);
 
         // Kalau pembina diganti/dilepas, pelatih yang sebelumnya terkait ekskul ini ikut
         // dilepas juga -- karena CRUD pelatih pembina lama tidak boleh lagi mengelolanya.
         if ((string) $ekskul->id_pembina !== (string) ($validated['id_pembina'] ?? '')) {
             $validated['id_pelatih'] = null;
+        }
+
+        // Poster: ganti kalau ada file baru, hapus kalau kotak "hapus poster" dicentang.
+        $hapus = ! empty($validated['hapus_poster']);
+        unset($validated['hapus_poster']);
+
+        if ($request->hasFile('poster')) {
+            $this->hapusFilePoster($ekskul);
+            $validated['poster'] = $request->file('poster')->store('poster-ekskul', 'public');
+        } elseif ($hapus) {
+            $this->hapusFilePoster($ekskul);
+            $validated['poster'] = null;
+        } else {
+            unset($validated['poster']);
         }
 
         $ekskul->update($validated);
@@ -90,10 +123,21 @@ class EkskulController extends Controller
 
     public function destroy(Ekskul $ekskul)
     {
+        $this->hapusFilePoster($ekskul);
         $ekskul->delete();
 
         return redirect()->route('admin.ekskul.index')
             ->with('success', 'Ekskul berhasil dihapus');
+    }
+
+    /**
+     * Hapus file poster dari storage (abaikan kalau berupa URL luar).
+     */
+    private function hapusFilePoster(Ekskul $ekskul): void
+    {
+        if ($ekskul->poster && ! str_starts_with($ekskul->poster, 'http')) {
+            Storage::disk('public')->delete($ekskul->poster);
+        }
     }
 
     /**

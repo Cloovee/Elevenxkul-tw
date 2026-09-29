@@ -1,0 +1,789 @@
+@php
+    $kat = ['organisasi' => 'Organisasi', 'ekstrakulikuler' => 'Ekstrakurikuler', 'komunitas' => 'Komunitas'];
+    $foto = asset('images/smkn11foto.jpg');
+    $logo = asset('images/smkn11logo.png');
+    $q = urlencode($sekolah['peta_query']);
+@endphp
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <script>try{if(localStorage.getItem('rail-folded')==='1')document.documentElement.classList.add('rail-folded')}catch(e){}</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Ekstrakurikuler {{ $sekolah['nama'] }}</title>
+    <meta name="description" content="Daftar ekstrakurikuler, pembina, galeri kegiatan, video, dan lokasi {{ $sekolah['nama'] }}.">
+    <link rel="icon" href="{{ $logo }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    {{-- Font sama dengan dashboard: Fredoka (judul) + Plus Jakarta Sans (isi) --}}
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* Palet sama dengan resources/css/app.css */
+        :root{--cloud:#F2F7FF;--blue:#0B409C;--navy:#10316B;--gold:#FFE867;--mute:#5B6E96;--line:#E3ECFB;
+            --display:'Fredoka',system-ui,sans-serif;--body:'Plus Jakarta Sans',system-ui,sans-serif;
+            --card:0 4px 24px -8px rgba(16,49,107,.10);--card-hover:0 24px 44px -20px rgba(11,64,156,.35);--ease:cubic-bezier(.16,1,.3,1)}
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+        html{scroll-behavior:smooth;scroll-padding-top:1.5rem}
+        body{font-family:var(--body);color:var(--navy);background:var(--cloud);line-height:1.65;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+        img{display:block;max-width:100%}
+        a{color:inherit;text-decoration:none}
+        :focus-visible{outline:3px solid var(--blue);outline-offset:3px;border-radius:12px}
+        .wrap{width:min(1160px,92%);margin-inline:auto}
+        .sec{padding:clamp(3.5rem,8vw,6.5rem) 0}
+        h1,h2,h3{font-family:var(--display);font-weight:600;line-height:1.15;letter-spacing:-.01em}
+        h2{font-size:clamp(1.9rem,3.6vw,2.6rem)}
+        .lead{color:var(--mute);max-width:52ch;margin-top:.7rem}
+        .panel{background:#fff;border-radius:2rem;box-shadow:var(--card);border:1px solid #F3F6FC}
+
+        .btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;padding:.8rem 1.6rem;border-radius:999px;font-weight:700;font-size:.92rem;border:0;cursor:pointer;transition:transform .35s var(--ease),box-shadow .35s var(--ease),background .25s,color .25s}
+        .btn:hover{transform:translateY(-3px)}
+        .btn-blue{background:var(--blue);color:#fff;box-shadow:0 8px 20px -8px rgba(11,64,156,.55)}
+        .btn-blue:hover{box-shadow:0 14px 26px -10px rgba(11,64,156,.7)}
+        .btn-soft{background:#fff;color:var(--navy);box-shadow:var(--card)}
+        .btn-soft:hover{background:var(--navy);color:#fff}
+        .btn-gold{background:var(--gold);color:var(--navy)}
+
+        /* ---------- Latar lembut (sama seperti layout admin) ---------- */
+        .blob{position:absolute;border-radius:50%;filter:blur(64px);pointer-events:none;z-index:0}
+
+        /* ---------- Sidebar rail (gaya sama dengan sidebar Admin/Pembina/Ketua) ---------- */
+        :root{--rail:0px}
+        @media(min-width:1024px){:root{--rail:9rem}}
+        @media(max-width:1023px){html{scroll-padding-top:5.5rem}}
+        .rail{position:fixed;z-index:60;top:.75rem;left:.75rem;right:.75rem;display:flex;align-items:center;gap:.5rem;padding:.6rem;border-radius:1.5rem;background:var(--blue);box-shadow:0 25px 50px -12px rgba(11,64,156,.35);outline:1px solid rgba(255,255,255,.2);overflow-x:auto;scrollbar-width:none;user-select:none}
+        .rail::-webkit-scrollbar{display:none}
+        .r-link{flex:none;display:flex;align-items:center;height:2.75rem;border-radius:1rem;color:rgba(255,255,255,.9);background:none;border:0;font:inherit;cursor:pointer;overflow:hidden;white-space:nowrap;transition:width .32s cubic-bezier(.4,0,.2,1),margin .32s cubic-bezier(.4,0,.2,1),padding .32s cubic-bezier(.4,0,.2,1),background .2s,box-shadow .2s}
+        .r-link:hover{background:rgba(255,255,255,.25);box-shadow:0 4px 8px -2px rgba(0,0,0,.15)}
+        .r-link[aria-current=page]{background:#fff;color:var(--blue);box-shadow:0 10px 15px -3px rgba(0,0,0,.1)}
+        .r-ico{width:2.75rem;height:2.75rem;flex:none;display:grid;place-items:center}
+        .r-ico svg{width:1.25rem;height:1.25rem;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .2s}
+        .r-link:hover .r-ico svg{transform:scale(1.15)}
+        .r-logo{width:2.75rem;height:2.75rem;border-radius:1rem;background:#fff;display:grid;place-items:center;box-shadow:0 4px 8px -2px rgba(0,0,0,.2)}
+        .r-logo img{width:1.7rem}
+        .r-txt{display:none;font-weight:600;font-size:.92rem;padding-right:.75rem}
+        .r-end{margin-left:auto}
+        .r-back{display:none}
+        @media(min-width:1024px){
+            .rail{top:2rem;bottom:2rem;left:2.5rem;right:auto;width:5rem;padding:.75rem;flex-direction:column;align-items:stretch;overflow:hidden;overscroll-behavior:contain;transition:width .32s cubic-bezier(.4,0,.2,1),box-shadow .32s}
+            .rail:hover,.rail:focus-within{width:17rem;box-shadow:0 30px 60px -15px rgba(16,49,107,.55)}
+            .r-link{width:2.75rem;margin-left:.375rem}
+            .rail:hover .r-link,.rail:focus-within .r-link{width:100%;margin-left:0;padding-left:.375rem}
+            .r-top{margin-bottom:1rem}.r-top .r-txt{margin-left:.75rem}
+            .r-end{margin-left:.375rem;margin-top:auto}
+            .rail:hover .r-end,.rail:focus-within .r-end{margin-left:0}
+            .r-txt{display:block;opacity:0;transform:translateX(-8px);transition:opacity .2s,transform .25s}
+            .rail:hover .r-txt,.rail:focus-within .r-txt{opacity:1;transform:none;transition-delay:.12s}
+            .r-back{display:block;position:fixed;inset:0;z-index:59;background:rgba(16,49,107,.18);backdrop-filter:blur(6px);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .3s,visibility .3s}
+            .rail:hover~.r-back,.rail:focus-within~.r-back{opacity:1;visibility:visible}
+        }
+        .content{padding-left:var(--rail)}
+
+        /* ---------- Lipat sidebar: jadi satu ikon melayang di pojok kiri bawah ---------- */
+        .rail{transition:width .32s cubic-bezier(.4,0,.2,1),box-shadow .32s,transform .55s var(--ease),opacity .35s}
+        @media(min-width:1024px){.rail{transform-origin:0 100%}}
+        html.rail-folded{--rail:0px}
+        html.rail-folded .rail{opacity:0;pointer-events:none;transform:translateY(-130%)}
+        @media(min-width:1024px){html.rail-folded .rail{transform:scale(.06)}}
+        .rail-fab{position:fixed;z-index:61;left:1rem;bottom:1rem;width:3.5rem;height:3.5rem;border:0;border-radius:1.25rem;background:var(--blue);color:#fff;display:grid;place-items:center;cursor:pointer;box-shadow:0 20px 40px -12px rgba(11,64,156,.65);outline:1px solid rgba(255,255,255,.25);opacity:0;transform:scale(.4);pointer-events:none;transition:opacity .3s,transform .55s var(--ease),background .25s}
+        .rail-fab svg{width:1.5rem;height:1.5rem;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+        html.rail-folded .rail-fab{opacity:1;transform:none;pointer-events:auto;transition-delay:.18s,.18s,0s}
+        html.rail-folded .rail-fab:hover{background:var(--navy);transform:translateY(-3px);transition-delay:0s}
+        html.rail-folded .rail-fab:active{transform:scale(.94)}
+        @media(min-width:1024px){.rail-fab{left:2.5rem;bottom:2rem}}
+        /* konten ikut bergeser halus saat sidebar dilipat/dibuka */
+        .content,.hero-top,.cf,.cf-meta,footer{transition:padding .5s var(--ease),margin .5s var(--ease)}
+        @media(min-width:1024px){.hero{padding-top:3rem}}
+
+        /* ---------- Hero: carousel ekskul (coverflow 3D) ---------- */
+        .hero{position:relative;min-height:100svh;display:flex;flex-direction:column;color:#fff;overflow:hidden;isolation:isolate;background:var(--navy);padding:6.5rem 0 4.5rem}
+        /* Latar hero: foto sekolah dengan opasitas 70% (ubah --hero-bg-opacity kalau mau lebih pekat/transparan) */
+        :root{--hero-bg-opacity:.7}
+        .hero-bg{position:absolute;left:0;top:-20%;width:100%;height:140%;z-index:-2;background:url('{{ $foto }}') center/cover no-repeat;opacity:var(--hero-bg-opacity);will-change:transform}
+        .hero::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(rgba(10,30,72,.55),rgba(10,30,72,.32) 45%,rgba(8,26,66,.82))}
+        .hero-top{padding-inline:calc(var(--rail) + 1.5rem) 1.5rem;position:relative;z-index:5}
+        .hero h1{font-size:clamp(1.6rem,3vw,2.5rem);font-weight:700;max-width:22ch;color:#fff;text-shadow:0 2px 16px rgba(0,0,0,.45)}
+        .hero .sub{margin-top:.6rem;max-width:52ch;color:rgba(255,255,255,.9);text-shadow:0 1px 10px rgba(0,0,0,.45)}
+        .cf{position:relative;flex:1;display:grid;place-items:center;margin-left:var(--rail);perspective:1500px;touch-action:pan-y;user-select:none;--ch:clamp(340px,66svh,640px);--cw:calc(var(--ch)*.58);min-height:calc(var(--ch) + 3rem)}
+        .cf:focus-visible{outline-offset:-8px}
+        .cf-card{position:absolute;left:50%;top:50%;width:var(--cw);height:var(--ch);margin:calc(var(--ch)/-2) 0 0 calc(var(--cw)/-2);border-radius:1.1rem;overflow:hidden;background:var(--blue);box-shadow:0 30px 50px -20px rgba(0,0,0,.6);cursor:pointer;will-change:transform,opacity}
+        .cf-card.on{cursor:default}
+        .cf-card img{width:100%;height:100%;object-fit:cover;pointer-events:none}
+        .cf-card::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 40%,rgba(8,26,66,.8));opacity:0;transition:opacity .6s}
+        .cf-card.on::after{opacity:1}
+        .cf-ph{position:absolute;inset:0;display:grid;place-items:center;font:700 5rem var(--display);color:rgba(255,255,255,.85);background:linear-gradient(160deg,var(--blue),var(--navy))}
+        .cf-cap{position:absolute;z-index:15;left:50%;bottom:calc(50% - var(--ch)/2 + 1.4rem);width:calc(var(--cw) - 2.4rem);transform:translateX(-50%);pointer-events:none;opacity:var(--o,0);transition:opacity .25s,transform .45s var(--ease)}
+        .cf-cap.swap{opacity:0;transform:translate(-50%,10px)}
+        .cf-title{font:700 clamp(1.25rem,2.1vw,1.9rem) var(--display);text-transform:uppercase;letter-spacing:.04em;line-height:1.1;text-shadow:0 2px 18px rgba(0,0,0,.5)}
+        .cf-line{width:2.2rem;height:2px;background:#fff;margin:.9rem 0 .6rem}
+        .cf-sub{font-size:.95rem;text-shadow:0 1px 10px rgba(0,0,0,.5)}
+        .cf-go{pointer-events:auto;margin-top:.9rem;padding:.55rem 1.2rem;font-size:.85rem}
+        .cf-arrow{position:absolute;top:50%;translate:0 -50%;z-index:20;width:3rem;height:3rem;border:0;border-radius:50%;background:rgba(255,255,255,.14);backdrop-filter:blur(6px);color:#fff;cursor:pointer;display:grid;place-items:center;opacity:var(--o,0);transition:background .3s,color .3s,transform .3s var(--ease)}
+        .cf-arrow svg{width:22px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+        .cf-arrow:hover{background:var(--gold);color:var(--navy)}.cf-arrow:active{transform:scale(.92)}
+        .cf-arrow.pv{left:1rem}.cf-arrow.nx{right:1rem}
+        .cf-meta{opacity:var(--o,0);margin-left:var(--rail);text-align:center;font:600 1rem var(--display);position:relative;z-index:5}
+        .cf-meta span{color:rgba(255,255,255,.6);font-weight:500}
+        .folded .cf-arrow,.folded .cf-go{pointer-events:none}
+        .cf-empty{margin:auto;padding:2rem;text-align:center;color:rgba(255,255,255,.85)}
+        .stats{position:relative;z-index:2;margin-top:-3rem;display:grid;grid-template-columns:repeat(4,1fr);padding:1.6rem 1rem}
+        .stat{text-align:center;padding:.2rem 1rem}
+        .stat+.stat{border-left:1px solid var(--line)}
+        .stat b{display:block;font:700 2.1rem var(--display);color:var(--blue);line-height:1.1}
+        .stat span{font-size:.85rem;color:var(--mute)}
+        @media(max-width:860px){.stats{grid-template-columns:repeat(2,1fr);row-gap:1.2rem}.stat:nth-child(3){border-left:0}.cf-arrow{width:2.6rem;height:2.6rem}.cf-arrow.pv{left:.4rem}.cf-arrow.nx{right:.4rem}}
+        .card.flash{animation:flash 1.6s ease}
+        @keyframes flash{0%,60%{box-shadow:0 0 0 4px var(--gold),var(--card-hover)}100%{box-shadow:var(--card)}}
+
+        /* ---------- Sekolah + video ---------- */
+        .school{display:grid;grid-template-columns:1.6fr 1fr;gap:1.6rem;margin-top:2.2rem;align-items:stretch}
+        .video{position:relative;aspect-ratio:16/9;border-radius:1.6rem;overflow:hidden;background:var(--navy)}
+        .video button,.video iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+        .video button{cursor:pointer;display:grid;place-items:center;background:linear-gradient(rgba(16,49,107,.2),rgba(16,49,107,.5)),url('https://i.ytimg.com/vi/{{ $sekolah['youtube_id'] }}/hqdefault.jpg') center/cover,url('{{ $foto }}') center/cover}
+        .play{width:76px;height:76px;border-radius:50%;background:var(--gold);display:grid;place-items:center;transition:transform .4s var(--ease);animation:pulse 2.4s infinite}
+        .video button:hover .play{transform:scale(1.12)}
+        .play svg{width:26px;margin-left:4px;fill:var(--navy)}
+        @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(255,232,103,.65)}70%,100%{box-shadow:0 0 0 20px rgba(255,232,103,0)}}
+        .school-info{display:flex;flex-direction:column;gap:1rem;padding:1.8rem}
+        .school-info h3{font-size:1.4rem}
+        .school-info p{color:var(--mute);font-size:.95rem}
+        .school-info .btn{margin-top:auto;align-self:flex-start}
+        .school-panel{padding:1.4rem}
+        @media(max-width:860px){.school{grid-template-columns:1fr}.school-panel{padding:1rem}}
+
+        /* ---------- Ekskul ---------- */
+        .head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:end;gap:1.2rem;margin-bottom:2rem}
+        .chips{display:flex;flex-wrap:wrap;gap:.45rem}
+        .chip{border:0;background:#fff;color:var(--mute);font:600 .85rem var(--body);padding:.55rem 1.15rem;border-radius:999px;cursor:pointer;box-shadow:var(--card);transition:background .25s,color .25s,transform .3s var(--ease)}
+        .chip:hover{transform:translateY(-2px);color:var(--navy)}
+        .chip[aria-pressed=true]{background:var(--blue);color:#fff}
+        .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.4rem;align-items:start}
+        .card{background:#fff;border-radius:1.8rem;padding:.8rem;box-shadow:var(--card);border:1px solid #F3F6FC;transition:transform .5s var(--ease),box-shadow .5s var(--ease)}
+        .card:hover,.card:focus-visible{transform:translateY(-8px);box-shadow:var(--card-hover)}
+        .card[hidden]{display:none}
+        .cover{position:relative;aspect-ratio:16/10;border-radius:1.3rem;overflow:hidden;background:var(--cloud)}
+        .cover img{width:100%;height:100%;object-fit:cover;transition:transform .8s var(--ease)}
+        .card:hover .cover img,.card:focus-visible .cover img{transform:scale(1.08)}
+        .ph{position:absolute;inset:0;display:grid;place-items:center;font:700 4.5rem var(--display);color:var(--blue);background:linear-gradient(135deg,#E4EEFF,#F7FAFF)}
+        .tag{position:absolute;left:.8rem;top:.8rem;padding:.28rem .8rem;border-radius:999px;font-size:.72rem;font-weight:700;background:var(--gold);color:var(--navy)}
+        .tag.k-organisasi{background:var(--blue);color:#fff}.tag.k-komunitas{background:var(--navy);color:#fff}
+        .card-body{padding:1.1rem .7rem .8rem}
+        .card h3{font-size:1.35rem}
+        .desc{margin-top:.5rem;font-size:.9rem;color:var(--mute);max-height:4.6em;overflow:hidden;transition:max-height .7s var(--ease)}
+        .card:hover .desc,.card:focus-visible .desc{max-height:18em}
+        .meta{margin-top:1rem;padding:.9rem 1rem;border-radius:1.1rem;background:var(--cloud);display:grid;gap:.35rem;font-size:.85rem}
+        .meta div{display:flex;gap:.6rem}
+        .meta dt{width:4.2rem;flex:none;color:var(--mute)}
+        .meta dd{font-weight:700}
+        .count{margin-top:.9rem;font-size:.85rem;color:var(--mute)}
+        .count b{font:700 1.25rem var(--display);color:var(--blue)}
+        .empty{padding:3rem;text-align:center;color:var(--mute);background:#fff;border-radius:1.8rem;box-shadow:var(--card)}
+
+        /* ---------- Pembina ---------- */
+        .plist{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:1rem;margin-top:2rem}
+        .person{display:flex;align-items:center;gap:1rem;padding:1rem 1.2rem;border-radius:1.5rem;background:#fff;box-shadow:var(--card);border:1px solid #F3F6FC;transition:transform .45s var(--ease),background .35s,color .35s}
+        .person:hover{transform:translateY(-5px);background:var(--navy);color:#fff}
+        .avatar{width:58px;height:58px;flex:none;border-radius:50%;object-fit:cover;display:grid;place-items:center;background:var(--blue);color:#fff;font:600 1.1rem var(--display);transition:transform .5s var(--ease)}
+        .person:hover .avatar{transform:scale(1.08)}
+        .person h3{font-size:1.02rem;font-weight:600}
+        .person p{font-size:.8rem;color:var(--mute);margin-top:.15rem;transition:color .3s}
+        .person:hover p{color:rgba(255,255,255,.75)}
+
+        /* ---------- Pita parallax ---------- */
+        .band{position:relative;border-radius:2.2rem;overflow:hidden;color:#fff;isolation:isolate;padding:clamp(3.5rem,8vw,6rem) 1.5rem;text-align:center}
+        .band img{position:absolute;left:0;top:-20%;width:100%;height:140%;object-fit:cover;z-index:-2;will-change:transform}
+        .band::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(rgba(16,49,107,.8),rgba(11,64,156,.78))}
+        .band h2{max-width:22ch;margin:0 auto}
+        .band .cta{justify-content:center}
+
+        /* ---------- Galeri ---------- */
+        .gal-panel{padding:clamp(1.5rem,4vw,3rem)}
+        .gal{display:grid;grid-template-columns:1.1fr 1fr;gap:clamp(2rem,5vw,4.5rem);align-items:center}
+        .stack{position:relative;aspect-ratio:4/3;width:min(100%,520px);margin-inline:auto;touch-action:pan-y;user-select:none;cursor:pointer}
+        .stack:focus-visible{outline-offset:12px}
+        .g-card{position:absolute;inset:0;margin:0;border-radius:1.6rem;overflow:hidden;background:#fff;border:6px solid #fff;box-shadow:0 20px 36px -18px rgba(16,49,107,.55);transition:transform .6s var(--ease),opacity .5s,filter .6s;will-change:transform}
+        .g-card img{width:100%;height:100%;object-fit:cover;border-radius:1.1rem;transition:transform .8s var(--ease);pointer-events:none}
+        .stack:hover .g-card.top img{transform:scale(1.05)}
+        .g-info .badge{display:inline-block;padding:.28rem .9rem;border-radius:999px;background:var(--gold);color:var(--navy);font-size:.78rem;font-weight:700}
+        .g-info h3{font-size:clamp(1.5rem,2.8vw,2rem);margin-top:.9rem}
+        .g-info .d{margin-top:.7rem;color:var(--mute);max-width:42ch;min-height:4.8em}
+        .g-txt{transition:opacity .3s,transform .45s var(--ease)}
+        .g-txt.swap{opacity:0;transform:translateY(10px)}
+        .ctrl{display:flex;align-items:center;gap:.8rem;margin-top:1.6rem}
+        .arrow{width:52px;height:52px;border-radius:50%;border:0;background:var(--cloud);color:var(--navy);cursor:pointer;display:grid;place-items:center;transition:background .3s,color .3s,transform .4s var(--ease)}
+        .arrow svg{width:20px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;transition:transform .35s var(--ease)}
+        .arrow:hover{background:var(--blue);color:#fff}
+        .arrow.nx:hover svg{transform:translateX(4px)}.arrow.pv:hover svg{transform:translateX(-4px)}
+        .arrow:active{transform:scale(.92)}
+        .num{margin-left:.5rem;font:600 1.05rem var(--display)}
+        .num span{color:var(--mute);font-weight:500}
+        @media(max-width:860px){.gal{grid-template-columns:1fr}.g-info{text-align:center}.g-info .d{margin-inline:auto}.ctrl{justify-content:center}.stack{width:min(88%,480px);margin-bottom:.8rem}}
+
+        /* ---------- Lokasi ---------- */
+        .mapgrid{display:grid;grid-template-columns:1fr 1.7fr;gap:1.4rem;margin-top:2rem;align-items:stretch}
+        .addr{padding:1.8rem;display:flex;flex-direction:column;gap:.9rem}
+        .addr h3{font-size:1.4rem}
+        .addr p{color:var(--mute);font-size:.95rem}
+        .addr .cta{margin-top:auto;padding-top:1rem;flex-direction:column;align-items:stretch}
+        .map{border-radius:2rem;overflow:hidden;min-height:380px;background:#fff;box-shadow:var(--card);border:6px solid #fff}
+        .map iframe{display:block;width:100%;height:100%;min-height:368px;border:0}
+        @media(max-width:860px){.mapgrid{grid-template-columns:1fr}}
+
+        footer{padding:2rem 0 2.5rem var(--rail);font-size:.88rem;color:var(--mute)}
+        footer .wrap{display:flex;flex-wrap:wrap;gap:1rem;justify-content:space-between;align-items:center;border-top:1px solid var(--line);padding-top:1.6rem}
+
+        /* ---------- Efek muncul saat di-scroll (kelas ditambahkan lewat JS) ---------- */
+        .reveal{opacity:0;transform:translate3d(0,38px,0);transition:opacity .9s var(--ease),transform 1s var(--ease);transition-delay:var(--rd,0ms);will-change:opacity,transform}
+        .reveal[data-r=zoom]{transform:scale(.93)}
+        .reveal[data-r=left]{transform:translate3d(-56px,0,0)}
+        .reveal[data-r=right]{transform:translate3d(56px,0,0)}
+        .reveal.in{opacity:1;transform:none}
+
+        @media(prefers-reduced-motion:reduce){
+            html{scroll-behavior:auto}
+            *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+            .rise{opacity:1}
+            .reveal{opacity:1;transform:none}
+        }
+    </style>
+</head>
+<body>
+
+<nav class="rail" id="rail" aria-label="Menu utama">
+        <a href="#beranda" class="r-link r-top" aria-label="{{ $sekolah['nama'] }}">
+            <span class="r-ico"><span class="r-logo"><img src="{{ $logo }}" alt=""></span></span>
+            <span class="r-txt">SMKN 11 Bandung</span>
+        </a>
+        <a href="#beranda" class="r-link" aria-label="Beranda"><span class="r-ico"><svg viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg></span><span class="r-txt">Beranda</span></a>
+        <a href="#sekolah" class="r-link" aria-label="Sekolah"><span class="r-ico"><svg viewBox="0 0 24 24"><path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg></span><span class="r-txt">Sekolah</span></a>
+        <a href="#ekskul" class="r-link" aria-label="Ekskul"><span class="r-ico"><svg viewBox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg></span><span class="r-txt">Ekskul</span></a>
+        @if($pembina->isNotEmpty())
+        <a href="#pembina" class="r-link" aria-label="Pembina"><span class="r-ico"><svg viewBox="0 0 24 24"><path d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></span><span class="r-txt">Pembina</span></a>
+        @endif
+        <a href="#galeri" class="r-link" aria-label="Galeri"><span class="r-ico"><svg viewBox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></span><span class="r-txt">Galeri</span></a>
+        <a href="#lokasi" class="r-link" aria-label="Lokasi"><span class="r-ico"><svg viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg></span><span class="r-txt">Lokasi</span></a>
+        @auth
+        <a href="{{ route('dashboard') }}" class="r-link r-end" aria-label="Dashboard"><span class="r-ico"><svg viewBox="0 0 24 24"><path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg></span><span class="r-txt">Dashboard</span></a>
+        @else
+        <a href="{{ route('login') }}" class="r-link r-end" aria-label="Masuk"><span class="r-ico"><svg viewBox="0 0 24 24"><path d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg></span><span class="r-txt">Masuk</span></a>
+        @endauth
+        <button type="button" class="r-link r-fold" id="rail-fold" aria-label="Lipat menu"><span class="r-ico"><svg viewBox="0 0 24 24"><path d="M11 17l-5-5 5-5M18 17l-5-5 5-5"/></svg></span><span class="r-txt">Lipat menu</span></button>
+</nav>
+<div class="r-back" aria-hidden="true"></div>
+<button type="button" class="rail-fab" id="rail-fab" aria-label="Buka menu" aria-controls="rail" aria-expanded="false" title="Buka menu" inert><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+
+<main>
+    {{-- ================= HERO: carousel ekskul ================= --}}
+    <section class="hero" id="beranda">
+        @php
+            $slides = $ekskuls->map(fn ($e) => [
+                'e' => $e,
+                'img' => $e->cover_url,
+                'sub' => \Illuminate\Support\Str::limit(strip_tags((string) $e->deskripsi), 70) ?: ($kat[$e->kategori] ?? ucfirst($e->kategori)),
+            ]);
+            $first = $slides->first();
+        @endphp
+        <div class="hero-bg" data-speed="0.25" data-clamp aria-hidden="true"></div>
+
+        <div class="hero-top">
+            <h1 class="rise" style="--d:0">Temukan ekskul yang cocok denganmu</h1>
+            <p class="sub rise" style="--d:1">Klik foto atau tekan panah untuk menjelajahi ekstrakurikuler {{ $sekolah['nama'] }}.</p>
+        </div>
+
+        @if($slides->isEmpty())
+            <p class="cf-empty">Belum ada ekskul. Data akan tampil di sini setelah admin menambahkannya.</p>
+        @else
+        <div class="cf" id="cf" tabindex="0" aria-roledescription="carousel" aria-label="Daftar ekskul">
+            @foreach($slides as $s)
+                <figure class="cf-card" data-nama="{{ $s['e']->nama_ekskul }}" data-sub="{{ $s['sub'] }}" data-href="#ekskul-{{ $s['e']->id_ekskul }}">
+                    @if($s['img'])<img src="{{ $s['img'] }}" alt="Kegiatan {{ $s['e']->nama_ekskul }}" draggable="false" loading="{{ $loop->index < 5 ? 'eager' : 'lazy' }}">
+                    @else<span class="cf-ph" aria-hidden="true">{{ strtoupper(mb_substr($s['e']->nama_ekskul, 0, 1)) }}</span>@endif
+                </figure>
+            @endforeach
+
+            <div class="cf-cap" id="cf-cap" aria-live="polite">
+                <h2 class="cf-title" id="cf-title">{{ $first['e']->nama_ekskul }}</h2>
+                <div class="cf-line"></div>
+                <p class="cf-sub" id="cf-sub">{{ $first['sub'] }}</p>
+                <a class="btn btn-gold cf-go" id="cf-go" href="#ekskul-{{ $first['e']->id_ekskul }}">Lihat detail</a>
+            </div>
+
+            @if($slides->count() > 1)
+            <button class="cf-arrow pv" id="cf-prev" aria-label="Ekskul sebelumnya"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+            <button class="cf-arrow nx" id="cf-next" aria-label="Ekskul berikutnya"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
+            @endif
+        </div>
+        <p class="cf-meta"><b id="cf-now">1</b> <span>/ {{ $slides->count() }}</span></p>
+        @endif
+    </section>
+
+    <div class="content">
+    <div class="wrap">
+        <div class="panel stats">
+            <div class="stat"><b>{{ $stat['ekskul'] }}</b><span>Ekskul</span></div>
+            <div class="stat"><b>{{ $stat['anggota'] }}</b><span>Anggota aktif</span></div>
+            <div class="stat"><b>{{ $stat['pembina'] }}</b><span>Pembina</span></div>
+            <div class="stat"><b>{{ $stat['pelatih'] }}</b><span>Pelatih</span></div>
+        </div>
+    </div>
+
+        {{-- ================= SEKOLAH + VIDEO ================= --}}
+    <section class="sec" id="sekolah">
+        <div class="wrap">
+            <h2>Kenali {{ $sekolah['nama'] }}</h2>
+            <p class="lead">Tonton video profil sekolah untuk melihat suasananya sebelum memilih ekskul.</p>
+
+            <div class="panel school-panel school">
+                <div class="video">
+                    <button type="button" id="video-play" aria-label="Putar video profil {{ $sekolah['nama'] }}">
+                        <span class="play"><svg viewBox="0 0 24 24"><path d="M6 4l14 8-14 8z"/></svg></span>
+                    </button>
+                </div>
+                <div class="school-info">
+                    <h3>{{ $sekolah['nama'] }}</h3>
+                    <p>{{ $sekolah['alamat'] }}</p>
+                    <a href="#lokasi" class="btn btn-blue">Lihat lokasi</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {{-- ================= EKSKUL ================= --}}
+    <section class="sec" id="ekskul" style="padding-top:0">
+        <div class="wrap">
+            <div class="head">
+                <div>
+                    <h2>Ekstrakurikuler</h2>
+                    <p class="lead">Arahkan kursor ke kartu (atau ketuk di ponsel) untuk membaca deskripsi lengkap.</p>
+                </div>
+                @if($ekskuls->isNotEmpty())
+                <div class="chips" role="group" aria-label="Filter kategori">
+                    <button class="chip" data-f="all" aria-pressed="true">Semua</button>
+                    @foreach($kat as $k => $label)
+                        @if($ekskuls->contains('kategori', $k))
+                            <button class="chip" data-f="{{ $k }}" aria-pressed="false">{{ $label }}</button>
+                        @endif
+                    @endforeach
+                </div>
+                @endif
+            </div>
+
+            <div class="cards">
+                @forelse($ekskuls as $e)
+                    @php $sampul = $e->cover_url; @endphp
+                    <article class="card" id="ekskul-{{ $e->id_ekskul }}" tabindex="0" data-kat="{{ $e->kategori }}">
+                        <div class="cover">
+                            @if($sampul)
+                                <img src="{{ $sampul }}" alt="Kegiatan {{ $e->nama_ekskul }}" loading="lazy">
+                            @else
+                                <span class="ph" aria-hidden="true">{{ strtoupper(mb_substr($e->nama_ekskul, 0, 1)) }}</span>
+                            @endif
+                            <span class="tag k-{{ $e->kategori }}">{{ $kat[$e->kategori] ?? ucfirst($e->kategori) }}</span>
+                        </div>
+                        <div class="card-body">
+                            <h3>{{ $e->nama_ekskul }}</h3>
+                            <p class="desc">{{ $e->deskripsi ?: 'Deskripsi belum ditambahkan.' }}</p>
+                            <dl class="meta">
+                                <div><dt>Pembina</dt><dd>{{ $e->pembina->nama_pembina ?? 'Belum ditentukan' }}</dd></div>
+                                <div><dt>Pelatih</dt><dd>{{ $e->pelatih->nama_pelatih ?? 'Belum ada' }}</dd></div>
+                                <div><dt>Ketua</dt><dd>{{ $e->ketua->nama_siswa ?? 'Belum ditentukan' }}</dd></div>
+                            </dl>
+                            <p class="count"><b>{{ $e->anggota_aktif }}</b> anggota aktif</p>
+                        </div>
+                    </article>
+                @empty
+                    <p class="empty">Belum ada ekskul. Data akan tampil di sini setelah admin menambahkannya.</p>
+                @endforelse
+            </div>
+        </div>
+    </section>
+
+    {{-- ================= PEMBINA ================= --}}
+    @if($pembina->isNotEmpty())
+    <section class="sec" id="pembina" style="padding-top:0">
+        <div class="wrap">
+            <h2>Pembina ekskul</h2>
+            <p class="lead">Guru yang mendampingi dan bertanggung jawab atas kegiatan ekskul.</p>
+            <div class="plist">
+                @foreach($pembina as $p)
+                    <div class="person">
+                        @if($p->foto_url)
+                            <img class="avatar" src="{{ $p->foto_url }}" alt="Foto {{ $p->nama_pembina }}" loading="lazy">
+                        @else
+                            <div class="avatar" aria-hidden="true">{{ $p->inisial }}</div>
+                        @endif
+                        <div>
+                            <h3>{{ $p->nama_pembina }}</h3>
+                            <p>{{ $p->ekskuls->isNotEmpty() ? $p->ekskuls->pluck('nama_ekskul')->join(', ') : 'Belum membina ekskul' }}</p>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    </section>
+    @endif
+
+    {{-- ================= PITA PARALLAX ================= --}}
+    <section class="wrap" aria-label="Ajakan bergabung">
+        <div class="band">
+            <img src="{{ $foto }}" alt="" data-speed="0.15" data-clamp>
+            <h2>{{ $stat['ekskul'] }} ekskul menunggu kamu di satu sekolah yang sama</h2>
+            <div class="cta"><a href="#ekskul" class="btn btn-gold">Pilih ekskulmu</a></div>
+        </div>
+    </section>
+
+    {{-- ================= GALERI ================= --}}
+    <section class="sec" id="galeri">
+        <div class="wrap">
+            <h2>Galeri kegiatan</h2>
+            <p class="lead">Klik foto atau tekan panah untuk melihat foto berikutnya.</p>
+
+            @if($galeri->isEmpty())
+                <p class="empty" style="margin-top:2rem">Galeri masih kosong. Foto akan tampil di sini setelah admin mengunggahnya.</p>
+            @else
+                <div class="panel gal-panel" style="margin-top:2rem">
+                    <div class="gal">
+                        <div class="stack" id="stack" tabindex="0" aria-roledescription="carousel" aria-label="Galeri foto ekskul">
+                            @foreach($galeri as $g)
+                                <figure class="g-card"
+                                    data-judul="{{ $g->judul }}"
+                                    data-ekskul="{{ $g->ekskul->nama_ekskul ?? 'Umum' }}"
+                                    data-ket="{{ $g->keterangan }}">
+                                    <img src="{{ $g->foto_url }}" alt="{{ $g->judul }}" loading="{{ $loop->index < 3 ? 'eager' : 'lazy' }}" draggable="false">
+                                </figure>
+                            @endforeach
+                        </div>
+
+                        <div class="g-info">
+                            <div class="g-txt" id="g-txt" aria-live="polite">
+                                <span class="badge" id="g-ekskul">{{ $galeri->first()->ekskul->nama_ekskul ?? 'Umum' }}</span>
+                                <h3 id="g-judul">{{ $galeri->first()->judul }}</h3>
+                                <p class="d" id="g-ket">{{ $galeri->first()->keterangan }}</p>
+                            </div>
+                            @if($galeri->count() > 1)
+                            <div class="ctrl">
+                                <button class="arrow pv" id="g-prev" aria-label="Foto sebelumnya"><svg viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+                                <button class="arrow nx" id="g-next" aria-label="Foto berikutnya"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+                                <div class="num"><b id="g-now">1</b> <span>/ {{ $galeri->count() }}</span></div>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            @endif
+        </div>
+    </section>
+
+    {{-- ================= LOKASI ================= --}}
+    <section class="sec" id="lokasi" style="padding-top:0">
+        <div class="wrap">
+            <h2>Lokasi sekolah</h2>
+            <p class="lead">Temukan {{ $sekolah['nama'] }} di peta, lalu buka rutenya dari lokasimu.</p>
+            <div class="mapgrid">
+                <div class="panel addr">
+                    <h3>{{ $sekolah['nama'] }}</h3>
+                    <p>{{ $sekolah['alamat'] }}</p>
+                    <div class="cta">
+                        <a class="btn btn-blue" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination={{ $q }}">Petunjuk arah</a>
+                        <a class="btn btn-soft" style="box-shadow:none;background:var(--cloud)" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query={{ $q }}">Buka di Google Maps</a>
+                    </div>
+                </div>
+                <div class="map">
+                    <iframe title="Peta {{ $sekolah['nama'] }}" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen
+                        src="https://www.google.com/maps?q={{ $q }}&output=embed"></iframe>
+                </div>
+            </div>
+        </div>
+    </section>
+    </div>
+</main>
+
+<footer>
+    <div class="wrap">
+        <span>&copy; {{ date('Y') }} {{ $sekolah['nama'] }}. Sistem Ekstrakurikuler.</span>
+        @auth
+            <a href="{{ route('dashboard') }}" class="btn btn-blue">Buka dashboard</a>
+        @else
+            <a href="{{ route('login') }}" class="btn btn-blue">Masuk ke sistem ekskul</a>
+        @endauth
+    </div>
+</footer>
+
+<script>
+(() => {
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    /* Parallax: elemen [data-speed] bergeser pelan mengikuti scroll.
+       Dengan atribut data-clamp, gerakannya dibatasi agar tidak keluar dari bingkai. */
+    const layers = [...document.querySelectorAll('[data-speed]')];
+    let ticking = false;
+    const parallax = () => {
+        ticking = false;
+        layers.forEach(el => {
+            const p = el.parentElement, r = p.getBoundingClientRect();
+            if (r.bottom < -250 || r.top > innerHeight + 250) return;
+            let v = -(r.top + r.height / 2 - innerHeight / 2) * el.dataset.speed;
+            if (el.hasAttribute('data-clamp')) {
+                const lim = (el.offsetHeight - p.offsetHeight) / 2;
+                v = Math.max(-lim, Math.min(lim, v));
+            }
+            el.style.transform = `translate3d(0,${v.toFixed(1)}px,0)`;
+        });
+    };
+    if (!reduce) {
+        addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(parallax); } }, { passive: true });
+        addEventListener('resize', parallax);
+        parallax();
+    }
+
+    /* Video YouTube dimuat saat diklik supaya halaman tetap ringan */
+    const playBtn = document.getElementById('video-play');
+    if (playBtn) playBtn.addEventListener('click', () => {
+        const f = document.createElement('iframe');
+        f.src = 'https://www.youtube-nocookie.com/embed/{{ $sekolah['youtube_id'] }}?autoplay=1&rel=0';
+        f.title = 'Video profil {{ $sekolah['nama'] }}';
+        f.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+        f.allowFullscreen = true;
+        playBtn.replaceWith(f);
+    });
+
+    /* Filter kategori ekskul */
+    const chips = document.querySelectorAll('.chip');
+    chips.forEach(c => c.addEventListener('click', () => {
+        chips.forEach(x => x.setAttribute('aria-pressed', x === c));
+        document.querySelectorAll('.card').forEach(card => {
+            card.hidden = c.dataset.f !== 'all' && card.dataset.kat !== c.dataset.f;
+        });
+    }));
+
+    /* ===== Carousel ekskul (coverflow) =====
+       - Saat halaman dibuka, kartu bertumpuk lalu menyebar pelan selama INTRO ms.
+       - Saat di-scroll ke bawah, kartu melipat kembali jadi satu kartu sambil mundur ke belakang
+         (mengecil, miring, dan memudar), mengikuti posisi scroll (scroll ke atas = maju & menyebar lagi).
+       - Panah next/prev menggeser semua kartu satu posisi (kartu paling kiri pindah ke paling kanan). */
+    const cf = document.getElementById('cf');
+    if (cf) {
+        const INTRO = 1800;                       /* durasi menyebar (ms) */
+        const RECEDE = 900, TILT = 12;            /* efek mundur saat scroll: jarak ke belakang (px) & kemiringan (derajat) */
+        const hero = document.getElementById('beranda');
+        const cards = [...cf.querySelectorAll('.cf-card')], n = cards.length;
+        const cap = document.getElementById('cf-cap');
+        const X = [0, 1.04, 1.9, 2.6], R = [0, 26, 34, 40], Z = [0, -90, -180, -260], S = [1, .86, .72, .6], B = [1, .62, .45, .35];
+        const curve = (arr, a) => { const i = Math.min(Math.floor(a), 2), t = Math.min(a, 3) - i; return arr[i] + (arr[i + 1] - arr[i]) * t; };
+        const easeIO = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+        const idx = () => ((Math.round(target) % n) + n) % n;
+
+        let target = 0, pos = 0, spread = reduce ? 1 : 0, fold = 0, t0 = Infinity, raf = 0, last = 0;
+
+        const offset = i => { let d = i - pos; return d - n * Math.round(d / n); };
+
+        const draw = () => {
+            const F = easeIO(spread) * (1 - fold), w = cards[0].offsetWidth;
+            cards.forEach((el, i) => {
+                const d = offset(i), a = Math.abs(d), sg = Math.sign(d);
+                el.style.transform = `translate3d(${(sg * curve(X, a) * w * F).toFixed(1)}px,0,${(curve(Z, a) * F - RECEDE * fold).toFixed(1)}px) rotateX(${(TILT * fold).toFixed(2)}deg) rotateY(${(-sg * curve(R, a) * F).toFixed(2)}deg) scale(${(1 + (curve(S, a) - 1) * F).toFixed(4)})`;
+                el.style.opacity = (a <= 2 ? 1 : Math.max(0, 3 - a)) * (1 - .7 * fold);
+                el.style.filter = `brightness(${((1 + (curve(B, a) - 1) * F) * (1 - .35 * fold)).toFixed(3)})`;
+                el.style.zIndex = Math.max(0, Math.round(10 - a * 3));
+                el.style.pointerEvents = (a > 2 || F < .9) ? 'none' : 'auto';
+                el.classList.toggle('on', a < .5);
+            });
+            const o = Math.min(1, Math.max(0, (F - .7) / .3));
+            hero.style.setProperty('--o', o.toFixed(3));
+            hero.classList.toggle('folded', o < .5);
+        };
+
+        const frame = ts => {
+            raf = 0;
+            const dt = Math.min(ts - (last || ts), 50); last = ts;
+            let busy = false;
+            if (spread < 1) { spread = Math.min(1, Math.max(0, (ts - t0) / INTRO)); busy = true; }
+            const diff = target - pos;
+            if (Math.abs(diff) > .001) { pos += diff * (1 - Math.exp(-dt / 110)); busy = true; } else pos = target;
+            draw();
+            if (busy) raf = requestAnimationFrame(frame); else last = 0;
+        };
+        const kick = () => { if (!raf) raf = requestAnimationFrame(frame); };
+
+        const caption = () => {
+            const c = cards[idx()];
+            cap.classList.add('swap');
+            setTimeout(() => {
+                document.getElementById('cf-title').textContent = c.dataset.nama;
+                document.getElementById('cf-sub').textContent = c.dataset.sub;
+                document.getElementById('cf-go').setAttribute('href', c.dataset.href);
+                const now = document.getElementById('cf-now'); if (now) now.textContent = idx() + 1;
+                cap.classList.remove('swap');
+            }, 240);
+        };
+        const go = delta => { if (n < 2 || !delta) return; target += delta; caption(); kick(); };
+
+        draw();                                             /* posisi awal: semua kartu menumpuk */
+        if (!reduce) {
+            const imgs = [...cf.querySelectorAll('img')].slice(0, 5).map(i => i.decode ? i.decode().catch(() => {}) : Promise.resolve());
+            Promise.race([Promise.all(imgs), new Promise(r => setTimeout(r, 1200))]).then(() => { t0 = performance.now() + 250; kick(); });
+
+            const onScroll = () => {
+                const f = Math.min(1, Math.max(0, scrollY / (hero.offsetHeight * .6)));
+                if (f !== fold) { fold = f; kick(); }
+            };
+            addEventListener('scroll', onScroll, { passive: true });
+            onScroll();
+        }
+        addEventListener('resize', kick);
+
+        document.getElementById('cf-next')?.addEventListener('click', () => go(1));
+        document.getElementById('cf-prev')?.addEventListener('click', () => go(-1));
+        cf.addEventListener('keydown', e => {
+            if (e.key === 'ArrowRight') { e.preventDefault(); go(1); }
+            if (e.key === 'ArrowLeft') { e.preventDefault(); go(-1); }
+        });
+        let x0 = null, swiped = false;
+        cf.addEventListener('pointerdown', e => { x0 = e.clientX; swiped = false; });
+        cf.addEventListener('pointerup', e => {
+            if (x0 === null) return;
+            const dx = e.clientX - x0; x0 = null;
+            if (Math.abs(dx) > 50) { swiped = true; go(dx < 0 ? 1 : -1); }
+        });
+        cards.forEach((el, i) => el.addEventListener('click', () => { if (!swiped) go(Math.round(offset(i))); }));
+
+        /* "Lihat detail": tampilkan semua kategori lalu sorot kartu ekskul yang dituju */
+        document.getElementById('cf-go')?.addEventListener('click', () => {
+            document.querySelector('.chip[data-f="all"]')?.click();
+            const t = document.querySelector(document.getElementById('cf-go').getAttribute('href'));
+            if (t) { t.classList.remove('flash'); void t.offsetWidth; t.classList.add('flash'); }
+        });
+    }
+
+    /* ===== Efek muncul saat scroll: tiap elemen memudar & bergeser masuk begitu terlihat ===== */
+    if (!reduce && 'IntersectionObserver' in window) {
+        const groups = [
+            ['up',    'section.sec h2, section.sec .lead, .chips, .card, .person, .empty, footer .wrap'],
+            ['zoom',  '.stats, .band, .gal-panel'],
+            ['left',  '.school .video, .mapgrid .addr'],
+            ['right', '.school .school-info, .mapgrid .map']
+        ];
+        const els = [];
+        groups.forEach(([type, sel]) => document.querySelectorAll(sel).forEach(el => {
+            el.classList.add('reveal'); el.dataset.r = type; els.push(el);
+        }));
+        els.forEach(el => {          /* jeda bertahap antar elemen bersaudara (mis. kartu dalam satu baris) */
+            const sib = [...el.parentElement.children].filter(c => c.classList.contains('reveal'));
+            el.style.setProperty('--rd', (sib.indexOf(el) % 4) * 90 + 'ms');
+        });
+        const io = new IntersectionObserver(es => es.forEach(e => {
+            const el = e.target;
+            if (e.isIntersecting) {
+                io.unobserve(el);
+                el.classList.add('in');
+                /* selesai animasi -> lepas kelas supaya efek hover bawaan elemen kembali normal */
+                setTimeout(() => el.classList.remove('reveal', 'in'), 1300 + parseInt(el.style.getPropertyValue('--rd')) || 1300);
+            } else if (e.boundingClientRect.top < 0) {   /* sudah terlewat (mis. halaman dibuka di tengah) */
+                io.unobserve(el); el.classList.remove('reveal');
+            }
+        }), { threshold: .12, rootMargin: '0px 0px -6% 0px' });
+        els.forEach(el => io.observe(el));
+    }
+
+    /* ===== Lipat / buka sidebar (status disimpan di localStorage) ===== */
+    const rail = document.getElementById('rail'), fab = document.getElementById('rail-fab'), htmlEl = document.documentElement;
+    const setFold = (f, save = true) => {
+        htmlEl.classList.toggle('rail-folded', f);
+        rail.toggleAttribute('inert', f);
+        rail.setAttribute('aria-hidden', f);
+        fab.toggleAttribute('inert', !f);
+        fab.setAttribute('aria-expanded', !f);
+        if (save) { try { localStorage.setItem('rail-folded', f ? '1' : '0'); } catch (e) {} }
+    };
+    setFold(htmlEl.classList.contains('rail-folded'), false);
+    document.getElementById('rail-fold')?.addEventListener('click', () => { setFold(true); fab.focus({ preventScroll: true }); });
+    fab.addEventListener('click', () => setFold(false));
+
+    /* Tombol sidebar aktif mengikuti bagian halaman yang sedang dilihat */
+    const rl = [...document.querySelectorAll('.rail a[href^="#"]')];
+    const spy = new IntersectionObserver(es => es.forEach(e => {
+        if (!e.isIntersecting) return;
+        rl.forEach(a => a.getAttribute('href') === '#' + e.target.id ? a.setAttribute('aria-current', 'page') : a.removeAttribute('aria-current'));
+    }), { rootMargin: '-45% 0px -50% 0px' });
+    rl.forEach(a => { const t = document.querySelector(a.getAttribute('href')); if (t) spy.observe(t); });
+
+    /* Galeri bertumpuk: foto paling depan terlempar keluar, foto di belakangnya maju satu layer */
+    const stack = document.getElementById('stack');
+    if (!stack) return;
+    const cards = [...stack.querySelectorAll('.g-card')], n = cards.length;
+    const txt = document.getElementById('g-txt');
+    let cur = 0, busy = false;
+    const OUT = 'translate3d(-120%,-8%,0) rotate(-14deg)';
+
+    const place = (c, off) => {
+        const s = 1 - off * .06, side = off % 2 ? 1 : -1;
+        c.style.transform = off > 3
+            ? 'translate3d(0,0,0) scale(.8)'
+            : `translate3d(${off * 28}px,${off * -9}px,0) rotate(${side * off * 2.2}deg) scale(${s})`;
+        c.style.opacity = off > 3 ? 0 : 1;
+        c.style.filter = `brightness(${1 - off * .08})`;
+        c.style.zIndex = n - off;
+        c.classList.toggle('top', off === 0);
+    };
+    const render = skip => cards.forEach((c, i) => { if (c !== skip) place(c, (i - cur + n) % n); });
+
+    const caption = () => {
+        const c = cards[cur];
+        txt.classList.add('swap');
+        setTimeout(() => {
+            document.getElementById('g-judul').textContent = c.dataset.judul;
+            document.getElementById('g-ekskul').textContent = c.dataset.ekskul;
+            document.getElementById('g-ket').textContent = c.dataset.ket;
+            const now = document.getElementById('g-now'); if (now) now.textContent = cur + 1;
+            txt.classList.remove('swap');
+        }, 240);
+    };
+
+    const go = dir => {
+        if (busy || n < 2) return;
+        busy = true;
+        if (dir > 0) {
+            const out = cards[cur];
+            out.style.zIndex = n + 2; out.style.opacity = 0; out.style.transform = OUT;
+            cur = (cur + 1) % n;
+            render(out);
+            setTimeout(() => {        /* setelah terlempar, foto pindah diam-diam ke tumpukan paling belakang */
+                out.style.transition = 'none';
+                place(out, n - 1);
+                out.offsetWidth;
+                out.style.transition = '';
+                busy = false;
+            }, 620);
+        } else {
+            const back = cards[(cur - 1 + n) % n];
+            back.style.transition = 'none';
+            back.style.zIndex = n + 2; back.style.opacity = 0; back.style.transform = OUT;
+            back.offsetWidth;
+            back.style.transition = '';
+            cur = (cur - 1 + n) % n;
+            render();
+            setTimeout(() => busy = false, 620);
+        }
+        caption();
+    };
+
+    render();
+    document.getElementById('g-next')?.addEventListener('click', e => { e.stopPropagation(); go(1); });
+    document.getElementById('g-prev')?.addEventListener('click', e => { e.stopPropagation(); go(-1); });
+    stack.addEventListener('keydown', e => {
+        if (e.key === 'ArrowRight') { e.preventDefault(); go(1); }
+        if (e.key === 'ArrowLeft') { e.preventDefault(); go(-1); }
+    });
+
+    /* Klik = foto berikutnya, geser (swipe) = maju/mundur */
+    let x0 = null, moved = false;
+    stack.addEventListener('pointerdown', e => { x0 = e.clientX; moved = false; });
+    stack.addEventListener('pointerup', e => {
+        if (x0 === null) return;
+        const dx = e.clientX - x0; x0 = null;
+        if (Math.abs(dx) > 50) { moved = true; go(dx < 0 ? 1 : -1); }
+    });
+    stack.addEventListener('click', () => { if (!moved) go(1); });
+})();
+</script>
+</body>
+</html>

@@ -20,7 +20,7 @@
         </div>
 
         <!-- Form Edit -->
-        <form action="{{ route('admin.ekskul.update', $ekskul->id_ekskul) }}" method="POST">
+        <form action="{{ route('admin.ekskul.update', $ekskul->id_ekskul) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
 
@@ -111,6 +111,47 @@
                             <i class="fas fa-exclamation-circle"></i> {{ $message }}
                         </p>
                     @enderror
+                </div>
+
+                <!-- Poster (tampil di carousel landing page) -->
+                <div class="md:col-span-2" x-data="{ preview: @js($ekskul->poster_url), hapus: false }">
+                    <label for="poster" class="block text-xs font-bold text-[#2b3674] uppercase tracking-wider mb-2">
+                        Poster Landing Page
+                    </label>
+
+                    <div class="flex flex-col sm:flex-row gap-5 items-start">
+                        <div class="w-36 shrink-0 aspect-[3/5] rounded-2xl overflow-hidden bg-[#f4f7fe] ring-1 ring-[#10316B]/10 flex items-center justify-center">
+                            <template x-if="preview && !hapus">
+                                <img :src="preview" alt="Pratinjau poster" class="w-full h-full object-cover">
+                            </template>
+                            <div x-show="!preview || hapus" class="text-center px-3 text-[#a3aed1]">
+                                <i class="fas fa-image text-2xl"></i>
+                                <p class="text-[11px] font-semibold mt-2">Belum ada poster</p>
+                            </div>
+                        </div>
+
+                        <div class="flex-1 min-w-0">
+                            <input type="file" name="poster" id="poster" accept="image/png,image/jpeg,image/webp"
+                                @change="const f = $event.target.files[0]; if (f) { preview = URL.createObjectURL(f); hapus = false }"
+                                class="block w-full text-sm text-[#2b3674] file:mr-4 file:py-2.5 file:px-5 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-[#0B409C] file:text-white hover:file:opacity-90 file:cursor-pointer bg-[#f4f7fe] rounded-xl @error('poster') ring-2 ring-red-500 @enderror">
+                            <p class="mt-1.5 text-xs text-[#a3aed1]">
+                                JPG, PNG, atau WEBP, maksimal 4 MB. Paling bagus berbentuk potret (rasio 3:5, misalnya 900&times;1500 px) karena tampil sebagai kartu tegak di carousel.
+                                Kalau dikosongkan, landing page memakai foto pertama dari Kelola Galeri.
+                            </p>
+                            @error('poster')
+                                <p class="mt-1.5 text-xs text-red-500 font-semibold flex items-center gap-1">
+                                    <i class="fas fa-exclamation-circle"></i> {{ $message }}
+                                </p>
+                            @enderror
+
+                            @if($ekskul->poster)
+                                <label class="mt-3 inline-flex items-center gap-2 text-xs font-semibold text-red-600 cursor-pointer">
+                                    <input type="checkbox" name="hapus_poster" value="1" x-model="hapus" class="rounded border-gray-300 text-red-600 focus:ring-red-500">
+                                    Hapus poster saat ini
+                                </label>
+                            @endif
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Deskripsi -->

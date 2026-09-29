@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\LandingController;
 use App\Http\Controllers\Ketua\RiwayatAbsensiController;
 use App\Http\Controllers\Pembina\AbsensiPelatihController;
 use App\Http\Controllers\Pembina\AbsensiPesertaController;
@@ -19,9 +20,10 @@ use App\Http\Controllers\Admin\KelasController;
 use Illuminate\Support\Facades\Route;
 use App\Models\Peserta;
 
-Route::get('/', function () {
-    return redirect()->route('login');
-});
+// ===== Landing page PUBLIK (tanpa login) =====
+// Siswa bisa lihat daftar ekskul & detailnya. Admin/Pembina/Ketua masuk lewat tombol Login.
+Route::get('/', [LandingController::class, 'index'])->name('landing');
+Route::get('/ekskul/{ekskul}', [LandingController::class, 'show'])->name('landing.ekskul');
 
 require __DIR__.'/auth.php';
 
@@ -161,6 +163,9 @@ Route::prefix('/admin')
         // Kelola Ekskul — pakai resource, otomatis generate semua route CRUD
         // (index, create, store, show, edit, update, destroy) dengan parameter {ekskul}
         Route::resource('ekskul', EkskulController::class);
+
+        // Kelola Galeri — foto yang tampil di landing page
+        Route::resource('galeri', \App\Http\Controllers\Admin\GaleriController::class)->except('show');
     });
 
 /*
