@@ -16,19 +16,6 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* Sidebar rail: posisi "fixed" ditulis sebagai CSS mentah (bukan
-           class Tailwind) supaya tidak bergantung pada proses build/compile
-           Tailwind — jadi selalu aktif walau aset belum di-rebuild. */
-        @media (min-width: 1024px) {
-            .ekk-sidebar-rail {
-                position: fixed;
-                top: 2rem;      /* selaras dengan py-8 pada wrapper halaman */
-                left: 2.5rem;   /* selaras dengan lg:px-10 pada wrapper halaman */
-                width: 5rem;    /* setara w-20 */
-                min-height: 33.75rem; /* setara min-h-[540px] */
-                z-index: 30;
-            }
-        }
     </style>
 </head>
 
@@ -45,68 +32,7 @@
             <div class="flex flex-col lg:flex-row gap-6">
 
                 {{-- ================= SIDEBAR RAIL ================= --}}
-                <aside class="lg:w-20 shrink-0">
-                    <div class="ekk-sidebar-rail bg-periwinkle rounded-3xl p-3
-                                flex lg:flex-col items-center gap-2 overflow-x-auto lg:overflow-visible
-                                shadow-2xl shadow-periwinkle/30 ring-1 ring-white/20">
-
-                        <a href="{{ route('admin.dashboard') }}"
-                           class="w-11 h-11 shrink-0 rounded-2xl bg-white flex items-center justify-center text-periwinkle lg:mb-4 shadow-md">
-                            <i class="fas fa-graduation-cap"></i>
-                        </a>
-
-                        <a href="{{ route('admin.dashboard') }}"
-                           class="w-11 h-11 shrink-0 rounded-2xl flex items-center justify-center transition-all {{ request()->routeIs('admin.dashboard') ? 'bg-white text-periwinkle shadow-lg shadow-black/10' : 'text-white/90 hover:bg-white/25 hover:shadow-md' }}"
-                           title="Dashboard">
-                            <i class="fas fa-border-all"></i>
-                        </a>
-
-                        <a href="{{ route('admin.siswa.index') }}"
-                           class="w-11 h-11 shrink-0 rounded-2xl flex items-center justify-center transition-all {{ request()->routeIs('admin.siswa.*') ? 'bg-white text-periwinkle shadow-lg shadow-black/10' : 'text-white/90 hover:bg-white/25 hover:shadow-md' }}"
-                           title="Kelola Siswa">
-                            <i class="fas fa-users"></i>
-                        </a>
-
-                        <a href="{{ route('admin.kelas.index') }}"
-                           class="w-11 h-11 shrink-0 rounded-2xl flex items-center justify-center transition-all {{ request()->routeIs('admin.kelas.*') ? 'bg-white text-periwinkle shadow-lg shadow-black/10' : 'text-white/90 hover:bg-white/25 hover:shadow-md' }}"
-                           title="Kelola Kelas">
-                            <i class="fas fa-school"></i>
-                        </a>
-
-                        <a href="{{ route('admin.user.index') }}"
-                           class="w-11 h-11 shrink-0 rounded-2xl flex items-center justify-center transition-all {{ request()->routeIs('admin.user.*') ? 'bg-white text-periwinkle shadow-lg shadow-black/10' : 'text-white/90 hover:bg-white/25 hover:shadow-md' }}"
-                           title="Kelola Users">
-                            <i class="fas fa-user-cog"></i>
-                        </a>
-
-                        <a href="{{ route('admin.ekskul.index') }}"
-                           class="w-11 h-11 shrink-0 rounded-2xl flex items-center justify-center transition-all {{ request()->routeIs('admin.ekskul.*') ? 'bg-white text-periwinkle shadow-lg shadow-black/10' : 'text-white/90 hover:bg-white/25 hover:shadow-md' }}"
-                           title="Kelola Ekskul">
-                            <i class="fas fa-cube"></i>
-                        </a>
-
-                        <a href="{{ route('admin.pembina.index') }}"
-                           class="w-11 h-11 shrink-0 rounded-2xl flex items-center justify-center transition-all {{ request()->routeIs('admin.pembina.*') ? 'bg-white text-periwinkle shadow-lg shadow-black/10' : 'text-white/90 hover:bg-white/25 hover:shadow-md' }}"
-                           title="Kelola Pembina">
-                            <i class="fas fa-user-tie"></i>
-                        </a>
-
-                        <a href="{{ route('profile.edit') }}"
-                           class="w-11 h-11 shrink-0 rounded-2xl flex items-center justify-center transition-all {{ request()->routeIs('profile.edit') ? 'bg-white text-periwinkle shadow-lg shadow-black/10' : 'text-white/90 hover:bg-white/25 hover:shadow-md' }}"
-                           title="Profil">
-                            <i class="fas fa-user"></i>
-                        </a>
-
-                        <form id="logout-form-sidebar" method="POST" action="{{ route('logout') }}" class="lg:mt-auto shrink-0">
-                            @csrf
-                            <button type="submit"
-                                    class="w-11 h-11 rounded-2xl flex items-center justify-center text-white/90 hover:bg-white/25 hover:shadow-md transition-all"
-                                    title="Keluar">
-                                <i class="fas fa-sign-out-alt"></i>
-                            </button>
-                        </form>
-                    </div>
-                </aside>
+                @include('partials.sidebar-admin')
 
                 {{-- ================= KONTEN ================= --}}
                 <main class="flex-1 min-w-0 space-y-5">
