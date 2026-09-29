@@ -60,9 +60,13 @@
 
                     <td class="px-3 py-3">
                         <div class="flex items-center gap-3">
-                            <div class="w-9 h-9 rounded-full bg-teal-50 text-teal-600 flex items-center justify-center font-display font-bold text-sm ring-2 ring-teal-100 flex-shrink-0">
-                                {{ $initial }}
-                            </div>
+                            @if($ekskul->poster_url)
+                                <img src="{{ $ekskul->poster_url }}" alt="Poster {{ $ekskul->nama_ekskul }}" class="w-9 h-12 rounded-lg object-cover ring-2 ring-[#10316B]/10 flex-shrink-0">
+                            @else
+                                <div class="w-9 h-9 rounded-full bg-teal-50 text-teal-600 flex items-center justify-center font-display font-bold text-sm ring-2 ring-teal-100 flex-shrink-0">
+                                    {{ $initial }}
+                                </div>
+                            @endif
                             <p class="text-[#10316B] font-bold whitespace-nowrap">{{ $ekskul->nama_ekskul }}</p>
                         </div>
                     </td>

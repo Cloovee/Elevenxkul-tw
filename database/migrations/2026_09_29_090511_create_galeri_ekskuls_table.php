@@ -12,6 +12,11 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Kalau tabel sudah ada (mis. dibuat dari migration lain), lewati saja.
+        if (Schema::hasTable('galeri_ekskuls')) {
+            return;
+        }
+
         Schema::create('galeri_ekskuls', function (Blueprint $table) {
             $table->id('id_galeri');
             $table->foreignId('id_ekskul')

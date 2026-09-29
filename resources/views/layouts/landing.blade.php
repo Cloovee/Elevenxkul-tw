@@ -7,6 +7,7 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+    <script>try{if(localStorage.getItem('rail-folded')==='1')document.documentElement.classList.add('rail-folded')}catch(e){}</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Ekstrakurikuler {{ $sekolah['nama'] }}</title>
@@ -22,7 +23,7 @@
             --display:'Fredoka',system-ui,sans-serif;--body:'Plus Jakarta Sans',system-ui,sans-serif;
             --card:0 4px 24px -8px rgba(16,49,107,.10);--card-hover:0 24px 44px -20px rgba(11,64,156,.35);--ease:cubic-bezier(.16,1,.3,1)}
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-        html{scroll-behavior:smooth;scroll-padding-top:6rem}
+        html{scroll-behavior:smooth;scroll-padding-top:1.5rem}
         body{font-family:var(--body);color:var(--navy);background:var(--cloud);line-height:1.65;overflow-x:hidden;-webkit-font-smoothing:antialiased}
         img{display:block;max-width:100%}
         a{color:inherit;text-decoration:none}
@@ -45,49 +46,93 @@
         /* ---------- Latar lembut (sama seperti layout admin) ---------- */
         .blob{position:absolute;border-radius:50%;filter:blur(64px);pointer-events:none;z-index:0}
 
-        /* ---------- Navigasi ---------- */
-        .nav{position:fixed;top:.9rem;left:0;right:0;z-index:50}
-        .nav-in{width:min(1160px,92%);margin-inline:auto;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.55rem .6rem .55rem 1.1rem;border-radius:999px;background:rgba(255,255,255,.88);backdrop-filter:blur(12px);box-shadow:0 10px 30px -14px rgba(16,49,107,.35);transition:box-shadow .3s}
-        .brand{display:flex;align-items:center;gap:.65rem;font-family:var(--display);font-weight:600;line-height:1.1}
-        .brand img{width:30px;height:auto}
-        .brand small{display:block;font:500 .7rem var(--body);color:var(--mute)}
-        .links{display:flex;align-items:center;gap:.3rem;font-size:.9rem;font-weight:600}
-        .links a:not(.btn){padding:.5rem .95rem;border-radius:999px;color:var(--mute);transition:background .25s,color .25s}
-        .links a:not(.btn):hover{background:var(--cloud);color:var(--navy)}
-        .links .btn{padding:.6rem 1.3rem;margin-left:.4rem}
-        @media(max-width:820px){.links a:not(.btn){display:none}}
+        /* ---------- Sidebar rail (gaya sama dengan sidebar Admin/Pembina/Ketua) ---------- */
+        :root{--rail:0px}
+        @media(min-width:1024px){:root{--rail:9rem}}
+        @media(max-width:1023px){html{scroll-padding-top:5.5rem}}
+        .rail{position:fixed;z-index:60;top:.75rem;left:.75rem;right:.75rem;display:flex;align-items:center;gap:.5rem;padding:.6rem;border-radius:1.5rem;background:var(--blue);box-shadow:0 25px 50px -12px rgba(11,64,156,.35);outline:1px solid rgba(255,255,255,.2);overflow-x:auto;scrollbar-width:none;user-select:none}
+        .rail::-webkit-scrollbar{display:none}
+        .r-link{flex:none;display:flex;align-items:center;height:2.75rem;border-radius:1rem;color:rgba(255,255,255,.9);background:none;border:0;font:inherit;cursor:pointer;overflow:hidden;white-space:nowrap;transition:width .32s cubic-bezier(.4,0,.2,1),margin .32s cubic-bezier(.4,0,.2,1),padding .32s cubic-bezier(.4,0,.2,1),background .2s,box-shadow .2s}
+        .r-link:hover{background:rgba(255,255,255,.25);box-shadow:0 4px 8px -2px rgba(0,0,0,.15)}
+        .r-link[aria-current=page]{background:#fff;color:var(--blue);box-shadow:0 10px 15px -3px rgba(0,0,0,.1)}
+        .r-ico{width:2.75rem;height:2.75rem;flex:none;display:grid;place-items:center}
+        .r-ico svg{width:1.25rem;height:1.25rem;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .2s}
+        .r-link:hover .r-ico svg{transform:scale(1.15)}
+        .r-logo{width:2.75rem;height:2.75rem;border-radius:1rem;background:#fff;display:grid;place-items:center;box-shadow:0 4px 8px -2px rgba(0,0,0,.2)}
+        .r-logo img{width:1.7rem}
+        .r-txt{display:none;font-weight:600;font-size:.92rem;padding-right:.75rem}
+        .r-end{margin-left:auto}
+        .r-back{display:none}
+        @media(min-width:1024px){
+            .rail{top:2rem;bottom:2rem;left:2.5rem;right:auto;width:5rem;padding:.75rem;flex-direction:column;align-items:stretch;overflow:hidden;overscroll-behavior:contain;transition:width .32s cubic-bezier(.4,0,.2,1),box-shadow .32s}
+            .rail:hover,.rail:focus-within{width:17rem;box-shadow:0 30px 60px -15px rgba(16,49,107,.55)}
+            .r-link{width:2.75rem;margin-left:.375rem}
+            .rail:hover .r-link,.rail:focus-within .r-link{width:100%;margin-left:0;padding-left:.375rem}
+            .r-top{margin-bottom:1rem}.r-top .r-txt{margin-left:.75rem}
+            .r-end{margin-left:.375rem;margin-top:auto}
+            .rail:hover .r-end,.rail:focus-within .r-end{margin-left:0}
+            .r-txt{display:block;opacity:0;transform:translateX(-8px);transition:opacity .2s,transform .25s}
+            .rail:hover .r-txt,.rail:focus-within .r-txt{opacity:1;transform:none;transition-delay:.12s}
+            .r-back{display:block;position:fixed;inset:0;z-index:59;background:rgba(16,49,107,.18);backdrop-filter:blur(6px);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .3s,visibility .3s}
+            .rail:hover~.r-back,.rail:focus-within~.r-back{opacity:1;visibility:visible}
+        }
+        .content{padding-left:var(--rail)}
 
-        /* ---------- Hero ---------- */
-        .hero{position:relative;padding:8.2rem 0 0;overflow:hidden}
-        .hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(2rem,5vw,4.5rem);align-items:center}
-        .hero h1{font-size:clamp(2.4rem,5.2vw,4rem);font-weight:700;max-width:14ch}
-        .hero .sub{margin-top:1.2rem;max-width:46ch;color:var(--mute);font-size:1.05rem}
-        .cta{display:flex;flex-wrap:wrap;gap:.8rem;margin-top:1.8rem}
-        .rise{opacity:0;animation:rise .9s var(--ease) forwards;animation-delay:calc(var(--d,0)*90ms + 80ms)}
-        @keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
-        .frame-wrap{position:relative;justify-self:end;width:min(100%,470px)}
-        .frame-back{position:absolute;inset:8% -5% -5% 8%;background:var(--gold);border-radius:2.2rem;will-change:transform;transition:none}
-        .frame{position:relative;aspect-ratio:4/4.6;border-radius:2.2rem;overflow:hidden;background:var(--navy);box-shadow:0 30px 50px -28px rgba(16,49,107,.6)}
-        .frame img{position:absolute;left:0;top:-12%;width:100%;height:124%;object-fit:cover;will-change:transform}
-        .chip-card{position:absolute;left:-1.6rem;bottom:2rem;display:flex;align-items:center;gap:.8rem;padding:.8rem 1.2rem .8rem .8rem;background:#fff;border-radius:1.4rem;box-shadow:0 18px 34px -16px rgba(16,49,107,.45);transition:transform .5s var(--ease)}
-        .chip-card:hover{transform:translateY(-6px) rotate(-1.5deg)}
-        .chip-card img{width:40px}
-        .chip-card b{display:block;font:600 .98rem var(--display);line-height:1.2}
-        .chip-card span{font-size:.75rem;color:var(--mute)}
-        .stats{position:relative;z-index:2;margin-top:3.5rem;display:grid;grid-template-columns:repeat(4,1fr);padding:1.6rem 1rem;transform:translateY(50%)}
+        /* ---------- Lipat sidebar: jadi satu ikon melayang di pojok kiri bawah ---------- */
+        .rail{transition:width .32s cubic-bezier(.4,0,.2,1),box-shadow .32s,transform .55s var(--ease),opacity .35s}
+        @media(min-width:1024px){.rail{transform-origin:0 100%}}
+        html.rail-folded{--rail:0px}
+        html.rail-folded .rail{opacity:0;pointer-events:none;transform:translateY(-130%)}
+        @media(min-width:1024px){html.rail-folded .rail{transform:scale(.06)}}
+        .rail-fab{position:fixed;z-index:61;left:1rem;bottom:1rem;width:3.5rem;height:3.5rem;border:0;border-radius:1.25rem;background:var(--blue);color:#fff;display:grid;place-items:center;cursor:pointer;box-shadow:0 20px 40px -12px rgba(11,64,156,.65);outline:1px solid rgba(255,255,255,.25);opacity:0;transform:scale(.4);pointer-events:none;transition:opacity .3s,transform .55s var(--ease),background .25s}
+        .rail-fab svg{width:1.5rem;height:1.5rem;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+        html.rail-folded .rail-fab{opacity:1;transform:none;pointer-events:auto;transition-delay:.18s,.18s,0s}
+        html.rail-folded .rail-fab:hover{background:var(--navy);transform:translateY(-3px);transition-delay:0s}
+        html.rail-folded .rail-fab:active{transform:scale(.94)}
+        @media(min-width:1024px){.rail-fab{left:2.5rem;bottom:2rem}}
+        /* konten ikut bergeser halus saat sidebar dilipat/dibuka */
+        .content,.hero-top,.cf,.cf-meta,footer{transition:padding .5s var(--ease),margin .5s var(--ease)}
+        @media(min-width:1024px){.hero{padding-top:3rem}}
+
+        /* ---------- Hero: carousel ekskul (coverflow 3D) ---------- */
+        .hero{position:relative;min-height:100svh;display:flex;flex-direction:column;color:#fff;overflow:hidden;isolation:isolate;background:var(--navy);padding:6.5rem 0 4.5rem}
+        /* Latar hero: foto sekolah dengan opasitas 70% (ubah --hero-bg-opacity kalau mau lebih pekat/transparan) */
+        :root{--hero-bg-opacity:.7}
+        .hero-bg{position:absolute;left:0;top:-20%;width:100%;height:140%;z-index:-2;background:url('{{ $foto }}') center/cover no-repeat;opacity:var(--hero-bg-opacity);will-change:transform}
+        .hero::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(rgba(10,30,72,.55),rgba(10,30,72,.32) 45%,rgba(8,26,66,.82))}
+        .hero-top{padding-inline:calc(var(--rail) + 1.5rem) 1.5rem;position:relative;z-index:5}
+        .hero h1{font-size:clamp(1.6rem,3vw,2.5rem);font-weight:700;max-width:22ch;color:#fff;text-shadow:0 2px 16px rgba(0,0,0,.45)}
+        .hero .sub{margin-top:.6rem;max-width:52ch;color:rgba(255,255,255,.9);text-shadow:0 1px 10px rgba(0,0,0,.45)}
+        .cf{position:relative;flex:1;display:grid;place-items:center;margin-left:var(--rail);perspective:1500px;touch-action:pan-y;user-select:none;--ch:clamp(340px,66svh,640px);--cw:calc(var(--ch)*.58);min-height:calc(var(--ch) + 3rem)}
+        .cf:focus-visible{outline-offset:-8px}
+        .cf-card{position:absolute;left:50%;top:50%;width:var(--cw);height:var(--ch);margin:calc(var(--ch)/-2) 0 0 calc(var(--cw)/-2);border-radius:1.1rem;overflow:hidden;background:var(--blue);box-shadow:0 30px 50px -20px rgba(0,0,0,.6);cursor:pointer;will-change:transform,opacity}
+        .cf-card.on{cursor:default}
+        .cf-card img{width:100%;height:100%;object-fit:cover;pointer-events:none}
+        .cf-card::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 40%,rgba(8,26,66,.8));opacity:0;transition:opacity .6s}
+        .cf-card.on::after{opacity:1}
+        .cf-ph{position:absolute;inset:0;display:grid;place-items:center;font:700 5rem var(--display);color:rgba(255,255,255,.85);background:linear-gradient(160deg,var(--blue),var(--navy))}
+        .cf-cap{position:absolute;z-index:15;left:50%;bottom:calc(50% - var(--ch)/2 + 1.4rem);width:calc(var(--cw) - 2.4rem);transform:translateX(-50%);pointer-events:none;opacity:var(--o,0);transition:opacity .25s,transform .45s var(--ease)}
+        .cf-cap.swap{opacity:0;transform:translate(-50%,10px)}
+        .cf-title{font:700 clamp(1.25rem,2.1vw,1.9rem) var(--display);text-transform:uppercase;letter-spacing:.04em;line-height:1.1;text-shadow:0 2px 18px rgba(0,0,0,.5)}
+        .cf-line{width:2.2rem;height:2px;background:#fff;margin:.9rem 0 .6rem}
+        .cf-sub{font-size:.95rem;text-shadow:0 1px 10px rgba(0,0,0,.5)}
+        .cf-go{pointer-events:auto;margin-top:.9rem;padding:.55rem 1.2rem;font-size:.85rem}
+        .cf-arrow{position:absolute;top:50%;translate:0 -50%;z-index:20;width:3rem;height:3rem;border:0;border-radius:50%;background:rgba(255,255,255,.14);backdrop-filter:blur(6px);color:#fff;cursor:pointer;display:grid;place-items:center;opacity:var(--o,0);transition:background .3s,color .3s,transform .3s var(--ease)}
+        .cf-arrow svg{width:22px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+        .cf-arrow:hover{background:var(--gold);color:var(--navy)}.cf-arrow:active{transform:scale(.92)}
+        .cf-arrow.pv{left:1rem}.cf-arrow.nx{right:1rem}
+        .cf-meta{opacity:var(--o,0);margin-left:var(--rail);text-align:center;font:600 1rem var(--display);position:relative;z-index:5}
+        .cf-meta span{color:rgba(255,255,255,.6);font-weight:500}
+        .folded .cf-arrow,.folded .cf-go{pointer-events:none}
+        .cf-empty{margin:auto;padding:2rem;text-align:center;color:rgba(255,255,255,.85)}
+        .stats{position:relative;z-index:2;margin-top:-3rem;display:grid;grid-template-columns:repeat(4,1fr);padding:1.6rem 1rem}
         .stat{text-align:center;padding:.2rem 1rem}
         .stat+.stat{border-left:1px solid var(--line)}
         .stat b{display:block;font:700 2.1rem var(--display);color:var(--blue);line-height:1.1}
         .stat span{font-size:.85rem;color:var(--mute)}
-        .hero-end{height:3.2rem}
-        @media(max-width:860px){
-            .hero-grid{grid-template-columns:1fr}
-            .frame-wrap{justify-self:center;width:min(86%,420px);margin-top:1rem}
-            .chip-card{left:-.6rem}
-            .stats{grid-template-columns:repeat(2,1fr);row-gap:1.2rem}
-            .stat:nth-child(3){border-left:0}
-            .hero-end{height:6.5rem}
-        }
+        @media(max-width:860px){.stats{grid-template-columns:repeat(2,1fr);row-gap:1.2rem}.stat:nth-child(3){border-left:0}.cf-arrow{width:2.6rem;height:2.6rem}.cf-arrow.pv{left:.4rem}.cf-arrow.nx{right:.4rem}}
+        .card.flash{animation:flash 1.6s ease}
+        @keyframes flash{0%,60%{box-shadow:0 0 0 4px var(--gold),var(--card-hover)}100%{box-shadow:var(--card)}}
 
         /* ---------- Sekolah + video ---------- */
         .school{display:grid;grid-template-columns:1.6fr 1fr;gap:1.6rem;margin-top:2.2rem;align-items:stretch}
@@ -183,79 +228,105 @@
         .map iframe{display:block;width:100%;height:100%;min-height:368px;border:0}
         @media(max-width:860px){.mapgrid{grid-template-columns:1fr}}
 
-        footer{padding:2rem 0 2.5rem;font-size:.88rem;color:var(--mute)}
+        footer{padding:2rem 0 2.5rem var(--rail);font-size:.88rem;color:var(--mute)}
         footer .wrap{display:flex;flex-wrap:wrap;gap:1rem;justify-content:space-between;align-items:center;border-top:1px solid var(--line);padding-top:1.6rem}
+
+        /* ---------- Efek muncul saat di-scroll (kelas ditambahkan lewat JS) ---------- */
+        .reveal{opacity:0;transform:translate3d(0,38px,0);transition:opacity .9s var(--ease),transform 1s var(--ease);transition-delay:var(--rd,0ms);will-change:opacity,transform}
+        .reveal[data-r=zoom]{transform:scale(.93)}
+        .reveal[data-r=left]{transform:translate3d(-56px,0,0)}
+        .reveal[data-r=right]{transform:translate3d(56px,0,0)}
+        .reveal.in{opacity:1;transform:none}
 
         @media(prefers-reduced-motion:reduce){
             html{scroll-behavior:auto}
             *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
             .rise{opacity:1}
+            .reveal{opacity:1;transform:none}
         }
     </style>
 </head>
 <body>
 
-<header class="nav">
-    <div class="nav-in">
-        <a href="#beranda" class="brand">
-            <img src="{{ $logo }}" alt="Logo {{ $sekolah['nama'] }}">
-            <span>SMKN 11 Bandung<small>Ekstrakurikuler</small></span>
+<nav class="rail" id="rail" aria-label="Menu utama">
+        <a href="#beranda" class="r-link r-top" aria-label="{{ $sekolah['nama'] }}">
+            <span class="r-ico"><span class="r-logo"><img src="{{ $logo }}" alt=""></span></span>
+            <span class="r-txt">SMKN 11 Bandung</span>
         </a>
-        <nav class="links" aria-label="Menu utama">
-            <a href="#sekolah">Sekolah</a>
-            <a href="#ekskul">Ekskul</a>
-            @if($pembina->isNotEmpty())<a href="#pembina">Pembina</a>@endif
-            <a href="#galeri">Galeri</a>
-            <a href="#lokasi">Lokasi</a>
-            @auth
-                <a href="{{ route('dashboard') }}" class="btn btn-blue">Dashboard</a>
-            @else
-                <a href="{{ route('login') }}" class="btn btn-blue">Masuk</a>
-            @endauth
-        </nav>
-    </div>
-</header>
+        <a href="#beranda" class="r-link" aria-label="Beranda"><span class="r-ico"><svg viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg></span><span class="r-txt">Beranda</span></a>
+        <a href="#sekolah" class="r-link" aria-label="Sekolah"><span class="r-ico"><svg viewBox="0 0 24 24"><path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg></span><span class="r-txt">Sekolah</span></a>
+        <a href="#ekskul" class="r-link" aria-label="Ekskul"><span class="r-ico"><svg viewBox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg></span><span class="r-txt">Ekskul</span></a>
+        @if($pembina->isNotEmpty())
+        <a href="#pembina" class="r-link" aria-label="Pembina"><span class="r-ico"><svg viewBox="0 0 24 24"><path d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></span><span class="r-txt">Pembina</span></a>
+        @endif
+        <a href="#galeri" class="r-link" aria-label="Galeri"><span class="r-ico"><svg viewBox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></span><span class="r-txt">Galeri</span></a>
+        <a href="#lokasi" class="r-link" aria-label="Lokasi"><span class="r-ico"><svg viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg></span><span class="r-txt">Lokasi</span></a>
+        @auth
+        <a href="{{ route('dashboard') }}" class="r-link r-end" aria-label="Dashboard"><span class="r-ico"><svg viewBox="0 0 24 24"><path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg></span><span class="r-txt">Dashboard</span></a>
+        @else
+        <a href="{{ route('login') }}" class="r-link r-end" aria-label="Masuk"><span class="r-ico"><svg viewBox="0 0 24 24"><path d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg></span><span class="r-txt">Masuk</span></a>
+        @endauth
+        <button type="button" class="r-link r-fold" id="rail-fold" aria-label="Lipat menu"><span class="r-ico"><svg viewBox="0 0 24 24"><path d="M11 17l-5-5 5-5M18 17l-5-5 5-5"/></svg></span><span class="r-txt">Lipat menu</span></button>
+</nav>
+<div class="r-back" aria-hidden="true"></div>
+<button type="button" class="rail-fab" id="rail-fab" aria-label="Buka menu" aria-controls="rail" aria-expanded="false" title="Buka menu" inert><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
 
 <main>
-    {{-- ================= HERO ================= --}}
+    {{-- ================= HERO: carousel ekskul ================= --}}
     <section class="hero" id="beranda">
-        <div class="blob" style="top:-6rem;right:-4rem;width:26rem;height:26rem;background:rgba(11,64,156,.12)"></div>
-        <div class="blob" style="top:24rem;left:-6rem;width:18rem;height:18rem;background:rgba(255,232,103,.35)"></div>
+        @php
+            $slides = $ekskuls->map(fn ($e) => [
+                'e' => $e,
+                'img' => $e->cover_url,
+                'sub' => \Illuminate\Support\Str::limit(strip_tags((string) $e->deskripsi), 70) ?: ($kat[$e->kategori] ?? ucfirst($e->kategori)),
+            ]);
+            $first = $slides->first();
+        @endphp
+        <div class="hero-bg" data-speed="0.25" data-clamp aria-hidden="true"></div>
 
-        <div class="wrap">
-            <div class="hero-grid">
-                <div>
-                    <h1 class="rise" style="--d:0">Temukan ekskul yang cocok denganmu</h1>
-                    <p class="sub rise" style="--d:1">Lihat semua ekstrakurikuler {{ $sekolah['nama'] }}, kenali pembinanya, dan intip kegiatannya sebelum bergabung.</p>
-                    <div class="cta rise" style="--d:2">
-                        <a href="#ekskul" class="btn btn-blue">Lihat ekskul</a>
-                        <a href="#sekolah" class="btn btn-soft">Tonton video sekolah</a>
-                    </div>
-                </div>
-
-                <div class="frame-wrap rise" style="--d:2">
-                    <div class="frame-back" data-speed="-0.05"></div>
-                    <div class="frame">
-                        <img src="{{ $foto }}" alt="Gedung {{ $sekolah['nama'] }}" data-speed="0.1" data-clamp>
-                    </div>
-                    <div class="chip-card">
-                        <img src="{{ $logo }}" alt="">
-                        <div><b>{{ $sekolah['nama'] }}</b><span>SMK Pusat Keunggulan</span></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="panel stats rise" style="--d:4">
-                <div class="stat"><b>{{ $stat['ekskul'] }}</b><span>Ekskul</span></div>
-                <div class="stat"><b>{{ $stat['anggota'] }}</b><span>Anggota aktif</span></div>
-                <div class="stat"><b>{{ $stat['pembina'] }}</b><span>Pembina</span></div>
-                <div class="stat"><b>{{ $stat['pelatih'] }}</b><span>Pelatih</span></div>
-            </div>
-            <div class="hero-end"></div>
+        <div class="hero-top">
+            <h1 class="rise" style="--d:0">Temukan ekskul yang cocok denganmu</h1>
+            <p class="sub rise" style="--d:1">Klik foto atau tekan panah untuk menjelajahi ekstrakurikuler {{ $sekolah['nama'] }}.</p>
         </div>
+
+        @if($slides->isEmpty())
+            <p class="cf-empty">Belum ada ekskul. Data akan tampil di sini setelah admin menambahkannya.</p>
+        @else
+        <div class="cf" id="cf" tabindex="0" aria-roledescription="carousel" aria-label="Daftar ekskul">
+            @foreach($slides as $s)
+                <figure class="cf-card" data-nama="{{ $s['e']->nama_ekskul }}" data-sub="{{ $s['sub'] }}" data-href="#ekskul-{{ $s['e']->id_ekskul }}">
+                    @if($s['img'])<img src="{{ $s['img'] }}" alt="Kegiatan {{ $s['e']->nama_ekskul }}" draggable="false" loading="{{ $loop->index < 5 ? 'eager' : 'lazy' }}">
+                    @else<span class="cf-ph" aria-hidden="true">{{ strtoupper(mb_substr($s['e']->nama_ekskul, 0, 1)) }}</span>@endif
+                </figure>
+            @endforeach
+
+            <div class="cf-cap" id="cf-cap" aria-live="polite">
+                <h2 class="cf-title" id="cf-title">{{ $first['e']->nama_ekskul }}</h2>
+                <div class="cf-line"></div>
+                <p class="cf-sub" id="cf-sub">{{ $first['sub'] }}</p>
+                <a class="btn btn-gold cf-go" id="cf-go" href="#ekskul-{{ $first['e']->id_ekskul }}">Lihat detail</a>
+            </div>
+
+            @if($slides->count() > 1)
+            <button class="cf-arrow pv" id="cf-prev" aria-label="Ekskul sebelumnya"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+            <button class="cf-arrow nx" id="cf-next" aria-label="Ekskul berikutnya"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
+            @endif
+        </div>
+        <p class="cf-meta"><b id="cf-now">1</b> <span>/ {{ $slides->count() }}</span></p>
+        @endif
     </section>
 
-    {{-- ================= SEKOLAH + VIDEO ================= --}}
+    <div class="content">
+    <div class="wrap">
+        <div class="panel stats">
+            <div class="stat"><b>{{ $stat['ekskul'] }}</b><span>Ekskul</span></div>
+            <div class="stat"><b>{{ $stat['anggota'] }}</b><span>Anggota aktif</span></div>
+            <div class="stat"><b>{{ $stat['pembina'] }}</b><span>Pembina</span></div>
+            <div class="stat"><b>{{ $stat['pelatih'] }}</b><span>Pelatih</span></div>
+        </div>
+    </div>
+
+        {{-- ================= SEKOLAH + VIDEO ================= --}}
     <section class="sec" id="sekolah">
         <div class="wrap">
             <h2>Kenali {{ $sekolah['nama'] }}</h2>
@@ -298,11 +369,11 @@
 
             <div class="cards">
                 @forelse($ekskuls as $e)
-                    @php $sampul = $e->galeri->first(); @endphp
-                    <article class="card" tabindex="0" data-kat="{{ $e->kategori }}">
+                    @php $sampul = $e->cover_url; @endphp
+                    <article class="card" id="ekskul-{{ $e->id_ekskul }}" tabindex="0" data-kat="{{ $e->kategori }}">
                         <div class="cover">
                             @if($sampul)
-                                <img src="{{ $sampul->foto_url }}" alt="Kegiatan {{ $e->nama_ekskul }}" loading="lazy">
+                                <img src="{{ $sampul }}" alt="Kegiatan {{ $e->nama_ekskul }}" loading="lazy">
                             @else
                                 <span class="ph" aria-hidden="true">{{ strtoupper(mb_substr($e->nama_ekskul, 0, 1)) }}</span>
                             @endif
@@ -423,6 +494,7 @@
             </div>
         </div>
     </section>
+    </div>
 </main>
 
 <footer>
@@ -482,6 +554,157 @@
             card.hidden = c.dataset.f !== 'all' && card.dataset.kat !== c.dataset.f;
         });
     }));
+
+    /* ===== Carousel ekskul (coverflow) =====
+       - Saat halaman dibuka, kartu bertumpuk lalu menyebar pelan selama INTRO ms.
+       - Saat di-scroll ke bawah, kartu melipat kembali jadi satu kartu sambil mundur ke belakang
+         (mengecil, miring, dan memudar), mengikuti posisi scroll (scroll ke atas = maju & menyebar lagi).
+       - Panah next/prev menggeser semua kartu satu posisi (kartu paling kiri pindah ke paling kanan). */
+    const cf = document.getElementById('cf');
+    if (cf) {
+        const INTRO = 1800;                       /* durasi menyebar (ms) */
+        const RECEDE = 900, TILT = 12;            /* efek mundur saat scroll: jarak ke belakang (px) & kemiringan (derajat) */
+        const hero = document.getElementById('beranda');
+        const cards = [...cf.querySelectorAll('.cf-card')], n = cards.length;
+        const cap = document.getElementById('cf-cap');
+        const X = [0, 1.04, 1.9, 2.6], R = [0, 26, 34, 40], Z = [0, -90, -180, -260], S = [1, .86, .72, .6], B = [1, .62, .45, .35];
+        const curve = (arr, a) => { const i = Math.min(Math.floor(a), 2), t = Math.min(a, 3) - i; return arr[i] + (arr[i + 1] - arr[i]) * t; };
+        const easeIO = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+        const idx = () => ((Math.round(target) % n) + n) % n;
+
+        let target = 0, pos = 0, spread = reduce ? 1 : 0, fold = 0, t0 = Infinity, raf = 0, last = 0;
+
+        const offset = i => { let d = i - pos; return d - n * Math.round(d / n); };
+
+        const draw = () => {
+            const F = easeIO(spread) * (1 - fold), w = cards[0].offsetWidth;
+            cards.forEach((el, i) => {
+                const d = offset(i), a = Math.abs(d), sg = Math.sign(d);
+                el.style.transform = `translate3d(${(sg * curve(X, a) * w * F).toFixed(1)}px,0,${(curve(Z, a) * F - RECEDE * fold).toFixed(1)}px) rotateX(${(TILT * fold).toFixed(2)}deg) rotateY(${(-sg * curve(R, a) * F).toFixed(2)}deg) scale(${(1 + (curve(S, a) - 1) * F).toFixed(4)})`;
+                el.style.opacity = (a <= 2 ? 1 : Math.max(0, 3 - a)) * (1 - .7 * fold);
+                el.style.filter = `brightness(${((1 + (curve(B, a) - 1) * F) * (1 - .35 * fold)).toFixed(3)})`;
+                el.style.zIndex = Math.max(0, Math.round(10 - a * 3));
+                el.style.pointerEvents = (a > 2 || F < .9) ? 'none' : 'auto';
+                el.classList.toggle('on', a < .5);
+            });
+            const o = Math.min(1, Math.max(0, (F - .7) / .3));
+            hero.style.setProperty('--o', o.toFixed(3));
+            hero.classList.toggle('folded', o < .5);
+        };
+
+        const frame = ts => {
+            raf = 0;
+            const dt = Math.min(ts - (last || ts), 50); last = ts;
+            let busy = false;
+            if (spread < 1) { spread = Math.min(1, Math.max(0, (ts - t0) / INTRO)); busy = true; }
+            const diff = target - pos;
+            if (Math.abs(diff) > .001) { pos += diff * (1 - Math.exp(-dt / 110)); busy = true; } else pos = target;
+            draw();
+            if (busy) raf = requestAnimationFrame(frame); else last = 0;
+        };
+        const kick = () => { if (!raf) raf = requestAnimationFrame(frame); };
+
+        const caption = () => {
+            const c = cards[idx()];
+            cap.classList.add('swap');
+            setTimeout(() => {
+                document.getElementById('cf-title').textContent = c.dataset.nama;
+                document.getElementById('cf-sub').textContent = c.dataset.sub;
+                document.getElementById('cf-go').setAttribute('href', c.dataset.href);
+                const now = document.getElementById('cf-now'); if (now) now.textContent = idx() + 1;
+                cap.classList.remove('swap');
+            }, 240);
+        };
+        const go = delta => { if (n < 2 || !delta) return; target += delta; caption(); kick(); };
+
+        draw();                                             /* posisi awal: semua kartu menumpuk */
+        if (!reduce) {
+            const imgs = [...cf.querySelectorAll('img')].slice(0, 5).map(i => i.decode ? i.decode().catch(() => {}) : Promise.resolve());
+            Promise.race([Promise.all(imgs), new Promise(r => setTimeout(r, 1200))]).then(() => { t0 = performance.now() + 250; kick(); });
+
+            const onScroll = () => {
+                const f = Math.min(1, Math.max(0, scrollY / (hero.offsetHeight * .6)));
+                if (f !== fold) { fold = f; kick(); }
+            };
+            addEventListener('scroll', onScroll, { passive: true });
+            onScroll();
+        }
+        addEventListener('resize', kick);
+
+        document.getElementById('cf-next')?.addEventListener('click', () => go(1));
+        document.getElementById('cf-prev')?.addEventListener('click', () => go(-1));
+        cf.addEventListener('keydown', e => {
+            if (e.key === 'ArrowRight') { e.preventDefault(); go(1); }
+            if (e.key === 'ArrowLeft') { e.preventDefault(); go(-1); }
+        });
+        let x0 = null, swiped = false;
+        cf.addEventListener('pointerdown', e => { x0 = e.clientX; swiped = false; });
+        cf.addEventListener('pointerup', e => {
+            if (x0 === null) return;
+            const dx = e.clientX - x0; x0 = null;
+            if (Math.abs(dx) > 50) { swiped = true; go(dx < 0 ? 1 : -1); }
+        });
+        cards.forEach((el, i) => el.addEventListener('click', () => { if (!swiped) go(Math.round(offset(i))); }));
+
+        /* "Lihat detail": tampilkan semua kategori lalu sorot kartu ekskul yang dituju */
+        document.getElementById('cf-go')?.addEventListener('click', () => {
+            document.querySelector('.chip[data-f="all"]')?.click();
+            const t = document.querySelector(document.getElementById('cf-go').getAttribute('href'));
+            if (t) { t.classList.remove('flash'); void t.offsetWidth; t.classList.add('flash'); }
+        });
+    }
+
+    /* ===== Efek muncul saat scroll: tiap elemen memudar & bergeser masuk begitu terlihat ===== */
+    if (!reduce && 'IntersectionObserver' in window) {
+        const groups = [
+            ['up',    'section.sec h2, section.sec .lead, .chips, .card, .person, .empty, footer .wrap'],
+            ['zoom',  '.stats, .band, .gal-panel'],
+            ['left',  '.school .video, .mapgrid .addr'],
+            ['right', '.school .school-info, .mapgrid .map']
+        ];
+        const els = [];
+        groups.forEach(([type, sel]) => document.querySelectorAll(sel).forEach(el => {
+            el.classList.add('reveal'); el.dataset.r = type; els.push(el);
+        }));
+        els.forEach(el => {          /* jeda bertahap antar elemen bersaudara (mis. kartu dalam satu baris) */
+            const sib = [...el.parentElement.children].filter(c => c.classList.contains('reveal'));
+            el.style.setProperty('--rd', (sib.indexOf(el) % 4) * 90 + 'ms');
+        });
+        const io = new IntersectionObserver(es => es.forEach(e => {
+            const el = e.target;
+            if (e.isIntersecting) {
+                io.unobserve(el);
+                el.classList.add('in');
+                /* selesai animasi -> lepas kelas supaya efek hover bawaan elemen kembali normal */
+                setTimeout(() => el.classList.remove('reveal', 'in'), 1300 + parseInt(el.style.getPropertyValue('--rd')) || 1300);
+            } else if (e.boundingClientRect.top < 0) {   /* sudah terlewat (mis. halaman dibuka di tengah) */
+                io.unobserve(el); el.classList.remove('reveal');
+            }
+        }), { threshold: .12, rootMargin: '0px 0px -6% 0px' });
+        els.forEach(el => io.observe(el));
+    }
+
+    /* ===== Lipat / buka sidebar (status disimpan di localStorage) ===== */
+    const rail = document.getElementById('rail'), fab = document.getElementById('rail-fab'), htmlEl = document.documentElement;
+    const setFold = (f, save = true) => {
+        htmlEl.classList.toggle('rail-folded', f);
+        rail.toggleAttribute('inert', f);
+        rail.setAttribute('aria-hidden', f);
+        fab.toggleAttribute('inert', !f);
+        fab.setAttribute('aria-expanded', !f);
+        if (save) { try { localStorage.setItem('rail-folded', f ? '1' : '0'); } catch (e) {} }
+    };
+    setFold(htmlEl.classList.contains('rail-folded'), false);
+    document.getElementById('rail-fold')?.addEventListener('click', () => { setFold(true); fab.focus({ preventScroll: true }); });
+    fab.addEventListener('click', () => setFold(false));
+
+    /* Tombol sidebar aktif mengikuti bagian halaman yang sedang dilihat */
+    const rl = [...document.querySelectorAll('.rail a[href^="#"]')];
+    const spy = new IntersectionObserver(es => es.forEach(e => {
+        if (!e.isIntersecting) return;
+        rl.forEach(a => a.getAttribute('href') === '#' + e.target.id ? a.setAttribute('aria-current', 'page') : a.removeAttribute('aria-current'));
+    }), { rootMargin: '-45% 0px -50% 0px' });
+    rl.forEach(a => { const t = document.querySelector(a.getAttribute('href')); if (t) spy.observe(t); });
 
     /* Galeri bertumpuk: foto paling depan terlempar keluar, foto di belakangnya maju satu layer */
     const stack = document.getElementById('stack');
