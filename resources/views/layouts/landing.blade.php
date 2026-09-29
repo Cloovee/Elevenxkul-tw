@@ -100,9 +100,9 @@
         :root{--hero-bg-opacity:.7}
         .hero-bg{position:absolute;left:0;top:-20%;width:100%;height:140%;z-index:-2;background:url('{{ $foto }}') center/cover no-repeat;opacity:var(--hero-bg-opacity);will-change:transform}
         .hero::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(rgba(10,30,72,.55),rgba(10,30,72,.32) 45%,rgba(8,26,66,.82))}
-        .hero-top{padding-inline:calc(var(--rail) + 1.5rem) 1.5rem;position:relative;z-index:5}
-        .hero h1{font-size:clamp(1.6rem,3vw,2.5rem);font-weight:700;max-width:22ch;color:#fff;text-shadow:0 2px 16px rgba(0,0,0,.45)}
-        .hero .sub{margin-top:.6rem;max-width:52ch;color:rgba(255,255,255,.9);text-shadow:0 1px 10px rgba(0,0,0,.45)}
+        .hero-top{padding-inline:calc(var(--rail) + 1.5rem) 1.5rem;position:relative;z-index:5;text-align:center}
+        .hero h1{font-size:clamp(1.6rem,3vw,2.5rem);font-weight:700;max-width:26ch;margin-inline:auto;color:#fff;text-shadow:0 2px 16px rgba(0,0,0,.45)}
+        .hero .sub{margin:.6rem auto 0;max-width:52ch;color:rgba(255,255,255,.9);text-shadow:0 1px 10px rgba(0,0,0,.45)}
         .cf{position:relative;flex:1;display:grid;place-items:center;margin-left:var(--rail);perspective:1500px;touch-action:pan-y;user-select:none;--ch:clamp(340px,66svh,640px);--cw:calc(var(--ch)*.58);min-height:calc(var(--ch) + 3rem)}
         .cf:focus-visible{outline-offset:-8px}
         .cf-card{position:absolute;left:50%;top:50%;width:var(--cw);height:var(--ch);margin:calc(var(--ch)/-2) 0 0 calc(var(--cw)/-2);border-radius:1.1rem;overflow:hidden;background:var(--blue);box-shadow:0 30px 50px -20px rgba(0,0,0,.6);cursor:pointer;will-change:transform,opacity}
@@ -228,8 +228,30 @@
         .map iframe{display:block;width:100%;height:100%;min-height:368px;border:0}
         @media(max-width:860px){.mapgrid{grid-template-columns:1fr}}
 
-        footer{padding:2rem 0 2.5rem var(--rail);font-size:.88rem;color:var(--mute)}
-        footer .wrap{display:flex;flex-wrap:wrap;gap:1rem;justify-content:space-between;align-items:center;border-top:1px solid var(--line);padding-top:1.6rem}
+        /* ---------- Footer ---------- */
+        footer{--ft:#081F40;background:var(--ft);color:rgba(255,255,255,.86);padding:clamp(2.8rem,6vw,4.2rem) 0 2rem var(--rail);font-size:1rem}
+        .ft-grid{display:grid;grid-template-columns:1.15fr .85fr 1fr;gap:clamp(2rem,5vw,4rem)}
+        .ft-brand{display:flex;align-items:center;gap:1rem}
+        .ft-brand img{width:3.4rem;height:auto;flex:none}
+        .ft-brand h3{font-size:1.65rem;color:#fff;letter-spacing:0}
+        .ft-brand p{color:rgba(255,255,255,.8);line-height:1.3}
+        .ft-desc{margin-top:1.4rem;text-align:justify;color:rgba(255,255,255,.8);line-height:1.75}
+        .ft-social{display:flex;gap:1.1rem;margin-top:1.4rem}
+        .ft-social a{width:2.1rem;height:2.1rem;display:grid;place-items:center;color:rgba(255,255,255,.85);border-radius:50%;transition:color .25s,transform .35s var(--ease)}
+        .ft-social a:hover{color:var(--gold);transform:translateY(-3px)}
+        .ft-social svg,.ft-ct svg{width:1.5rem;height:1.5rem;fill:currentColor;flex:none}
+        footer h4{font-family:var(--display);font-weight:600;font-size:1.65rem;line-height:1.15;color:#fff;margin-bottom:1.3rem}
+        .ft-links{list-style:none;display:grid;gap:.85rem}
+        .ft-links a{color:rgba(255,255,255,.86);transition:color .25s,padding-left .3s var(--ease)}
+        .ft-links a:hover{color:var(--gold);padding-left:.35rem}
+        .ft-ct{list-style:none;display:grid;gap:1.1rem}
+        .ft-ct li{display:flex;align-items:flex-start;gap:1rem}
+        .ft-ct svg{width:1.4rem;height:1.4rem;margin-top:.15rem;color:#fff}
+        .ft-ct a:hover{color:var(--gold)}
+        .ft-bar{margin-top:clamp(2rem,4vw,2.8rem);padding-top:1.9rem;border-top:1px solid rgba(255,255,255,.16);color:rgba(255,255,255,.8)}
+        .ft-bar b{color:#fff;font-weight:700}
+        @media(max-width:960px){.ft-grid{grid-template-columns:1fr 1fr}.ft-col-brand{grid-column:1/-1}}
+        @media(max-width:600px){.ft-grid{grid-template-columns:1fr}footer h4,.ft-brand h3{font-size:1.4rem}}
 
         /* ---------- Efek muncul saat di-scroll (kelas ditambahkan lewat JS) ---------- */
         .reveal{opacity:0;transform:translate3d(0,38px,0);transition:opacity .9s var(--ease),transform 1s var(--ease);transition-delay:var(--rd,0ms);will-change:opacity,transform}
@@ -285,7 +307,7 @@
         <div class="hero-bg" data-speed="0.25" data-clamp aria-hidden="true"></div>
 
         <div class="hero-top">
-            <h1 class="rise" style="--d:0">Temukan ekskul yang cocok denganmu</h1>
+            <h1 class="rise" style="--d:0">Ayo kembangkan bakatmu di 11 melalui ElevenXkul</h1>
             <p class="sub rise" style="--d:1">Klik foto atau tekan panah untuk menjelajahi ekstrakurikuler {{ $sekolah['nama'] }}.</p>
         </div>
 
@@ -499,12 +521,58 @@
 
 <footer>
     <div class="wrap">
-        <span>&copy; {{ date('Y') }} {{ $sekolah['nama'] }}. Sistem Ekstrakurikuler.</span>
-        @auth
-            <a href="{{ route('dashboard') }}" class="btn btn-blue">Buka dashboard</a>
-        @else
-            <a href="{{ route('login') }}" class="btn btn-blue">Masuk ke sistem ekskul</a>
-        @endauth
+        <div class="ft-grid">
+            {{-- Kolom 1: identitas sekolah --}}
+            <div class="ft-col-brand">
+                <div class="ft-brand">
+                    <img src="{{ $logo }}" alt="Logo {{ $sekolah['nama'] }}">
+                    <div>
+                        <h3>{{ $sekolah['singkat'] }}</h3>
+                        <p>{{ $sekolah['tagline'] }}</p>
+                    </div>
+                </div>
+                <p class="ft-desc">{{ $sekolah['deskripsi'] }}</p>
+                <div class="ft-social" aria-label="Media sosial">
+                    <a href="{{ $sekolah['sosmed']['facebook'] }}" target="_blank" rel="noopener" aria-label="Facebook"><svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a>
+                    <a href="{{ $sekolah['sosmed']['tiktok'] }}" target="_blank" rel="noopener" aria-label="TikTok"><svg viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg></a>
+                    <a href="{{ $sekolah['sosmed']['instagram'] }}" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg></a>
+                    <a href="{{ $sekolah['sosmed']['youtube'] }}" target="_blank" rel="noopener" aria-label="YouTube"><svg viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></a>
+                </div>
+            </div>
+
+            {{-- Kolom 2: tautan cepat (mengarah ke bagian yang ada di halaman ini) --}}
+            <nav aria-label="Tautan cepat">
+                <h4>Quick Links</h4>
+                <ul class="ft-links">
+                    <li><a href="#beranda">Home</a></li>
+                    <li><a href="#sekolah">Profil Sekolah</a></li>
+                    <li><a href="#ekskul">Ekstrakurikuler</a></li>
+                    <li><a href="#galeri">Galeri</a></li>
+                    <li><a href="#lokasi">Kontak</a></li>
+                </ul>
+            </nav>
+
+            {{-- Kolom 3: kontak --}}
+            <div>
+                <h4>Kontak Kami</h4>
+                <ul class="ft-ct">
+                    <li>
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 119.5 9 2.5 2.5 0 0112 11.5z"/></svg>
+                        <span>{{ $sekolah['alamat_footer'] }}</span>
+                    </li>
+                    <li>
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.02-.24 11.36 11.36 0 003.58.57 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.45.57 3.58a1 1 0 01-.25 1.02l-2.2 2.19z"/></svg>
+                        <a href="tel:{{ preg_replace('/[^0-9+]/', '', $sekolah['telepon']) }}">{{ $sekolah['telepon'] }}</a>
+                    </li>
+                    <li>
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 4H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V6a2 2 0 00-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                        <a href="mailto:{{ $sekolah['email'] }}">{{ $sekolah['email'] }}</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <p class="ft-bar">&copy; {{ date('Y') }} <b>{{ $sekolah['singkat'] }}.</b> All rights reserved.</p>
     </div>
 </footer>
 
