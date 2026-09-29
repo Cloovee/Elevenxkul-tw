@@ -34,6 +34,8 @@
     $sidebarPembina = auth()->user()?->pembina;
 @endphp
 
+@include('pembina.partials.scrollbar')
+
 <style>
     @media (min-width: 1024px) {
         .ekk-sidebar-rail {
@@ -112,6 +114,9 @@
     .ekk-nav-ico { width: 2.75rem; height: 2.75rem; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
     @media (max-width: 1023.98px) { .ekk-nav-label { display: none; } }
 
+    /* Jarak antara foto profil (kotak penuh 2.75rem) dan teks di sebelahnya */
+    .ekk-nav-label-avatar { margin-left: .75rem; }
+
     .ekk-nav-link .ekk-nav-icon { transition: transform .2s ease; }
     .ekk-nav-link:hover .ekk-nav-icon { transform: scale(1.15); }
 
@@ -157,7 +162,7 @@
                     @endif
                 </span>
             </span>
-            <span class="ekk-nav-label">
+            <span class="ekk-nav-label ekk-nav-label-avatar">
                 <span class="ekk-nav-title">Profil Saya</span>
             </span>
         </a>

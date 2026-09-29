@@ -96,6 +96,7 @@ class PembinaDashboardController extends Controller
             'pendingValidasi' => $pendingValidasi,
             'riwayatAktivitas' => $riwayatAktivitas,
             'trend' => $trend,
+            'notifikasi' => $pembina ? $pembina->notifikasiAbsensi() : null,
         ]);
     }
 }
