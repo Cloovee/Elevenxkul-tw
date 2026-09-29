@@ -12,7 +12,12 @@
         </div>
         <h3 class="text-xl font-extrabold text-[#10316B]">Edit Data Pembina</h3>
     </div>
-    <p class="text-xs text-[#7C8DB5] mb-6">Data biodata dan akun login pembina diisi dalam satu form. Keduanya tersimpan otomatis (tabel <strong>pembina</strong> &amp; <strong>users</strong>).</p>
+
+    @unless($pembina->user)
+        <div class="mb-6 p-4 bg-amber-50 rounded-xl">
+            <p class="text-sm text-amber-600 font-bold"><i class="fas fa-triangle-exclamation mr-1"></i> Akun login pembina ini sudah dihapus. Isi email & password di bawah untuk membuatnya ulang tidak otomatis -- hubungi admin sistem.</p>
+        </div>
+    @endunless
 
     <form action="{{ route('admin.pembina.update', $pembina->id_pembina) }}" method="POST" enctype="multipart/form-data">
         @csrf
@@ -70,10 +75,22 @@
                 @error('nomor_hp')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
             <div>
-                <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Email <span class="text-red-500">*</span></label>
-                <input type="email" name="email" class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C] @error('email') ring-2 ring-red-400 @enderror" value="{{ old('email', $pembina->email ?? optional($pembina->user)->email) }}" required>
+                <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Email (Username Login) <span class="text-red-500">*</span></label>
+                <input type="email" name="email" class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C] @error('email') ring-2 ring-red-400 @enderror" value="{{ old('email', $pembina->email) }}" required>
                 @error('email')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
+
+            <div>
+                <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Password Baru <span class="text-xs normal-case font-normal text-[#7C8DB5]">(kosongkan jika tidak diganti)</span></label>
+                <input type="password" name="password" class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C] @error('password') ring-2 ring-red-400 @enderror">
+                @error('password')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Konfirmasi Password Baru</label>
+                <input type="password" name="password_confirmation" class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C]">
+            </div>
+
             <div>
                 <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Media Sosial</label>
                 <input type="text" name="medsos" class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C] @error('medsos') ring-2 ring-red-400 @enderror" value="{{ old('medsos', $pembina->medsos) }}">
@@ -86,22 +103,26 @@
             </div>
         </div>
 
-        <p class="text-[11px] font-bold text-[#0B409C] uppercase tracking-wider mb-3 pt-4 border-t border-gray-100">Akun Login</p>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
-            <div>
-                <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Username <span class="text-red-500">*</span> <span class="text-xs normal-case font-normal text-[#7C8DB5]">(dipakai untuk login)</span></label>
-                <input type="text" name="username" class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C] @error('username') ring-2 ring-red-400 @enderror" value="{{ old('username', optional($pembina->user)->username) }}" required>
-                @error('username')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+        <div class="mt-6">
+            <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Ekskul yang Dibina</label>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-64 overflow-y-auto p-4 bg-[#F2F7FF] rounded-xl @error('ekskul_ids') ring-2 ring-red-400 @enderror">
+                @forelse($ekskuls as $ek)
+                    <label class="flex items-center gap-2 text-sm text-[#10316B] bg-white rounded-lg px-3 py-2 cursor-pointer">
+                        <input type="checkbox" name="ekskul_ids[]" value="{{ $ek->id_ekskul }}" class="rounded border-[#DDE8FB] text-[#0B409C] focus:ring-[#0B409C]" {{ in_array($ek->id_ekskul, old('ekskul_ids', $assignedEkskulIds)) ? 'checked' : '' }}>
+                        <span>
+                            {{ $ek->nama_ekskul }}
+                            @if($ek->id_pembina && $ek->id_pembina != $pembina->id_pembina)
+                                <span class="block text-[11px] text-amber-600">Sekarang: {{ $ek->pembina->nama_pembina }} (ambil alih kalau dicentang)</span>
+                            @endif
+                        </span>
+                    </label>
+                @empty
+                    <p class="text-sm text-[#7C8DB5] col-span-2">Belum ada data ekskul.</p>
+                @endforelse
             </div>
-            <div>
-                <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Password <span class="text-xs normal-case font-normal text-[#7C8DB5]">(kosongkan jika tidak ingin mengganti)</span></label>
-                <input type="password" name="password" class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C] @error('password') ring-2 ring-red-400 @enderror" autocomplete="new-password">
-                @error('password')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
-            </div>
+            @error('ekskul_ids')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+            @error('ekskul_ids.*')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
         </div>
-
-        <p class="text-[11px] font-bold text-[#0B409C] uppercase tracking-wider mb-3 pt-4 border-t border-gray-100">Pembinaan</p>
-        @include('admin.CRUD-pembina._ekskul-picker', ['ekskuls' => $ekskuls, 'terpilih' => old('ekskul', $pembina->ekskuls->pluck('id_ekskul')->all()), 'idPembinaSaatIni' => $pembina->id_pembina])
 
         <div class="mt-8 flex gap-3">
             <button type="submit" class="inline-flex items-center gap-2 px-6 py-2.5 bg-[#0B409C] text-white rounded-full text-sm font-bold shadow-md shadow-[#0B409C]/30 hover:opacity-90 transition-opacity">

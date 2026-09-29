@@ -16,7 +16,9 @@ use App\Http\Controllers\Admin\SiswaController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\PembinaController;
 use App\Http\Controllers\Admin\EkskulController;
+use App\Http\Controllers\Admin\EkskulMonitoringController;
 use App\Http\Controllers\Admin\KelasController;
+use App\Http\Controllers\Admin\TahunAjaranController;
 use Illuminate\Support\Facades\Route;
 use App\Models\Peserta;
 
@@ -135,8 +137,6 @@ Route::prefix('/admin')
 
         Route::prefix('/user')->name('user.')->group(function () {
             Route::get('/', [UserController::class, 'index'])->name('index');
-            Route::get('/create', [UserController::class, 'create'])->name('create');
-            Route::post('/store', [UserController::class, 'store'])->name('store');
             Route::get('/{id}/edit', [UserController::class, 'edit'])->name('edit');
             Route::put('/{id}', [UserController::class, 'update'])->name('update');
             Route::delete('/{id}', [UserController::class, 'destroy'])->name('destroy');
@@ -166,6 +166,30 @@ Route::prefix('/admin')
 
         // Kelola Galeri — foto yang tampil di landing page
         Route::resource('galeri', \App\Http\Controllers\Admin\GaleriController::class)->except('show');
+        // Lihat Semua Ekskul — monitoring READ ONLY (daftar, detail, cetak laporan).
+        // Sudah dilindungi middleware 'role:Admin' dari grup /admin di atas.
+        Route::prefix('/semua-ekskul')->name('monitoring-ekskul.')->group(function () {
+            Route::get('/', [EkskulMonitoringController::class, 'index'])->name('index');
+            Route::get('/{ekskul}', [EkskulMonitoringController::class, 'show'])->name('show');
+            Route::get('/{ekskul}/cetak', [EkskulMonitoringController::class, 'cetak'])->name('cetak');
+        });
+
+        // Modul Tahun Ajaran: Tahun Ajaran Aktif -> Ganti Tahun Ajaran -> Perubahan siswa -> Preview -> Finalisasi.
+        // Sudah dilindungi middleware 'role:Admin' dari grup /admin di atas.
+        Route::prefix('/tahun-ajaran')->name('tahun-ajaran.')->group(function () {
+            Route::get('/', [TahunAjaranController::class, 'index'])->name('index');
+
+            // Hanya dipakai sekali di awal, saat belum ada Tahun Ajaran aktif sama sekali.
+            Route::post('/bootstrap', [TahunAjaranController::class, 'bootstrap'])->name('bootstrap');
+
+            // Wizard "Ganti Tahun Ajaran": tentukan periode tujuan (belum mengubah siswa).
+            Route::get('/ganti', [TahunAjaranController::class, 'gantiForm'])->name('ganti.form');
+            Route::post('/ganti', [TahunAjaranController::class, 'gantiStore'])->name('ganti.store');
+
+            Route::get('/{tahunAjaran}/perubahan', [TahunAjaranController::class, 'perubahan'])->name('perubahan');
+            Route::post('/{tahunAjaran}/preview', [TahunAjaranController::class, 'preview'])->name('preview');
+            Route::post('/{tahunAjaran}/finalisasi', [TahunAjaranController::class, 'finalisasi'])->name('finalisasi');
+        });
     });
 
 /*
@@ -294,7 +318,7 @@ Route::get('/kelola-anggota/tambah', function () {
             'nama_kelas' => $s->nama_kelas,
         ]);
 
-    $daftarKelas = \App\Models\Kelas::orderBy('tingkat')->orderBy('jurusan')->orderBy('rombel')->get();
+    $daftarKelas = \App\Models\Kelas::orderBy('tingkat')->orderBy('program_keahlian')->orderBy('rombel')->get();
 
     return view('dashboard-ketua.kelola-anggota.tambah', compact('daftarSiswa', 'daftarKelas'));
 })->middleware(['auth', 'verified', 'role:Ketua'])
@@ -414,10 +438,6 @@ Route::delete('/kelola-anggota/{id}', function ($id) {
 
 })->middleware(['auth', 'verified', 'role:Ketua'])
   ->name('ketua.kelola-anggota.destroy');
-
-Route::get('/riwayat-absensi', [RiwayatAbsensiController::class, 'index'])
-    ->middleware(['auth', 'verified', 'role:Ketua'])
-    ->name('ketua.riwayat-absensi');
 
 /*
 |--------------------------------------------------------------------------

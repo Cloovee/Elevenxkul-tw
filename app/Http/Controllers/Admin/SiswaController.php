@@ -30,7 +30,7 @@ class SiswaController extends Controller
             $query->where('id_kelas', $request->kelas);
         }
 
-        $siswa = $query->orderBy('nama_siswa')->paginate(20);
+        $siswa = $query->orderBy('nama_siswa')->paginate(20)->withQueryString();
         $kelas = Kelas::all();
 
         return view('admin.siswa.index', compact('siswa', 'kelas'));
@@ -163,11 +163,34 @@ class SiswaController extends Controller
 
     public function downloadTemplate()
     {
-        $data = [
-            ['NISN', 'NIS', 'Nama Siswa', 'Jenis Kelamin', 'Agama', 'Tingkat', 'Jurusan', 'Rombel', 'Nomor HP', 'Email', 'MedSos', 'Alamat'],
-            ['1234567890', '10001', 'Budi Santoso', 'L', 'Islam', 'X', 'IPA', '1', '08123456789', 'budi@email.com', '@budi', 'Jl. Merdeka No.1'],
-            ['1234567891', '10002', 'Siti Rahayu', 'P', 'Islam', 'X', 'IPA', '1', '08123456788', 'siti@email.com', '@siti', 'Jl. Merdeka No.2'],
+        $daftarKelas = Kelas::orderBy('tingkat')->orderBy('program_keahlian')->orderBy('rombel')->get();
+
+        // Kolom Kelas diisi id_kelas. Contoh baris pakai ID Kelas asli kalau datanya sudah ada.
+        $contohId1 = $daftarKelas->get(0)?->id_kelas ?? '';
+        $contohId2 = $daftarKelas->get(1)?->id_kelas ?? $contohId1;
+
+        $siswaRows = [
+            ['NISN', 'NIS', 'Nama', 'JK', 'Agama', 'Kelas', 'No. HP', 'Email', 'Medsos', 'Alamat'],
+            ['1234567890', '10001', 'Budi Santoso', 'L', 'Islam', $contohId1, '08123456789', 'budi@email.com', '@budi', 'Jl. Merdeka No.1'],
+            ['1234567891', '10002', 'Siti Rahayu', 'P', 'Islam', $contohId2, '08123456788', 'siti@email.com', '@siti', 'Jl. Merdeka No.2'],
         ];
+
+        // Daftar referensi ID Kelas ditaruh di kolom kanan sheet yang SAMA
+        // (setelah 1 kolom pemisah kosong), biar user tinggal lihat ke samping.
+        // Baris yang cuma berisi referensi ini otomatis dilewati saat import
+        // (lihat SiswaImport::isEmptyWhen).
+        $refRows = [['Ref: ID Kelas', 'Ref: Tingkat', 'Ref: Program Keahlian', 'Ref: Rombel']];
+        foreach ($daftarKelas as $k) {
+            $refRows[] = [$k->id_kelas, $k->tingkat, $k->program_keahlian, $k->rombel];
+        }
+
+        $totalRows = max(count($siswaRows), count($refRows));
+        $data = [];
+        for ($i = 0; $i < $totalRows; $i++) {
+            $left = $siswaRows[$i] ?? array_fill(0, 10, '');
+            $right = $refRows[$i] ?? array_fill(0, 4, '');
+            $data[] = array_merge($left, [''], $right);
+        }
 
         return Excel::download(
             new class($data) implements \Maatwebsite\Excel\Concerns\FromArray {

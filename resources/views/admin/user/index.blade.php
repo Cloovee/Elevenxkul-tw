@@ -33,11 +33,9 @@
         </form>
     </div>
 
-    <!-- Tombol Aksi -->
+    <!-- Info -->
     <div class="flex flex-wrap gap-2 mb-6 pb-6 border-b border-gray-100">
-        <a href="{{ route('admin.user.create') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-[#0B409C] text-white rounded-full text-sm font-bold shadow-md shadow-[#0B409C]/30 hover:opacity-90 transition-opacity">
-            <i class="fas fa-user-plus"></i> Tambah Akun
-        </a>
+        <p class="text-xs text-[#7C8DB5]">Akun Pembina dibuat otomatis lewat menu <strong>Kelola Pembina</strong>. Di sini admin hanya bisa mengedit atau menghapus akun.</p>
 
         <!-- Ringkasan mini per role, biar keliatan sebaran akunnya -->
         <div class="ml-auto flex gap-2">
