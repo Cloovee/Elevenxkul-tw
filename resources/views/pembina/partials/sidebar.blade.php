@@ -34,6 +34,8 @@
     $sidebarPembina = auth()->user()?->pembina;
 @endphp
 
+@include('pembina.partials.scrollbar')
+
 <style>
     @media (min-width: 1024px) {
         .ekk-sidebar-rail {

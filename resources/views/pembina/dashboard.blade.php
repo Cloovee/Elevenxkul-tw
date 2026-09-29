@@ -70,15 +70,7 @@
                 </h1>
             </div>
             <div class="flex items-center gap-3">
-                <a href="{{ route('pembina.validasi.index') }}"
-                   class="relative w-[44px] h-[44px] rounded-2xl bg-lavender/10 flex items-center justify-center text-lavender hover:bg-lavender/20 hover:-translate-y-0.5 transition-all">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
-                    @if($pendingValidasi > 0)
-                        <span class="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center ring-2 ring-bgsoft">
-                            {{ $pendingValidasi > 9 ? '9+' : $pendingValidasi }}
-                        </span>
-                    @endif
-                </a>
+                @include('pembina.partials.notifikasi-button', ['notifikasi' => $notifikasi ?? null])
 
                 @php
                     // supports either a full accessor (foto_url) or a raw storage path (foto)
@@ -258,6 +250,9 @@
         });
     });
 </script>
+
+{{-- Modal notifikasi absensi (di luar <main> agar position:fixed tidak terpengaruh transform animasi) --}}
+@include('pembina.partials.notifikasi-modal', ['notifikasi' => $notifikasi ?? null])
 
 </body>
 </html>
