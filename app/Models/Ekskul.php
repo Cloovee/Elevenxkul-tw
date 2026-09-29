@@ -51,4 +51,12 @@ class Ekskul extends Model
         return $this->hasMany(Peserta::class, 'id_ekskul', 'id_ekskul');
     }
 
+    /**
+     * Foto galeri yang diunggah admin untuk ekskul ini.
+     */
+    public function galeri()
+    {
+        return $this->hasMany(Galeri::class, 'id_ekskul', 'id_ekskul');
+    }
+
 }

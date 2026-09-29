@@ -127,6 +127,12 @@
         </form>
     </div>
 
+    <!-- Kembali ke landing page publik -->
+    <a href="{{ route('landing') }}"
+       class="inline-flex items-center gap-1.5 mt-6 text-sm font-medium text-inksoft hover:text-periwinkle transition">
+        &larr; Kembali ke beranda
+    </a>
+
 
     <script>
         function togglePassword() {

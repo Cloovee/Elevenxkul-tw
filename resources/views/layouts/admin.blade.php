@@ -85,6 +85,12 @@
                             <i class="fas fa-cube"></i>
                         </a>
 
+                        <a href="{{ route('admin.galeri.index') }}"
+                           class="w-11 h-11 shrink-0 rounded-2xl flex items-center justify-center transition-all {{ request()->routeIs('admin.galeri.*') ? 'bg-white text-periwinkle shadow-lg shadow-black/10' : 'text-white/90 hover:bg-white/25 hover:shadow-md' }}"
+                           title="Kelola Galeri">
+                            <i class="fas fa-images"></i>
+                        </a>
+
                         <a href="{{ route('admin.pembina.index') }}"
                            class="w-11 h-11 shrink-0 rounded-2xl flex items-center justify-center transition-all {{ request()->routeIs('admin.pembina.*') ? 'bg-white text-periwinkle shadow-lg shadow-black/10' : 'text-white/90 hover:bg-white/25 hover:shadow-md' }}"
                            title="Kelola Pembina">
