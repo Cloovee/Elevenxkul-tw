@@ -9,8 +9,9 @@ use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
 use Maatwebsite\Excel\Concerns\SkipsOnFailure;
 use Maatwebsite\Excel\Concerns\SkipsFailures;
+use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
 
-class SiswaImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnFailure
+class SiswaImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnFailure, SkipsEmptyRows
 {
     use SkipsFailures;
 
@@ -21,6 +22,17 @@ class SiswaImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnFai
     public function __construct($idKelasDefault = null)
     {
         $this->idKelasDefault = $idKelasDefault;
+    }
+
+    /**
+     * Lewati baris yang NISN, NIS, dan nama siswanya kosong semua -- misalnya
+     * baris yang cuma berisi daftar referensi ID Kelas di kolom kanan template.
+     */
+    public function isEmptyWhen(array $row): bool
+    {
+        return trim((string) ($row['nisn'] ?? '')) === ''
+            && trim((string) ($row['nis'] ?? '')) === ''
+            && trim((string) ($row['nama'] ?? '')) === '';
     }
 
     public function prepareForValidation($data, $index)
@@ -50,45 +62,26 @@ class SiswaImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnFai
             return null;
         }
 
-        // Tentukan kelas: cari dari tingkat+jurusan+rombel di Excel.
-        // WAJIB sudah ada di database (tidak lagi auto-create) — kalau belum
-        // terdaftar, baris ini gagal diimport.
-        // Kalau tingkat/jurusan/rombel kosong semua di Excel, pakai kelas
-        // default dari form.
-        $idKelas = $this->idKelasDefault;
+        // Tentukan kelas: sekarang langsung dari kolom "Kelas" di Excel
+        // (harus cocok dengan id_kelas di tabel kelas -- lihat halaman Kelola
+        // Kelas atau sheet "Daftar ID Kelas" di template untuk lihat ID-nya).
+        // Kalau kolom ID Kelas kosong, pakai kelas default dari form.
+        $idKelasCell = trim((string) ($row['kelas'] ?? ''));
 
-        $tingkat = trim($row['tingkat'] ?? '');
-        $jurusan = trim($row['jurusan'] ?? '');
-        $rombel  = trim($row['rombel'] ?? '');
-
-        $adaSebagian = $tingkat !== '' || $jurusan !== '' || $rombel !== '';
-        $lengkap = $tingkat !== '' && $jurusan !== '' && $rombel !== '';
-
-        if ($adaSebagian && !$lengkap) {
-            $this->barisError[] = [
-                'baris' => $this->totalBaris + 1,
-                'error' => "Kolom tingkat/jurusan/rombel harus diisi lengkap semua atau dikosongkan semua (pakai kelas default)"
-            ];
-            return null;
-        }
-
-        if ($lengkap) {
-            // Catatan: header kolom Excel tetap "jurusan" (baca App\Http\Controllers\Admin\SiswaController::downloadTemplate)
-            // supaya template yang sudah beredar tidak rusak. Yang berubah cuma nama kolom di tabel kelas.
-            $kelas = Kelas::where('tingkat', $tingkat)
-                           ->where('program_keahlian', $jurusan)
-                           ->where('rombel', $rombel)
-                           ->first();
+        if ($idKelasCell !== '') {
+            $kelas = Kelas::find($idKelasCell);
 
             if (!$kelas) {
                 $this->barisError[] = [
                     'baris' => $this->totalBaris + 1,
-                    'error' => "Kelas {$tingkat} {$jurusan} - {$rombel} belum terdaftar. Tambahkan dulu di menu Kelola Kelas sebelum import."
+                    'error' => "Kelas dengan ID {$idKelasCell} tidak ditemukan. Cek lagi di halaman Kelola Kelas."
                 ];
                 return null;
             }
 
             $idKelas = $kelas->id_kelas;
+        } else {
+            $idKelas = $this->idKelasDefault;
         }
 
         if (!$idKelas) {
@@ -103,10 +96,10 @@ class SiswaImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnFai
             'id_kelas'   => $idKelas,
             'NISN'       => $row['nisn'],
             'NIS'        => $row['nis'],
-            'nama_siswa' => $row['nama_siswa'],
-            'jk'         => $row['jenis_kelamin'],
+            'nama_siswa' => $row['nama'],
+            'jk'         => $row['jk'],
             'agama'      => $row['agama'] ?? null,
-            'nomor_hp'   => $row['nomor_hp'] ?? null,
+            'nomor_hp'   => $row['no_hp'] ?? null,
             'email'      => $row['email'] ?? null,
             'medsos'     => $row['medsos'] ?? null,
             'alamat'     => $row['alamat'] ?? null,
@@ -118,8 +111,9 @@ class SiswaImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnFai
         return [
             '*.nisn' => ['required', 'string', 'max:20'],
             '*.nis' => ['required', 'string', 'max:20'],
-            '*.nama_siswa' => ['required', 'string', 'max:100'],
-            '*.jenis_kelamin' => ['required', 'in:L,P'],
+            '*.nama' => ['required', 'string', 'max:100'],
+            '*.jk' => ['required', 'in:L,P'],
+            '*.kelas' => ['nullable', 'integer'],
         ];
     }
 

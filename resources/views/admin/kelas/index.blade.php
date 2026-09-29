@@ -14,8 +14,22 @@
             <div class="relative">
                 <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-[#7C8DB5] text-sm"></i>
                 <input type="text" name="search" placeholder="Cari tingkat/jurusan/rombel..." value="{{ request('search') }}"
-                    class="pl-10 pr-4 py-2 bg-[#F2F7FF] border-none rounded-full text-sm text-[#10316B] placeholder-[#7C8DB5] focus:ring-2 focus:ring-[#0B409C] w-56">
+                    class="pl-10 pr-4 py-2 bg-[#F2F7FF] border-none rounded-full text-sm text-[#10316B] placeholder-[#7C8DB5] focus:ring-2 focus:ring-[#0B409C] w-56" onkeydown="if(event.key==='Enter'){this.form.submit();}">
             </div>
+            <select name="tingkat" class="px-4 py-2 bg-[#F2F7FF] border-none rounded-full text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C]">
+                <option value="">Semua Tingkat</option>
+                @foreach($daftarTingkat as $t)
+                    <option value="{{ $t }}" {{ request('tingkat') == $t ? 'selected' : '' }}>{{ $t }}</option>
+                @endforeach
+            </select>
+
+            <select name="program_keahlian" class="px-4 py-2 bg-[#F2F7FF] border-none rounded-full text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C]">
+                <option value="">Semua Jurusan</option>
+                @foreach($daftarProgram as $pk)
+                    <option value="{{ $pk }}" {{ request('program_keahlian') == $pk ? 'selected' : '' }}>{{ $pk }}</option>
+                @endforeach
+            </select>
+
             <button type="submit" class="px-4 py-2 bg-[#F2F7FF] hover:bg-[#DDE8FB] text-[#10316B] rounded-full text-sm font-bold transition-colors">
                 <i class="fas fa-filter mr-1"></i> Filter
             </button>
@@ -49,6 +63,7 @@
             <thead>
                 <tr class="text-left text-[#7C8DB5] text-[11px] font-bold uppercase tracking-wider border-b border-gray-100">
                     <th class="px-3 py-3">No</th>
+                    <th class="px-3 py-3">ID</th>
                     <th class="px-3 py-3">Tingkat</th>
                     <th class="px-3 py-3">Jurusan</th>
                     <th class="px-3 py-3">Rombel</th>
@@ -60,6 +75,7 @@
                 @forelse($kelas as $key => $k)
                 <tr class="hover:bg-[#F2F7FF]/60 transition-colors">
                     <td class="px-3 py-3 text-[#7C8DB5] font-medium">{{ $kelas->firstItem() + $key }}</td>
+                    <td class="px-3 py-3 text-[#7C8DB5] font-mono text-xs">#{{ $k->id_kelas }}</td>
                     <td class="px-3 py-3 text-[#10316B] font-semibold">{{ $k->tingkat }}</td>
                     <td class="px-3 py-3">
                         <div class="flex items-center gap-3">
@@ -91,7 +107,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="6" class="text-center py-12">
+                    <td colspan="7" class="text-center py-12">
                         <div class="flex flex-col items-center text-[#7C8DB5]">
                             <i class="fas fa-school text-3xl mb-2"></i>
                             <p class="font-bold text-sm">Belum ada data kelas.</p>

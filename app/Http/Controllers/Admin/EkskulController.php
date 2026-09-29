@@ -16,10 +16,21 @@ class EkskulController extends Controller
             ->when($request->search, function ($query, $search) {
                 $query->where('nama_ekskul', 'like', "%{$search}%");
             })
+            ->when($request->kategori, function ($query, $kategori) {
+                $query->where('kategori', $kategori);
+            })
+            ->when($request->pembina, function ($query, $pembina) {
+                $pembina === 'none'
+                    ? $query->whereNull('id_pembina')
+                    : $query->where('id_pembina', $pembina);
+            })
             ->latest()
             ->paginate(10)
             ->withQueryString();
-        return view('admin.ekskul.index', compact('ekskuls'));
+
+        $pembinas = Pembina::orderBy('nama_pembina')->get();
+
+        return view('admin.ekskul.index', compact('ekskuls', 'pembinas'));
     }
 
     public function create()

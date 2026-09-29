@@ -64,4 +64,12 @@ class Siswa extends Model
     {
         return $this->hasOne(Ekskul::class, 'id_ketua', 'id_siswa');
     }
+
+    /**
+     * Histori penempatan kelas siswa ini per Tahun Ajaran (modul Tahun Ajaran).
+     */
+    public function riwayatKelas()
+    {
+        return $this->hasMany(RiwayatKelasSiswa::class, 'id_siswa', 'id_siswa');
+    }
 }

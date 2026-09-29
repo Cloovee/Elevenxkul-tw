@@ -23,6 +23,16 @@ class PembinaController extends Controller
             $query->where('nama_pembina', 'LIKE', "%{$search}%");
         }
 
+        if ($request->jk) {
+            $query->where('jk', $request->jk);
+        }
+
+        if ($request->status === 'membina') {
+            $query->has('ekskuls');
+        } elseif ($request->status === 'belum') {
+            $query->doesntHave('ekskuls');
+        }
+
         $pembina = $query->orderBy('nama_pembina')->paginate(20)->withQueryString();
 
         return view('admin.CRUD-pembina.index', compact('pembina'));

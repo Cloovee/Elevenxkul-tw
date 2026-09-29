@@ -13,7 +13,9 @@ use App\Http\Controllers\Admin\SiswaController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\PembinaController;
 use App\Http\Controllers\Admin\EkskulController;
+use App\Http\Controllers\Admin\EkskulMonitoringController;
 use App\Http\Controllers\Admin\KelasController;
+use App\Http\Controllers\Admin\TahunAjaranController;
 use Illuminate\Support\Facades\Route;
 use App\Models\Peserta;
 
@@ -144,6 +146,31 @@ Route::prefix('/admin')
         // Kelola Ekskul — pakai resource, otomatis generate semua route CRUD
         // (index, create, store, show, edit, update, destroy) dengan parameter {ekskul}
         Route::resource('ekskul', EkskulController::class);
+
+        // Lihat Semua Ekskul — monitoring READ ONLY (daftar, detail, cetak laporan).
+        // Sudah dilindungi middleware 'role:Admin' dari grup /admin di atas.
+        Route::prefix('/semua-ekskul')->name('monitoring-ekskul.')->group(function () {
+            Route::get('/', [EkskulMonitoringController::class, 'index'])->name('index');
+            Route::get('/{ekskul}', [EkskulMonitoringController::class, 'show'])->name('show');
+            Route::get('/{ekskul}/cetak', [EkskulMonitoringController::class, 'cetak'])->name('cetak');
+        });
+
+        // Modul Tahun Ajaran: Tahun Ajaran Aktif -> Ganti Tahun Ajaran -> Perubahan siswa -> Preview -> Finalisasi.
+        // Sudah dilindungi middleware 'role:Admin' dari grup /admin di atas.
+        Route::prefix('/tahun-ajaran')->name('tahun-ajaran.')->group(function () {
+            Route::get('/', [TahunAjaranController::class, 'index'])->name('index');
+
+            // Hanya dipakai sekali di awal, saat belum ada Tahun Ajaran aktif sama sekali.
+            Route::post('/bootstrap', [TahunAjaranController::class, 'bootstrap'])->name('bootstrap');
+
+            // Wizard "Ganti Tahun Ajaran": tentukan periode tujuan (belum mengubah siswa).
+            Route::get('/ganti', [TahunAjaranController::class, 'gantiForm'])->name('ganti.form');
+            Route::post('/ganti', [TahunAjaranController::class, 'gantiStore'])->name('ganti.store');
+
+            Route::get('/{tahunAjaran}/perubahan', [TahunAjaranController::class, 'perubahan'])->name('perubahan');
+            Route::post('/{tahunAjaran}/preview', [TahunAjaranController::class, 'preview'])->name('preview');
+            Route::post('/{tahunAjaran}/finalisasi', [TahunAjaranController::class, 'finalisasi'])->name('finalisasi');
+        });
     });
 
 /*

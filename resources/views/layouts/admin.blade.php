@@ -91,6 +91,18 @@
                             <i class="fas fa-user-tie"></i>
                         </a>
 
+                        <a href="{{ route('admin.monitoring-ekskul.index') }}"
+                           class="w-11 h-11 shrink-0 rounded-2xl flex items-center justify-center transition-all {{ request()->routeIs('admin.monitoring-ekskul.*') ? 'bg-white text-periwinkle shadow-lg shadow-black/10' : 'text-white/90 hover:bg-white/25 hover:shadow-md' }}"
+                           title="Lihat Semua Ekskul">
+                            <i class="fas fa-clipboard-list"></i>
+                        </a>
+
+                        <a href="{{ route('admin.tahun-ajaran.index') }}"
+                           class="w-11 h-11 shrink-0 rounded-2xl flex items-center justify-center transition-all {{ request()->routeIs('admin.tahun-ajaran.*') ? 'bg-white text-periwinkle shadow-lg shadow-black/10' : 'text-white/90 hover:bg-white/25 hover:shadow-md' }}"
+                           title="Tahun Ajaran">
+                            <i class="fas fa-calendar-alt"></i>
+                        </a>
+
                         <a href="{{ route('profile.edit') }}"
                            class="w-11 h-11 shrink-0 rounded-2xl flex items-center justify-center transition-all {{ request()->routeIs('profile.edit') ? 'bg-white text-periwinkle shadow-lg shadow-black/10' : 'text-white/90 hover:bg-white/25 hover:shadow-md' }}"
                            title="Profil">

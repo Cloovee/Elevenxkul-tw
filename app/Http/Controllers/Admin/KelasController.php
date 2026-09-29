@@ -23,9 +23,20 @@ class KelasController extends Controller
             });
         }
 
+        if ($request->tingkat) {
+            $query->where('tingkat', $request->tingkat);
+        }
+
+        if ($request->program_keahlian) {
+            $query->where('program_keahlian', $request->program_keahlian);
+        }
+
+        $daftarTingkat = Kelas::select('tingkat')->distinct()->orderBy('tingkat')->pluck('tingkat');
+        $daftarProgram = Kelas::select('program_keahlian')->distinct()->orderBy('program_keahlian')->pluck('program_keahlian');
+
         $kelas = $query->orderBy('tingkat')->orderBy('program_keahlian')->orderBy('rombel')->paginate(20)->withQueryString();
 
-        return view('admin.kelas.index', compact('kelas'));
+        return view('admin.kelas.index', compact('kelas', 'daftarTingkat', 'daftarProgram'));
     }
 
     public function create()

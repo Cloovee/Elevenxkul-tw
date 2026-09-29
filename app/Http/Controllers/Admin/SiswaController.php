@@ -165,53 +165,38 @@ class SiswaController extends Controller
     {
         $daftarKelas = Kelas::orderBy('tingkat')->orderBy('program_keahlian')->orderBy('rombel')->get();
 
-        // Contoh baris pakai ID Kelas asli kalau datanya sudah ada, biar guru
-        // langsung lihat contoh yang valid. Kalau belum ada kelas sama sekali,
-        // dikosongkan saja (kolom ID Kelas opsional, pakai kelas default form).
+        // Kolom Kelas diisi id_kelas. Contoh baris pakai ID Kelas asli kalau datanya sudah ada.
         $contohId1 = $daftarKelas->get(0)?->id_kelas ?? '';
         $contohId2 = $daftarKelas->get(1)?->id_kelas ?? $contohId1;
 
-        $dataSiswa = [
-            ['NISN', 'NIS', 'Nama Siswa', 'Jenis Kelamin', 'Agama', 'ID Kelas', 'Nomor HP', 'Email', 'MedSos', 'Alamat'],
+        $siswaRows = [
+            ['NISN', 'NIS', 'Nama', 'JK', 'Agama', 'Kelas', 'No. HP', 'Email', 'Medsos', 'Alamat'],
             ['1234567890', '10001', 'Budi Santoso', 'L', 'Islam', $contohId1, '08123456789', 'budi@email.com', '@budi', 'Jl. Merdeka No.1'],
             ['1234567891', '10002', 'Siti Rahayu', 'P', 'Islam', $contohId2, '08123456788', 'siti@email.com', '@siti', 'Jl. Merdeka No.2'],
         ];
 
-        // Sheet referensi ID Kelas dipisah dari sheet data siswa, supaya tidak
-        // ikut ke-parse sebagai baris siswa kalau lupa dihapus sebelum diimport.
-        $dataKelas = [
-            ['ID Kelas', 'Tingkat', 'Program Keahlian', 'Rombel'],
-        ];
+        // Daftar referensi ID Kelas ditaruh di kolom kanan sheet yang SAMA
+        // (setelah 1 kolom pemisah kosong), biar user tinggal lihat ke samping.
+        // Baris yang cuma berisi referensi ini otomatis dilewati saat import
+        // (lihat SiswaImport::isEmptyWhen).
+        $refRows = [['Ref: ID Kelas', 'Ref: Tingkat', 'Ref: Program Keahlian', 'Ref: Rombel']];
         foreach ($daftarKelas as $k) {
-            $dataKelas[] = [$k->id_kelas, $k->tingkat, $k->program_keahlian, $k->rombel];
+            $refRows[] = [$k->id_kelas, $k->tingkat, $k->program_keahlian, $k->rombel];
+        }
+
+        $totalRows = max(count($siswaRows), count($refRows));
+        $data = [];
+        for ($i = 0; $i < $totalRows; $i++) {
+            $left = $siswaRows[$i] ?? array_fill(0, 10, '');
+            $right = $refRows[$i] ?? array_fill(0, 4, '');
+            $data[] = array_merge($left, [''], $right);
         }
 
         return Excel::download(
-            new class($dataSiswa, $dataKelas) implements \Maatwebsite\Excel\Concerns\WithMultipleSheets {
-                private array $dataSiswa;
-                private array $dataKelas;
-                public function __construct(array $dataSiswa, array $dataKelas)
-                {
-                    $this->dataSiswa = $dataSiswa;
-                    $this->dataKelas = $dataKelas;
-                }
-                public function sheets(): array
-                {
-                    return [
-                        new class($this->dataSiswa) implements \Maatwebsite\Excel\Concerns\FromArray, \Maatwebsite\Excel\Concerns\WithTitle {
-                            private array $data;
-                            public function __construct(array $data) { $this->data = $data; }
-                            public function array(): array { return $this->data; }
-                            public function title(): string { return 'Data Siswa'; }
-                        },
-                        new class($this->dataKelas) implements \Maatwebsite\Excel\Concerns\FromArray, \Maatwebsite\Excel\Concerns\WithTitle {
-                            private array $data;
-                            public function __construct(array $data) { $this->data = $data; }
-                            public function array(): array { return $this->data; }
-                            public function title(): string { return 'Daftar ID Kelas'; }
-                        },
-                    ];
-                }
+            new class($data) implements \Maatwebsite\Excel\Concerns\FromArray {
+                private array $data;
+                public function __construct(array $data) { $this->data = $data; }
+                public function array(): array { return $this->data; }
             },
             'template_import_siswa.xlsx'
         );
