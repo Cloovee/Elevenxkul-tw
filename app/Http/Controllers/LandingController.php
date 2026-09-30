@@ -42,6 +42,20 @@ class LandingController extends Controller
             'alamat'     => 'Jl. Budi, Cilember, Kota Bandung, Jawa Barat',
             'peta_query' => 'SMK Negeri 11 Bandung, Jl. Budi, Cilember, Bandung',
             'youtube_id' => 'ONWUEFy4wjE',
+
+            // Data footer. Ganti tanda '#' pada sosmed dengan link akun resmi sekolah.
+            'singkat'      => 'SMKN 11 Bandung',
+            'tagline'      => 'Sekolah Pusat Keunggulan',
+            'deskripsi'    => 'Sekolah Menengah Kejuruan yang berfokus pada pengembangan kompetensi dan karakter siswa untuk menghadapi tantangan masa depan.',
+            'alamat_footer' => 'Jl. Budhi Cilember, Sukaraja, Cicendo, Bandung',
+            'telepon'      => '(022) 6652442',
+            'email'        => 'smkn11bdg@gmail.com',
+            'sosmed'       => [
+                'facebook'  => '#',
+                'tiktok'    => '#',
+                'instagram' => '#',
+                'youtube'   => '#',
+            ],
         ];
 
         return view('layouts.landing', compact('ekskuls', 'pembina', 'galeri', 'stat', 'sekolah'));

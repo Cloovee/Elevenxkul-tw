@@ -32,6 +32,7 @@
             <div class="flex flex-col lg:flex-row gap-6">
 
                 {{-- ================= SIDEBAR RAIL ================= --}}
+                {{-- Hover melebar + latar blur, seragam dengan role pembina & ketua --}}
                 @include('partials.sidebar-admin')
 
                 {{-- ================= KONTEN ================= --}}
