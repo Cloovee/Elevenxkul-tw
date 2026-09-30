@@ -166,7 +166,6 @@ Route::prefix('/admin')
 
         // Kelola Galeri — foto yang tampil di landing page
         Route::resource('galeri', \App\Http\Controllers\Admin\GaleriController::class)->except('show');
-
         // Lihat Semua Ekskul — monitoring READ ONLY (daftar, detail, cetak laporan).
         // Sudah dilindungi middleware 'role:Admin' dari grup /admin di atas.
         Route::prefix('/semua-ekskul')->name('monitoring-ekskul.')->group(function () {
@@ -277,7 +276,6 @@ Route::get('/absensi-peserta', [App\Http\Controllers\Ketua\AbsensiPesertaControl
 Route::post('/absensi-peserta', [App\Http\Controllers\Ketua\AbsensiPesertaController::class, 'store'])
     ->middleware(['auth', 'verified'])->name('ketua.absensi-peserta.store');
 
-// Riwayat Absensi Ketua — seluruh histori absensi peserta & pelatih
 Route::get('/riwayat-absensi', [RiwayatAbsensiController::class, 'index'])
     ->middleware(['auth', 'verified', 'role:Ketua'])->name('ketua.riwayat-absensi');
 

@@ -38,10 +38,10 @@
                     />
 
                     <h1 class="font-display font-bold text-white text-2xl mt-6">
-                        SMKN 11 Bandung
+                        ElevenXkul
                     </h1>
                     <p class="text-white font-semibold text-sm mt-1">
-                        Sistem Ekstrakurikuler
+                        Ekskul Management
                     </p>
                     <p class="text-white/70 text-sm mt-4 leading-relaxed">
                         Kelola presensi, validasi laporan, dan penilaian kegiatan ekskul dalam satu platform.
@@ -65,8 +65,8 @@
                     <div class="lg:hidden mb-8 flex items-center gap-3">
                         <img src="{{ asset('images/smkn11logo.png') }}" alt="Logo SMKN 11" class="w-11 h-11 object-contain shrink-0 drop-shadow-[0_4px_12px_rgba(0,0,0,0.35)]" />
                         <div class="leading-tight">
-                            <p class="font-display font-bold text-white text-sm">SMKN 11 Bandung</p>
-                            <p class="text-white/80 text-xs">Sistem Ekstrakurikuler</p>
+                            <p class="font-display font-bold text-white text-sm">ElevenXkul</p>
+                            <p class="text-white/80 text-xs">Ekskul Management</p>
                         </div>
                     </div>
 

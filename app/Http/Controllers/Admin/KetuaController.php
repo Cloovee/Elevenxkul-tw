@@ -97,7 +97,7 @@ class KetuaController extends Controller
         $pembina = $this->pembinaOrFail();
 
         $ekskuls = $pembina->ekskuls()->with('ketua')->orderBy('nama_ekskul')->get();
-        $kelas = Kelas::orderBy('tingkat')->orderBy('jurusan')->orderBy('rombel')->get();
+        $kelas = Kelas::orderBy('tingkat')->orderBy('program_keahlian')->orderBy('rombel')->get();
 
         return view('pembina.ketua.create', compact('ekskuls', 'kelas'));
     }
@@ -180,7 +180,7 @@ class KetuaController extends Controller
             ->findOrFail($id);
 
         $ekskuls = $pembina->ekskuls()->with('ketua')->orderBy('nama_ekskul')->get();
-        $kelas = Kelas::orderBy('tingkat')->orderBy('jurusan')->orderBy('rombel')->get();
+        $kelas = Kelas::orderBy('tingkat')->orderBy('program_keahlian')->orderBy('rombel')->get();
 
         $ekskulSaatIni = Ekskul::whereIn('id_ekskul', $ekskulIds)
             ->where('id_ketua', $siswa->id_siswa)
