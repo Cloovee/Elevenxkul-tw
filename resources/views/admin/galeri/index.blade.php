@@ -4,7 +4,7 @@
 @section('page-title', 'Kelola Galeri Ekstrakurikuler')
 
 @section('content')
-<div class="bg-white rounded-3xl shadow-[0_4px_24px_-8px_rgba(0,0,0,0.05)] border border-gray-50 p-6">
+<div class="bg-white rounded-3xl shadow-[0_4px_24px_-8px_rgba(0,0,0,0.05)] border border-gray-50 p-4 sm:p-6">
 
     <div class="flex flex-wrap justify-between items-center gap-4 mb-4">
         <div>

@@ -7,9 +7,9 @@
     <title>Validasi Absensi Pelatih — ElevenXkul</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="font-body bg-bgsoft text-ink min-h-screen">
+<body class="overflow-x-hidden font-body bg-bgsoft text-ink min-h-screen">
 
-<div class="flex gap-5 p-5 min-h-screen">
+<div class="flex flex-col lg:flex-row gap-5 p-5 min-h-screen">
 
     @include('pembina.partials.sidebar', ['active' => 'validasi'])
 

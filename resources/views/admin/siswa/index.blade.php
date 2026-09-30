@@ -4,7 +4,7 @@
 @section('page-title', 'Data Siswa')
 
 @section('content')
-<div class="bg-white rounded-3xl shadow-[0_4px_24px_-8px_rgba(0,0,0,0.05)] border border-gray-50 p-6">
+<div class="bg-white rounded-3xl shadow-[0_4px_24px_-8px_rgba(0,0,0,0.05)] border border-gray-50 p-4 sm:p-6">
 
     <!-- Header: Judul + Search + Aksi -->
     <div class="flex flex-wrap justify-between items-center gap-4 mb-4">
@@ -56,7 +56,7 @@
 
     <!-- Table -->
     <div class="overflow-x-auto">
-        <table class="min-w-full text-sm">
+        <table class="rtable min-w-full text-sm">
             <thead>
                 <tr class="text-left text-[#7C8DB5] text-[11px] font-bold uppercase tracking-wider border-b border-gray-100">
                     <th class="px-3 py-3">No</th>
@@ -76,22 +76,22 @@
             <tbody class="divide-y divide-ink/5">
                 @forelse($siswa as $key => $s)
                 <tr class="hover:bg-[#F2F7FF]/60 transition-colors">
-                    <td class="px-3 py-3 text-[#7C8DB5] font-medium">{{ $siswa->firstItem() + $key }}</td>
-                    <td class="px-3 py-3 text-[#10316B] font-semibold whitespace-nowrap">{{ $s->NISN }}</td>
-                    <td class="px-3 py-3 text-[#10316B] whitespace-nowrap">{{ $s->NIS }}</td>
-                    <td class="px-3 py-3 text-[#10316B] font-bold whitespace-nowrap">{{ $s->nama_siswa }}</td>
-                    <td class="px-3 py-3">
+                    <td data-label="No" class="px-3 py-3 text-[#7C8DB5] font-medium">{{ $siswa->firstItem() + $key }}</td>
+                    <td data-label="NISN" class="px-3 py-3 text-[#10316B] font-semibold whitespace-nowrap">{{ $s->NISN }}</td>
+                    <td data-label="NIS" class="px-3 py-3 text-[#10316B] whitespace-nowrap">{{ $s->NIS }}</td>
+                    <td data-label="Nama" data-primary class="px-3 py-3 text-[#10316B] font-bold whitespace-nowrap">{{ $s->nama_siswa }}</td>
+                    <td data-label="JK" class="px-3 py-3">
                         <span class="px-2 py-1 rounded-full text-[10px] font-bold {{ $s->jk == 'L' ? 'bg-sky/15 text-sky-500' : 'bg-pink-50 text-pink-500' }}">
                             {{ $s->jk }}
                         </span>
                     </td>
-                    <td class="px-3 py-3 text-[#10316B] whitespace-nowrap">{{ $s->nama_kelas }}</td>
-                    <td class="px-3 py-3 text-[#7C8DB5] whitespace-nowrap">{{ $s->agama ?? '-' }}</td>
-                    <td class="px-3 py-3 text-[#7C8DB5] whitespace-nowrap">{{ $s->nomor_hp ?? '-' }}</td>
-                    <td class="px-3 py-3 text-[#7C8DB5] whitespace-nowrap">{{ $s->email ?? '-' }}</td>
-                    <td class="px-3 py-3 text-[#7C8DB5] whitespace-nowrap">{{ $s->medsos ?? '-' }}</td>
-                    <td class="px-3 py-3 text-[#7C8DB5] max-w-xs truncate" title="{{ $s->alamat }}">{{ $s->alamat ?? '-' }}</td>
-                    <td class="px-3 py-3">
+                    <td data-label="Kelas" class="px-3 py-3 text-[#10316B] whitespace-nowrap">{{ $s->nama_kelas }}</td>
+                    <td data-label="Agama" class="px-3 py-3 text-[#7C8DB5] whitespace-nowrap">{{ $s->agama ?? '-' }}</td>
+                    <td data-label="No. HP" class="px-3 py-3 text-[#7C8DB5] whitespace-nowrap">{{ $s->nomor_hp ?? '-' }}</td>
+                    <td data-label="Email" class="px-3 py-3 text-[#7C8DB5] whitespace-nowrap">{{ $s->email ?? '-' }}</td>
+                    <td data-label="MedSos" class="px-3 py-3 text-[#7C8DB5] whitespace-nowrap">{{ $s->medsos ?? '-' }}</td>
+                    <td data-label="Alamat" class="px-3 py-3 text-[#7C8DB5] max-w-xs truncate" title="{{ $s->alamat }}">{{ $s->alamat ?? '-' }}</td>
+                    <td data-label="Aksi" class="px-3 py-3">
                         <div class="flex gap-2">
                             <a href="{{ route('admin.siswa.edit', $s->id_siswa) }}" class="w-8 h-8 flex items-center justify-center rounded-lg bg-amber-50 text-amber-500 hover:bg-amber-500 hover:text-white transition-colors" title="Edit">
                                 <i class="fas fa-pen text-xs"></i>

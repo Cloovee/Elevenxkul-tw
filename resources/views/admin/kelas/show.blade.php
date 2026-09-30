@@ -60,7 +60,7 @@
         </div>
     </div>
 
-    <div class="flex items-center gap-3 mt-6 pt-6 border-t border-[#F3F4FC]">
+    <div class="flex flex-wrap items-center gap-3 mt-6 pt-6 border-t border-[#F3F4FC]">
         <a href="{{ route('admin.ekskul.edit', $ekskul->id_ekskul) }}" class="px-6 py-2.5 bg-gradient-to-r from-sky to-periwinkle text-white font-semibold rounded-xl hover:opacity-90 transition shadow-md shadow-periwinkle/30">
             <i class="fas fa-edit mr-2"></i>Edit
         </a>

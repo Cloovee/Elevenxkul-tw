@@ -23,9 +23,11 @@
             --display:'Fredoka',system-ui,sans-serif;--body:'Plus Jakarta Sans',system-ui,sans-serif;
             --card:0 4px 24px -8px rgba(16,49,107,.10);--card-hover:0 24px 44px -20px rgba(11,64,156,.35);--ease:cubic-bezier(.16,1,.3,1)}
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-        html{scroll-behavior:smooth;scroll-padding-top:1.5rem}
+        html{scroll-behavior:smooth;scroll-padding-top:1.5rem;-webkit-text-size-adjust:100%;text-size-adjust:100%}
         body{font-family:var(--body);color:var(--navy);background:var(--cloud);line-height:1.65;overflow-x:hidden;-webkit-font-smoothing:antialiased}
         img{display:block;max-width:100%}
+        [hidden]{display:none!important}
+        .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
         a{color:inherit;text-decoration:none}
         :focus-visible{outline:3px solid var(--blue);outline-offset:3px;border-radius:12px}
         .wrap{width:min(1160px,92%);margin-inline:auto}
@@ -42,6 +44,9 @@
         .btn-soft{background:#fff;color:var(--navy);box-shadow:var(--card)}
         .btn-soft:hover{background:var(--navy);color:#fff}
         .btn-gold{background:var(--gold);color:var(--navy)}
+        .cta{display:flex;flex-wrap:wrap;gap:.7rem}
+        .btn-flat{box-shadow:none;background:var(--cloud)}
+        .btn-flat:hover{background:var(--navy)}
 
         /* ---------- Latar lembut (sama seperti layout admin) ---------- */
         .blob{position:absolute;border-radius:50%;filter:blur(64px);pointer-events:none;z-index:0}
@@ -77,6 +82,12 @@
             .rail:hover~.r-back,.rail:focus-within~.r-back{opacity:1;visibility:visible}
         }
         .content{padding-left:var(--rail)}
+        @media(max-width:1023px){
+            .rail{gap:.25rem;padding:.4rem;border-radius:1.25rem}
+            .r-link{flex:1 1 0;min-width:0;max-width:2.75rem;justify-content:center}
+            .r-ico{width:100%}
+        }
+        @media(max-width:420px){.r-top{display:none}}
 
         /* ---------- Lipat sidebar: jadi satu ikon melayang di pojok kiri bawah ---------- */
         .rail{transition:width .32s cubic-bezier(.4,0,.2,1),box-shadow .32s,transform .55s var(--ease),opacity .35s}
@@ -95,7 +106,7 @@
         @media(min-width:1024px){.hero{padding-top:3rem}}
 
         /* ---------- Hero: carousel ekskul (coverflow 3D) ---------- */
-        .hero{position:relative;min-height:100svh;display:flex;flex-direction:column;color:#fff;overflow:hidden;isolation:isolate;background:var(--navy);padding:6.5rem 0 4.5rem}
+        .hero{position:relative;min-height:100vh;min-height:100svh;display:flex;flex-direction:column;color:#fff;overflow:hidden;isolation:isolate;background:var(--navy);padding:6.5rem 0 4.5rem}
         /* Latar hero: foto sekolah dengan opasitas 70% (ubah --hero-bg-opacity kalau mau lebih pekat/transparan) */
         :root{--hero-bg-opacity:.7}
         .hero-bg{position:absolute;left:0;top:-20%;width:100%;height:140%;z-index:-2;background:url('{{ $foto }}') center/cover no-repeat;opacity:var(--hero-bg-opacity);will-change:transform}
@@ -105,6 +116,7 @@
         .hero .sub{margin-top:.6rem;max-width:52ch;color:rgba(255,255,255,.9);text-shadow:0 1px 10px rgba(0,0,0,.45)}
         .cf{position:relative;flex:1;display:grid;place-items:center;margin-left:var(--rail);perspective:1500px;touch-action:pan-y;user-select:none;--ch:clamp(340px,66svh,640px);--cw:calc(var(--ch)*.58);min-height:calc(var(--ch) + 3rem)}
         .cf:focus-visible{outline-offset:-8px}
+        @supports not (height:100svh){.cf{--ch:clamp(340px,66vh,640px)}}
         .cf-card{position:absolute;left:50%;top:50%;width:var(--cw);height:var(--ch);margin:calc(var(--ch)/-2) 0 0 calc(var(--cw)/-2);border-radius:1.1rem;overflow:hidden;background:var(--blue);box-shadow:0 30px 50px -20px rgba(0,0,0,.6);cursor:pointer;will-change:transform,opacity}
         .cf-card.on{cursor:default}
         .cf-card img{width:100%;height:100%;object-fit:cover;pointer-events:none}
@@ -116,6 +128,7 @@
         .cf-title{font:700 clamp(1.25rem,2.1vw,1.9rem) var(--display);text-transform:uppercase;letter-spacing:.04em;line-height:1.1;text-shadow:0 2px 18px rgba(0,0,0,.5)}
         .cf-line{width:2.2rem;height:2px;background:#fff;margin:.9rem 0 .6rem}
         .cf-sub{font-size:.95rem;text-shadow:0 1px 10px rgba(0,0,0,.5)}
+        .cf-title,.cf-sub{overflow-wrap:anywhere}
         .cf-go{pointer-events:auto;margin-top:.9rem;padding:.55rem 1.2rem;font-size:.85rem}
         .cf-arrow{position:absolute;top:50%;translate:0 -50%;z-index:20;width:3rem;height:3rem;border:0;border-radius:50%;background:rgba(255,255,255,.14);backdrop-filter:blur(6px);color:#fff;cursor:pointer;display:grid;place-items:center;opacity:var(--o,0);transition:background .3s,color .3s,transform .3s var(--ease)}
         .cf-arrow svg{width:22px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
@@ -124,14 +137,20 @@
         .cf-meta{opacity:var(--o,0);margin-left:var(--rail);text-align:center;font:600 1rem var(--display);position:relative;z-index:5}
         .cf-meta span{color:rgba(255,255,255,.6);font-weight:500}
         .folded .cf-arrow,.folded .cf-go{pointer-events:none}
+        @media(max-width:600px){
+            .hero{padding:5.6rem 0 4rem}
+            .hero-top{padding-inline:calc(var(--rail) + 1.1rem) 1.1rem}
+            .cf{--ch:clamp(300px,58svh,520px);--cw:calc(var(--ch)*.68)}
+            .cf-cap{width:calc(var(--cw) - 1.8rem);bottom:calc(50% - var(--ch)/2 + 1.1rem)}
+            .cf-sub{font-size:.85rem}
+        }
         .cf-empty{margin:auto;padding:2rem;text-align:center;color:rgba(255,255,255,.85)}
         .stats{position:relative;z-index:2;margin-top:-3rem;display:grid;grid-template-columns:repeat(4,1fr);padding:1.6rem 1rem}
         .stat{text-align:center;padding:.2rem 1rem}
         .stat+.stat{border-left:1px solid var(--line)}
         .stat b{display:block;font:700 2.1rem var(--display);color:var(--blue);line-height:1.1}
         .stat span{font-size:.85rem;color:var(--mute)}
-        @media(max-width:860px){.stats{grid-template-columns:repeat(2,1fr);row-gap:1.2rem}.stat:nth-child(3){border-left:0}.cf-arrow{width:2.6rem;height:2.6rem}.cf-arrow.pv{left:.4rem}.cf-arrow.nx{right:.4rem}}
-        .card.flash{animation:flash 1.6s ease}
+        @media(max-width:860px){.stats{grid-template-columns:repeat(2,1fr);row-gap:1.2rem}.stat:nth-child(3){border-left:0}.stat:nth-child(n+3){border-top:1px solid var(--line);padding-top:1.2rem}.cf-arrow{width:2.6rem;height:2.6rem}.cf-arrow.pv{left:.4rem}.cf-arrow.nx{right:.4rem}}
         @keyframes flash{0%,60%{box-shadow:0 0 0 4px var(--gold),var(--card-hover)}100%{box-shadow:var(--card)}}
 
         /* ---------- Sekolah + video ---------- */
@@ -151,41 +170,93 @@
         @media(max-width:860px){.school{grid-template-columns:1fr}.school-panel{padding:1rem}}
 
         /* ---------- Ekskul ---------- */
-        .head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:end;gap:1.2rem;margin-bottom:2rem}
+        .head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:end;gap:1.2rem;margin-bottom:1.4rem}
+        .toolbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.8rem 1.2rem;margin-bottom:1.4rem}
+        .search{position:relative;flex:1 1 240px;max-width:360px}
+        .search svg{position:absolute;left:1rem;top:50%;translate:0 -50%;width:1.05rem;height:1.05rem;fill:none;stroke:var(--mute);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;pointer-events:none}
+        .search input{width:100%;-webkit-appearance:none;appearance:none;font:500 1rem var(--body);color:var(--navy);padding:.7rem 1rem .7rem 2.6rem;border-radius:999px;border:1px solid var(--line);background:#fff;box-shadow:var(--card)}
+        .search input::placeholder{color:var(--mute);opacity:.8}
         .chips{display:flex;flex-wrap:wrap;gap:.45rem}
-        .chip{border:0;background:#fff;color:var(--mute);font:600 .85rem var(--body);padding:.55rem 1.15rem;border-radius:999px;cursor:pointer;box-shadow:var(--card);transition:background .25s,color .25s,transform .3s var(--ease)}
+        .chip{flex:none;border:0;background:#fff;color:var(--mute);font:600 .85rem var(--body);padding:.55rem 1.15rem;border-radius:999px;cursor:pointer;box-shadow:var(--card);transition:background .25s,color .25s,transform .3s var(--ease)}
         .chip:hover{transform:translateY(-2px);color:var(--navy)}
         .chip[aria-pressed=true]{background:var(--blue);color:#fff}
-        .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.4rem;align-items:start}
-        .card{background:#fff;border-radius:1.8rem;padding:.8rem;box-shadow:var(--card);border:1px solid #F3F6FC;transition:transform .5s var(--ease),box-shadow .5s var(--ease)}
-        .card:hover,.card:focus-visible{transform:translateY(-8px);box-shadow:var(--card-hover)}
-        .card[hidden]{display:none}
-        .cover{position:relative;aspect-ratio:16/10;border-radius:1.3rem;overflow:hidden;background:var(--cloud)}
+        /* Kartu ringkas: 2 kolom di ponsel, 3-4 kolom di layar lebar. Jumlah yang tampil dibatasi lewat tombol "Tampilkan lebih banyak". */
+        .cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.8rem;align-items:stretch}
+        .cards>.empty{grid-column:1/-1}
+        @media(min-width:600px){.cards{grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1.2rem}}
+        .card{display:flex;flex-direction:column;min-width:0;background:#fff;border-radius:1.4rem;padding:.5rem;box-shadow:var(--card);border:1px solid #F3F6FC;cursor:pointer;transition:transform .5s var(--ease),box-shadow .5s var(--ease)}
+        .card:hover{transform:translateY(-6px);box-shadow:var(--card-hover)}
+        .card:focus-visible{transform:translateY(-6px);box-shadow:var(--card-hover)}
+        .cover{position:relative;flex:none;aspect-ratio:4/3;border-radius:1rem;overflow:hidden;background:var(--cloud)}
         .cover img{width:100%;height:100%;object-fit:cover;transition:transform .8s var(--ease)}
-        .card:hover .cover img,.card:focus-visible .cover img{transform:scale(1.08)}
-        .ph{position:absolute;inset:0;display:grid;place-items:center;font:700 4.5rem var(--display);color:var(--blue);background:linear-gradient(135deg,#E4EEFF,#F7FAFF)}
-        .tag{position:absolute;left:.8rem;top:.8rem;padding:.28rem .8rem;border-radius:999px;font-size:.72rem;font-weight:700;background:var(--gold);color:var(--navy)}
+        .card:hover .cover img{transform:scale(1.08)}
+        .ph{position:absolute;inset:0;display:grid;place-items:center;font:700 3.5rem var(--display);color:var(--blue);background:linear-gradient(135deg,#E4EEFF,#F7FAFF)}
+        .tag{position:absolute;left:.6rem;top:.6rem;max-width:calc(100% - 1.2rem);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:.22rem .7rem;border-radius:999px;font-size:.68rem;font-weight:700;background:var(--gold);color:var(--navy)}
         .tag.k-organisasi{background:var(--blue);color:#fff}.tag.k-komunitas{background:var(--navy);color:#fff}
-        .card-body{padding:1.1rem .7rem .8rem}
-        .card h3{font-size:1.35rem}
-        .desc{margin-top:.5rem;font-size:.9rem;color:var(--mute);max-height:4.6em;overflow:hidden;transition:max-height .7s var(--ease)}
-        .card:hover .desc,.card:focus-visible .desc{max-height:18em}
+        .card-body{display:flex;flex-direction:column;flex:1;padding:.75rem .45rem .45rem}
+        .card h3{font-size:1.05rem;line-height:1.2;overflow-wrap:anywhere}
+        .desc{margin-top:.35rem;font-size:.82rem;line-height:1.5;color:var(--mute);display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden;overflow-wrap:anywhere}
+        .count{margin-top:auto;padding-top:.7rem;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:.2rem .6rem;font-size:.8rem;color:var(--mute)}
+        .count b{font:700 1.1rem var(--display);color:var(--blue)}
+        .count .go{font-weight:700;color:var(--blue)}
+        .card.flash{animation:flash 1.6s ease}
+        .enter{animation:enter .55s var(--ease) both}
+        @keyframes enter{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+        .empty{padding:3rem 1.5rem;text-align:center;color:var(--mute);background:#fff;border-radius:1.8rem;box-shadow:var(--card)}
+        .more-wrap{display:flex;flex-direction:column;align-items:center;gap:.8rem;margin-top:1.8rem}
+        .more-info{font-size:.85rem;color:var(--mute)}
+        .more-info:empty{display:none}
         .meta{margin-top:1rem;padding:.9rem 1rem;border-radius:1.1rem;background:var(--cloud);display:grid;gap:.35rem;font-size:.85rem}
         .meta div{display:flex;gap:.6rem}
         .meta dt{width:4.2rem;flex:none;color:var(--mute)}
-        .meta dd{font-weight:700}
-        .count{margin-top:.9rem;font-size:.85rem;color:var(--mute)}
-        .count b{font:700 1.25rem var(--display);color:var(--blue)}
-        .empty{padding:3rem;text-align:center;color:var(--mute);background:#fff;border-radius:1.8rem;box-shadow:var(--card)}
+        .meta dd{font-weight:700;min-width:0;overflow-wrap:anywhere}
+        @media(max-width:600px){
+            .search{max-width:none;flex-basis:100%}
+            /* chip kategori jadi satu baris yang bisa digeser, hemat tinggi layar */
+            .chips{flex:0 0 auto;flex-wrap:nowrap;overflow-x:auto;width:calc(100% + 8vw);margin-inline:-4vw;padding:.2rem 4vw .7rem;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+            .chips::-webkit-scrollbar{display:none}
+            .toolbar{margin-bottom:.6rem}
+            .card{border-radius:1.2rem;padding:.4rem}
+            .cover{border-radius:.85rem}
+            .card-body{padding:.65rem .35rem .35rem}
+            .card h3{font-size:.98rem}
+            .ph{font-size:3rem}
+        }
+
+        /* ---------- Detail ekskul (pop-up) ---------- */
+        .dlg{position:fixed;inset:0;margin:auto;width:min(92vw,520px);max-width:none;max-height:min(90vh,760px);max-height:min(90svh,760px);padding:0;border:0;border-radius:1.8rem;background:#fff;color:var(--navy);box-shadow:0 40px 80px -20px rgba(16,49,107,.55);overflow:hidden}
+        .dlg[open]{display:flex;flex-direction:column;animation:dlgIn .4s var(--ease)}
+        .dlg::backdrop{background:rgba(16,49,107,.45);backdrop-filter:blur(4px)}
+        @keyframes dlgIn{from{opacity:0;transform:translateY(24px) scale(.97)}to{opacity:1;transform:none}}
+        html:has(.dlg[open]){overflow:hidden}
+        .dlg-x{position:absolute;z-index:2;top:.8rem;right:.8rem;width:2.5rem;height:2.5rem;border:0;border-radius:50%;background:rgba(255,255,255,.92);color:var(--navy);cursor:pointer;display:grid;place-items:center;box-shadow:0 4px 12px -2px rgba(0,0,0,.25);transition:background .25s,color .25s}
+        .dlg-x:hover{background:var(--navy);color:#fff}
+        .dlg-x svg{width:1.1rem;height:1.1rem;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round}
+        .dlg-cover{position:relative;flex:none;aspect-ratio:16/9;max-height:36vh;max-height:36svh;background:var(--cloud)}
+        .dlg-cover img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+        .dlg-cover .tag{left:1rem;top:1rem;font-size:.75rem}
+        .dlg-body{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:1.4rem 1.5rem 1.6rem}
+        .dlg-body h3{font-size:1.6rem;overflow-wrap:anywhere}
+        .dlg-desc{margin-top:.6rem;color:var(--mute);font-size:.95rem;white-space:pre-line;overflow-wrap:anywhere}
+        .dlg-body .count{margin-top:1rem;padding-top:0;justify-content:flex-start;font-size:.9rem}
+        @media(max-width:560px){
+            .dlg{width:100%;margin:auto 0 0;border-radius:1.6rem 1.6rem 0 0;max-height:88vh;max-height:88svh}
+            .dlg-body{padding:1.1rem 1.1rem calc(1.4rem + env(safe-area-inset-bottom,0px))}
+            .dlg-body h3{font-size:1.4rem}
+        }
 
         /* ---------- Pembina ---------- */
-        .plist{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:1rem;margin-top:2rem}
+        .plist{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,250px),1fr));gap:1rem;margin-top:2rem}
+        @media(max-width:560px){.plist{gap:.7rem;margin-top:1.4rem}.person{padding:.8rem 1rem}.avatar{width:50px;height:50px}}
         .person{display:flex;align-items:center;gap:1rem;padding:1rem 1.2rem;border-radius:1.5rem;background:#fff;box-shadow:var(--card);border:1px solid #F3F6FC;transition:transform .45s var(--ease),background .35s,color .35s}
         .person:hover{transform:translateY(-5px);background:var(--navy);color:#fff}
         .avatar{width:58px;height:58px;flex:none;border-radius:50%;object-fit:cover;display:grid;place-items:center;background:var(--blue);color:#fff;font:600 1.1rem var(--display);transition:transform .5s var(--ease)}
         .person:hover .avatar{transform:scale(1.08)}
         .person h3{font-size:1.02rem;font-weight:600}
         .person p{font-size:.8rem;color:var(--mute);margin-top:.15rem;transition:color .3s}
+        .person>div:last-child{min-width:0}
+        .person{min-width:0}
+        .person h3,.person p{overflow-wrap:anywhere}
         .person:hover p{color:rgba(255,255,255,.75)}
 
         /* ---------- Pita parallax ---------- */
@@ -193,7 +264,7 @@
         .band img{position:absolute;left:0;top:-20%;width:100%;height:140%;object-fit:cover;z-index:-2;will-change:transform}
         .band::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(rgba(16,49,107,.8),rgba(11,64,156,.78))}
         .band h2{max-width:22ch;margin:0 auto}
-        .band .cta{justify-content:center}
+        .band .cta{justify-content:center;margin-top:1.8rem}
 
         /* ---------- Galeri ---------- */
         .gal-panel{padding:clamp(1.5rem,4vw,3rem)}
@@ -226,16 +297,40 @@
         .addr .cta{margin-top:auto;padding-top:1rem;flex-direction:column;align-items:stretch}
         .map{border-radius:2rem;overflow:hidden;min-height:380px;background:#fff;box-shadow:var(--card);border:6px solid #fff}
         .map iframe{display:block;width:100%;height:100%;min-height:368px;border:0}
-        @media(max-width:860px){.mapgrid{grid-template-columns:1fr}}
+        @media(max-width:860px){.mapgrid{grid-template-columns:1fr}.map{min-height:320px}.map iframe{min-height:308px}}
 
+        @media(max-width:860px){.g-info .d{min-height:3.6em}}
         footer{padding:2rem 0 2.5rem var(--rail);font-size:.88rem;color:var(--mute)}
         footer .wrap{display:flex;flex-wrap:wrap;gap:1rem;justify-content:space-between;align-items:center;border-top:1px solid var(--line);padding-top:1.6rem}
+        @media(max-width:560px){
+            .head{margin-bottom:1.4rem}
+            .chip{padding:.5rem .95rem;font-size:.8rem}
+            .school-info{padding:.8rem .5rem .5rem}
+            .addr{padding:1.4rem}
+            .band{border-radius:1.6rem;padding-inline:1.1rem}
+            .gal-panel{padding:1.1rem}
+            footer .wrap{flex-direction:column;text-align:center}
+        }
+
+        /* ---------- Layar sentuh: tanpa efek hover yang menempel setelah ketukan ---------- */
+        @media(hover:none){
+            .card:hover,.card:focus-visible{transform:none;box-shadow:var(--card)}
+            .card:hover .cover img{transform:none}
+            .person:hover{transform:none;background:#fff;color:var(--navy)}
+            .person:hover p{color:var(--mute)}
+            .person:hover .avatar{transform:none}
+            .btn:hover,.chip:hover{transform:none}
+            .arrow:hover{background:var(--cloud);color:var(--navy)}
+            .arrow.nx:hover svg,.arrow.pv:hover svg{transform:none}
+            .cf-arrow:hover{background:rgba(255,255,255,.14);color:#fff}
+        }
 
         /* ---------- Efek muncul saat di-scroll (kelas ditambahkan lewat JS) ---------- */
         .reveal{opacity:0;transform:translate3d(0,38px,0);transition:opacity .9s var(--ease),transform 1s var(--ease);transition-delay:var(--rd,0ms);will-change:opacity,transform}
         .reveal[data-r=zoom]{transform:scale(.93)}
         .reveal[data-r=left]{transform:translate3d(-56px,0,0)}
         .reveal[data-r=right]{transform:translate3d(56px,0,0)}
+        @media(max-width:860px){.reveal[data-r=left],.reveal[data-r=right]{transform:translate3d(0,38px,0)}}
         .reveal.in{opacity:1;transform:none}
 
         @media(prefers-reduced-motion:reduce){
@@ -353,47 +448,67 @@
             <div class="head">
                 <div>
                     <h2>Ekstrakurikuler</h2>
-                    <p class="lead">Arahkan kursor ke kartu (atau ketuk di ponsel) untuk membaca deskripsi lengkap.</p>
+                    <p class="lead">Cari atau saring ekskul, lalu ketuk kartunya untuk melihat deskripsi lengkap dan pengurusnya.</p>
                 </div>
-                @if($ekskuls->isNotEmpty())
+            </div>
+
+            @if($ekskuls->isNotEmpty())
+            <div class="toolbar">
+                <label class="search">
+                    <span class="sr">Cari ekskul</span>
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+                    <input type="search" id="ek-q" placeholder="Cari ekskul, pembina, pelatih..." autocomplete="off" enterkeyhint="search">
+                </label>
                 <div class="chips" role="group" aria-label="Filter kategori">
-                    <button class="chip" data-f="all" aria-pressed="true">Semua</button>
+                    <button type="button" class="chip" data-f="all" aria-pressed="true">Semua</button>
                     @foreach($kat as $k => $label)
                         @if($ekskuls->contains('kategori', $k))
-                            <button class="chip" data-f="{{ $k }}" aria-pressed="false">{{ $label }}</button>
+                            <button type="button" class="chip" data-f="{{ $k }}" aria-pressed="false">{{ $label }}</button>
                         @endif
                     @endforeach
                 </div>
-                @endif
             </div>
+            @endif
 
-            <div class="cards">
+            <div class="cards" id="ek-grid">
                 @forelse($ekskuls as $e)
-                    @php $sampul = $e->cover_url; @endphp
-                    <article class="card" id="ekskul-{{ $e->id_ekskul }}" tabindex="0" data-kat="{{ $e->kategori }}">
+                    @php $sampul = $e->cover_url; $labelKat = $kat[$e->kategori] ?? ucfirst($e->kategori); @endphp
+                    <article class="card" id="ekskul-{{ $e->id_ekskul }}" tabindex="0" role="button" aria-haspopup="dialog"
+                        data-kat="{{ $e->kategori }}"
+                        data-tag="{{ $labelKat }}"
+                        data-nama="{{ $e->nama_ekskul }}"
+                        data-desc="{{ $e->deskripsi }}"
+                        data-img="{{ $sampul }}"
+                        data-pembina="{{ $e->pembina->nama_pembina ?? 'Belum ditentukan' }}"
+                        data-pelatih="{{ $e->pelatih->nama_pelatih ?? 'Belum ada' }}"
+                        data-ketua="{{ $e->ketua->nama_siswa ?? 'Belum ditentukan' }}"
+                        data-anggota="{{ $e->anggota_aktif }}">
                         <div class="cover">
                             @if($sampul)
                                 <img src="{{ $sampul }}" alt="Kegiatan {{ $e->nama_ekskul }}" loading="lazy">
                             @else
                                 <span class="ph" aria-hidden="true">{{ strtoupper(mb_substr($e->nama_ekskul, 0, 1)) }}</span>
                             @endif
-                            <span class="tag k-{{ $e->kategori }}">{{ $kat[$e->kategori] ?? ucfirst($e->kategori) }}</span>
+                            <span class="tag k-{{ $e->kategori }}">{{ $labelKat }}</span>
                         </div>
                         <div class="card-body">
                             <h3>{{ $e->nama_ekskul }}</h3>
                             <p class="desc">{{ $e->deskripsi ?: 'Deskripsi belum ditambahkan.' }}</p>
-                            <dl class="meta">
-                                <div><dt>Pembina</dt><dd>{{ $e->pembina->nama_pembina ?? 'Belum ditentukan' }}</dd></div>
-                                <div><dt>Pelatih</dt><dd>{{ $e->pelatih->nama_pelatih ?? 'Belum ada' }}</dd></div>
-                                <div><dt>Ketua</dt><dd>{{ $e->ketua->nama_siswa ?? 'Belum ditentukan' }}</dd></div>
-                            </dl>
-                            <p class="count"><b>{{ $e->anggota_aktif }}</b> anggota aktif</p>
+                            <p class="count"><span><b>{{ $e->anggota_aktif }}</b> anggota</span><span class="go">Detail &rarr;</span></p>
                         </div>
                     </article>
                 @empty
                     <p class="empty">Belum ada ekskul. Data akan tampil di sini setelah admin menambahkannya.</p>
                 @endforelse
             </div>
+
+            @if($ekskuls->isNotEmpty())
+            <p class="empty" id="ek-none" hidden>Tidak ada ekskul yang cocok dengan pencarianmu. Coba kata kunci atau kategori lain.</p>
+            <div class="more-wrap">
+                <p class="more-info" id="ek-info" aria-live="polite"></p>
+                <button type="button" class="btn btn-soft" id="ek-more" hidden></button>
+            </div>
+            @endif
         </div>
     </section>
 
@@ -403,7 +518,7 @@
         <div class="wrap">
             <h2>Pembina ekskul</h2>
             <p class="lead">Guru yang mendampingi dan bertanggung jawab atas kegiatan ekskul.</p>
-            <div class="plist">
+            <div class="plist" id="pb-grid">
                 @foreach($pembina as $p)
                     <div class="person">
                         @if($p->foto_url)
@@ -417,6 +532,10 @@
                         </div>
                     </div>
                 @endforeach
+            </div>
+            <div class="more-wrap">
+                <p class="more-info" id="pb-info" aria-live="polite"></p>
+                <button type="button" class="btn btn-soft" id="pb-more" hidden></button>
             </div>
         </div>
     </section>
@@ -484,7 +603,7 @@
                     <p>{{ $sekolah['alamat'] }}</p>
                     <div class="cta">
                         <a class="btn btn-blue" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination={{ $q }}">Petunjuk arah</a>
-                        <a class="btn btn-soft" style="box-shadow:none;background:var(--cloud)" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query={{ $q }}">Buka di Google Maps</a>
+                        <a class="btn btn-soft btn-flat" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query={{ $q }}">Buka di Google Maps</a>
                     </div>
                 </div>
                 <div class="map">
@@ -507,6 +626,26 @@
         @endauth
     </div>
 </footer>
+
+{{-- Pop-up detail ekskul (diisi lewat JS dari atribut data-* pada kartu) --}}
+<dialog class="dlg" id="ek-dlg" aria-labelledby="dlg-title">
+    <button type="button" class="dlg-x" aria-label="Tutup"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    <div class="dlg-cover">
+        <img id="dlg-img" alt="" hidden>
+        <span class="ph" id="dlg-ph" aria-hidden="true"></span>
+        <span class="tag" id="dlg-tag"></span>
+    </div>
+    <div class="dlg-body">
+        <h3 id="dlg-title"></h3>
+        <p class="dlg-desc" id="dlg-desc"></p>
+        <dl class="meta">
+            <div><dt>Pembina</dt><dd id="dlg-pembina"></dd></div>
+            <div><dt>Pelatih</dt><dd id="dlg-pelatih"></dd></div>
+            <div><dt>Ketua</dt><dd id="dlg-ketua"></dd></div>
+        </dl>
+        <p class="count"><span><b id="dlg-n">0</b> anggota aktif</span></p>
+    </div>
+</dialog>
 
 <script>
 (() => {
@@ -546,14 +685,84 @@
         playBtn.replaceWith(f);
     });
 
-    /* Filter kategori ekskul */
-    const chips = document.querySelectorAll('.chip');
-    chips.forEach(c => c.addEventListener('click', () => {
-        chips.forEach(x => x.setAttribute('aria-pressed', x === c));
-        document.querySelectorAll('.card').forEach(card => {
-            card.hidden = c.dataset.f !== 'all' && card.dataset.kat !== c.dataset.f;
+    /* ===== Pager: batasi kartu yang tampil supaya halaman tidak memanjang =====
+       Jumlah awal = jumlah kolom x 3 baris (minimal 6), lalu tombol menambah per batch yang sama. */
+    const makePager = ({ grid, items, btn, info, none, unit, rows = 3, min = 6 }) => {
+        let pages = 1, pred = () => true;
+        const cols = () => getComputedStyle(grid).gridTemplateColumns.split(' ').filter(Boolean).length || 1;
+        const step = () => Math.max(min, cols() * rows);
+        const render = anim => {
+            const lim = step() * pages; let seen = 0, shown = 0;
+            items.forEach(el => {
+                const vis = pred(el) && seen++ < lim;
+                if (vis) shown++;
+                if (vis && el.hidden && anim) { el.classList.remove('enter'); void el.offsetWidth; el.classList.add('enter'); }
+                el.hidden = !vis;
+            });
+            if (none) none.hidden = seen > 0;
+            if (info) info.textContent = seen ? `Menampilkan ${shown} dari ${seen} ${unit}` : '';
+            if (shown < seen) { btn.hidden = false; btn.dataset.mode = 'more'; btn.textContent = `Tampilkan lebih banyak (${seen - shown} lagi)`; }
+            else if (seen > step()) { btn.hidden = false; btn.dataset.mode = 'less'; btn.textContent = 'Tampilkan lebih sedikit'; }
+            else btn.hidden = true;
+        };
+        btn.addEventListener('click', () => {
+            if (btn.dataset.mode === 'more') { pages++; render(true); }
+            else { pages = 1; render(); (grid.closest('section') || grid).scrollIntoView({ block: 'start' }); }
         });
-    }));
+        addEventListener('resize', () => render());
+        render();
+        return {
+            filter(fn) { pred = fn; pages = 1; render(); },
+            reveal(el) { pred = () => true; pages = Math.max(pages, Math.ceil((items.indexOf(el) + 1) / step())); render(); }
+        };
+    };
+
+    /* Pembina */
+    const pbGrid = document.getElementById('pb-grid');
+    if (pbGrid) makePager({ grid: pbGrid, items: [...pbGrid.querySelectorAll('.person')], btn: document.getElementById('pb-more'), info: document.getElementById('pb-info'), unit: 'pembina' });
+
+    /* Ekskul: pencarian + filter kategori + pager */
+    const ekGrid = document.getElementById('ek-grid');
+    const ekItems = ekGrid ? [...ekGrid.querySelectorAll('.card')] : [];
+    const chips = [...document.querySelectorAll('.chip')], ekQ = document.getElementById('ek-q');
+    let ekPager = null, ekCat = 'all', ekTerm = '';
+    if (ekItems.length) {
+        ekItems.forEach(c => { const d = c.dataset; d.q = [d.nama, d.tag, d.pembina, d.pelatih, d.ketua].join(' ').toLowerCase(); });
+        ekPager = makePager({ grid: ekGrid, items: ekItems, btn: document.getElementById('ek-more'), info: document.getElementById('ek-info'), none: document.getElementById('ek-none'), unit: 'ekskul' });
+        const apply = () => ekPager.filter(c => (ekCat === 'all' || c.dataset.kat === ekCat) && (!ekTerm || c.dataset.q.includes(ekTerm)));
+        chips.forEach(c => c.addEventListener('click', () => {
+            ekCat = c.dataset.f;
+            chips.forEach(x => x.setAttribute('aria-pressed', x === c));
+            apply();
+        }));
+        ekQ?.addEventListener('input', () => { ekTerm = ekQ.value.trim().toLowerCase(); apply(); });
+    }
+
+    /* Pop-up detail ekskul */
+    const dlg = document.getElementById('ek-dlg');
+    if (dlg && ekItems.length) {
+        const $ = id => document.getElementById(id);
+        const openDetail = c => {
+            const d = c.dataset, img = $('dlg-img'), ph = $('dlg-ph'), tag = $('dlg-tag');
+            $('dlg-title').textContent = d.nama;
+            $('dlg-desc').textContent = d.desc || 'Deskripsi belum ditambahkan.';
+            $('dlg-pembina').textContent = d.pembina;
+            $('dlg-pelatih').textContent = d.pelatih;
+            $('dlg-ketua').textContent = d.ketua;
+            $('dlg-n').textContent = d.anggota;
+            tag.textContent = d.tag; tag.className = 'tag k-' + d.kat;
+            if (d.img) { img.src = d.img; img.alt = 'Kegiatan ' + d.nama; img.hidden = false; ph.hidden = true; }
+            else { img.hidden = true; img.removeAttribute('src'); ph.hidden = false; ph.textContent = d.nama.charAt(0).toUpperCase(); }
+            dlg.showModal();
+            dlg.querySelector('.dlg-body').scrollTop = 0;
+        };
+        ekItems.forEach(c => {
+            c.addEventListener('click', () => openDetail(c));
+            c.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openDetail(c); } });
+        });
+        dlg.addEventListener('click', e => { if (e.target === dlg) dlg.close(); });
+        dlg.querySelector('.dlg-x').addEventListener('click', () => dlg.close());
+    }
 
     /* ===== Carousel ekskul (coverflow) =====
        - Saat halaman dibuka, kartu bertumpuk lalu menyebar pelan selama INTRO ms.
@@ -567,7 +776,7 @@
         const hero = document.getElementById('beranda');
         const cards = [...cf.querySelectorAll('.cf-card')], n = cards.length;
         const cap = document.getElementById('cf-cap');
-        const X = [0, 1.04, 1.9, 2.6], R = [0, 26, 34, 40], Z = [0, -90, -180, -260], S = [1, .86, .72, .6], B = [1, .62, .45, .35];
+        const XD = [0, 1.04, 1.9, 2.6], XM = [0, .8, 1.4, 1.9], R = [0, 26, 34, 40], Z = [0, -90, -180, -260], S = [1, .86, .72, .6], B = [1, .62, .45, .35];
         const curve = (arr, a) => { const i = Math.min(Math.floor(a), 2), t = Math.min(a, 3) - i; return arr[i] + (arr[i + 1] - arr[i]) * t; };
         const easeIO = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
         const idx = () => ((Math.round(target) % n) + n) % n;
@@ -577,7 +786,7 @@
         const offset = i => { let d = i - pos; return d - n * Math.round(d / n); };
 
         const draw = () => {
-            const F = easeIO(spread) * (1 - fold), w = cards[0].offsetWidth;
+            const F = easeIO(spread) * (1 - fold), w = cards[0].offsetWidth, X = innerWidth < 700 ? XM : XD;
             cards.forEach((el, i) => {
                 const d = offset(i), a = Math.abs(d), sg = Math.sign(d);
                 el.style.transform = `translate3d(${(sg * curve(X, a) * w * F).toFixed(1)}px,0,${(curve(Z, a) * F - RECEDE * fold).toFixed(1)}px) rotateX(${(TILT * fold).toFixed(2)}deg) rotateY(${(-sg * curve(R, a) * F).toFixed(2)}deg) scale(${(1 + (curve(S, a) - 1) * F).toFixed(4)})`;
@@ -646,18 +855,25 @@
         });
         cards.forEach((el, i) => el.addEventListener('click', () => { if (!swiped) go(Math.round(offset(i))); }));
 
-        /* "Lihat detail": tampilkan semua kategori lalu sorot kartu ekskul yang dituju */
-        document.getElementById('cf-go')?.addEventListener('click', () => {
-            document.querySelector('.chip[data-f="all"]')?.click();
+        /* "Lihat detail": buka bagian ekskul, pastikan kartunya tampil (reset filter/pencarian), lalu sorot */
+        document.getElementById('cf-go')?.addEventListener('click', e => {
+            e.preventDefault();
             const t = document.querySelector(document.getElementById('cf-go').getAttribute('href'));
-            if (t) { t.classList.remove('flash'); void t.offsetWidth; t.classList.add('flash'); }
+            if (!t) return;
+            if (ekPager) {
+                ekCat = 'all'; ekTerm = ''; if (ekQ) ekQ.value = '';
+                chips.forEach(x => x.setAttribute('aria-pressed', x.dataset.f === 'all'));
+                ekPager.reveal(t);
+            }
+            t.scrollIntoView({ block: 'center' });
+            t.classList.remove('flash'); void t.offsetWidth; t.classList.add('flash');
         });
     }
 
     /* ===== Efek muncul saat scroll: tiap elemen memudar & bergeser masuk begitu terlihat ===== */
     if (!reduce && 'IntersectionObserver' in window) {
         const groups = [
-            ['up',    'section.sec h2, section.sec .lead, .chips, .card, .person, .empty, footer .wrap'],
+            ['up',    'section.sec h2, section.sec .lead, .toolbar, .empty, footer .wrap'],
             ['zoom',  '.stats, .band, .gal-panel'],
             ['left',  '.school .video, .mapgrid .addr'],
             ['right', '.school .school-info, .mapgrid .map']
@@ -715,10 +931,10 @@
     const OUT = 'translate3d(-120%,-8%,0) rotate(-14deg)';
 
     const place = (c, off) => {
-        const s = 1 - off * .06, side = off % 2 ? 1 : -1;
+        const s = 1 - off * .06, side = off % 2 ? 1 : -1, k = Math.max(.35, Math.min(1, stack.offsetWidth / 520));
         c.style.transform = off > 3
             ? 'translate3d(0,0,0) scale(.8)'
-            : `translate3d(${off * 28}px,${off * -9}px,0) rotate(${side * off * 2.2}deg) scale(${s})`;
+            : `translate3d(${(off * 28 * k).toFixed(1)}px,${(off * -9 * k).toFixed(1)}px,0) rotate(${side * off * 2.2}deg) scale(${s})`;
         c.style.opacity = off > 3 ? 0 : 1;
         c.style.filter = `brightness(${1 - off * .08})`;
         c.style.zIndex = n - off;
@@ -767,6 +983,7 @@
     };
 
     render();
+    addEventListener('resize', () => { if (!busy) render(); });
     document.getElementById('g-next')?.addEventListener('click', e => { e.stopPropagation(); go(1); });
     document.getElementById('g-prev')?.addEventListener('click', e => { e.stopPropagation(); go(-1); });
     stack.addEventListener('keydown', e => {

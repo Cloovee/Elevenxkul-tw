@@ -19,7 +19,7 @@
 
                 <!-- 5 Card Total — layout vertikal supaya label tidak pernah kepotong -->
                 <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
-                    <div class="bg-white rounded-2xl px-4 sm:px-5 py-3 sm:py-4 shadow-sm border border-gray-50 flex items-center gap-3">
+                    <div class="bg-white rounded-2xl px-4 sm:px-5 py-3 sm:py-4 shadow-sm border border-gray-50 flex flex-col items-start sm:flex-row sm:items-center gap-2 sm:gap-3">
                         <div class="w-9 h-9 sm:w-10 sm:h-10 bg-[#F2F7FF] rounded-xl flex items-center justify-center text-[#0B409C] flex-shrink-0">
                             <i class="fas fa-building text-base sm:text-lg"></i>
                         </div>
@@ -31,7 +31,7 @@
                         </div>
                     </div>
 
-                    <div class="bg-white rounded-2xl px-4 sm:px-5 py-3 sm:py-4 shadow-sm border border-gray-50 flex items-center gap-3">
+                    <div class="bg-white rounded-2xl px-4 sm:px-5 py-3 sm:py-4 shadow-sm border border-gray-50 flex flex-col items-start sm:flex-row sm:items-center gap-2 sm:gap-3">
                         <div class="w-9 h-9 sm:w-10 sm:h-10 bg-[#FFF9DB] rounded-xl flex items-center justify-center text-orange-400 flex-shrink-0">
                             <i class="fas fa-user-graduate text-base sm:text-lg"></i>
                         </div>
@@ -41,7 +41,7 @@
                         </div>
                     </div>
 
-                    <div class="bg-white rounded-2xl px-4 sm:px-5 py-3 sm:py-4 shadow-sm border border-gray-50 flex items-center gap-3">
+                    <div class="bg-white rounded-2xl px-4 sm:px-5 py-3 sm:py-4 shadow-sm border border-gray-50 flex flex-col items-start sm:flex-row sm:items-center gap-2 sm:gap-3">
                         <div class="w-9 h-9 sm:w-10 sm:h-10 bg-orange-50 rounded-xl flex items-center justify-center text-orange-500 flex-shrink-0">
                             <i class="fas fa-school text-base sm:text-lg"></i>
                         </div>
@@ -51,7 +51,7 @@
                         </div>
                     </div>
 
-                    <div class="bg-white rounded-2xl px-4 sm:px-5 py-3 sm:py-4 shadow-sm border border-gray-50 flex items-center gap-3">
+                    <div class="bg-white rounded-2xl px-4 sm:px-5 py-3 sm:py-4 shadow-sm border border-gray-50 flex flex-col items-start sm:flex-row sm:items-center gap-2 sm:gap-3">
                         <div class="w-9 h-9 sm:w-10 sm:h-10 bg-teal-50 rounded-xl flex items-center justify-center text-teal-500 flex-shrink-0">
                             <i class="fas fa-user-tie text-base sm:text-lg"></i>
                         </div>
@@ -61,7 +61,7 @@
                         </div>
                     </div>
 
-                    <div class="bg-white rounded-2xl px-4 sm:px-5 py-3 sm:py-4 shadow-sm border border-gray-50 flex items-center gap-3">
+                    <div class="bg-white rounded-2xl px-4 sm:px-5 py-3 sm:py-4 shadow-sm border border-gray-50 col-span-2 sm:col-span-1 flex flex-col items-start sm:flex-row sm:items-center gap-2 sm:gap-3">
                         <div class="w-9 h-9 sm:w-10 sm:h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-500 flex-shrink-0">
                             <i class="fas fa-user-cog text-base sm:text-lg"></i>
                         </div>
@@ -108,7 +108,7 @@
                     <p class="text-[#7C8DB5] text-xs font-medium mt-1">Manajemen guru pembina</p>
                 </a>
 
-                <a href="{{ route('admin.ekskul.index') }}" class="bg-white rounded-3xl p-4 sm:p-5 shadow-[0_4px_24px_-8px_rgba(0,0,0,0.05)] group cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-all duration-300 border border-gray-50 block">
+                <a href="{{ route('admin.ekskul.index') }}" class="col-span-2 sm:col-span-1 bg-white rounded-3xl p-4 sm:p-5 shadow-[0_4px_24px_-8px_rgba(0,0,0,0.05)] group cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-all duration-300 border border-gray-50 block">
                     <div class="w-10 h-10 sm:w-12 sm:h-12 bg-purple-100 rounded-xl flex items-center justify-center text-purple-500 text-lg sm:text-xl mb-3 sm:mb-4 group-hover:scale-110 group-hover:bg-purple-500 group-hover:text-white transition-all duration-300">
                         <i class="fas fa-layer-group"></i>
                     </div>

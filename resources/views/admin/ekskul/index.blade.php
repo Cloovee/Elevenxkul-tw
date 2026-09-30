@@ -4,7 +4,7 @@
 @section('page-title', 'Kelola Ekstrakurikuler')
 
 @section('content')
-<div class="bg-white rounded-3xl shadow-[0_4px_24px_-8px_rgba(0,0,0,0.05)] border border-gray-50 p-6">
+<div class="bg-white rounded-3xl shadow-[0_4px_24px_-8px_rgba(0,0,0,0.05)] border border-gray-50 p-4 sm:p-6">
 
     <!-- Header: Judul + Search + Aksi -->
     <div class="flex flex-wrap justify-between items-center gap-4 mb-4">
@@ -40,7 +40,7 @@
 
     <!-- Table -->
     <div class="overflow-x-auto">
-        <table class="min-w-full text-sm">
+        <table class="rtable min-w-full text-sm">
             <thead>
                 <tr class="text-left text-[#7C8DB5] text-[11px] font-bold uppercase tracking-wider border-b border-gray-100">
                     <th class="px-3 py-3">No</th>
@@ -56,9 +56,9 @@
                 @forelse($ekskuls as $key => $ekskul)
                 @php $initial = strtoupper(substr($ekskul->nama_ekskul, 0, 1)); @endphp
                 <tr class="hover:bg-[#F2F7FF]/60 transition-colors">
-                    <td class="px-3 py-3 text-[#7C8DB5] font-medium">{{ $ekskuls->firstItem() + $key }}</td>
+                    <td data-label="No" class="px-3 py-3 text-[#7C8DB5] font-medium">{{ $ekskuls->firstItem() + $key }}</td>
 
-                    <td class="px-3 py-3">
+                    <td data-label="Nama Ekskul" data-primary class="px-3 py-3">
                         <div class="flex items-center gap-3">
                             @if($ekskul->poster_url)
                                 <img src="{{ $ekskul->poster_url }}" alt="Poster {{ $ekskul->nama_ekskul }}" class="w-9 h-12 rounded-lg object-cover ring-2 ring-[#10316B]/10 flex-shrink-0">
@@ -71,7 +71,7 @@
                         </div>
                     </td>
 
-                    <td class="px-3 py-3">
+                    <td data-label="Kategori" class="px-3 py-3">
                         @php
                             $colors = [
                                 'organisasi' => 'bg-sky/15 text-sky-500',
@@ -84,7 +84,7 @@
                         </span>
                     </td>
 
-                    <td class="px-3 py-3 text-[#7C8DB5] whitespace-nowrap">
+                    <td data-label="Pembina" data-primary class="px-3 py-3 text-[#7C8DB5] whitespace-nowrap">
                         @if($ekskul->pembina)
                             <span class="text-[#10316B] font-semibold">{{ $ekskul->pembina->nama_pembina }}</span>
                         @else
@@ -92,15 +92,15 @@
                         @endif
                     </td>
 
-                    <td class="px-3 py-3 text-[#7C8DB5] whitespace-nowrap">
+                    <td data-label="Pelatih" class="px-3 py-3 text-[#7C8DB5] whitespace-nowrap">
                         {{ $ekskul->pelatih->nama_pelatih ?? '-' }}
                     </td>
 
-                    <td class="px-3 py-3 text-[#7C8DB5] max-w-xs truncate" title="{{ $ekskul->deskripsi }}">
+                    <td data-label="Deskripsi" class="px-3 py-3 text-[#7C8DB5] max-w-xs truncate" title="{{ $ekskul->deskripsi }}">
                         {{ $ekskul->deskripsi ?? '-' }}
                     </td>
 
-                    <td class="px-3 py-3">
+                    <td data-label="Aksi" class="px-3 py-3">
                         <div class="flex gap-2">
                             <a href="{{ route('admin.ekskul.show', $ekskul->id_ekskul) }}" class="w-8 h-8 flex items-center justify-center rounded-lg bg-sky/15 text-sky-500 hover:bg-sky-500 hover:text-white transition-colors" title="Detail">
                                 <i class="fas fa-eye text-xs"></i>

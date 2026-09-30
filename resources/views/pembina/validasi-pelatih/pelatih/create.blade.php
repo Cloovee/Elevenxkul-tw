@@ -64,7 +64,7 @@
                 <p class="mt-1 text-xs text-inksoft">Hanya ekskul yang kamu bina yang muncul di sini.</p>
             </div>
 
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Nama Pelatih <span class="text-red-500">*</span></label>
                     <input type="text" name="nama_pelatih" required value="{{ old('nama_pelatih') }}"
@@ -80,7 +80,7 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Agama</label>
                     <input type="text" name="agama" value="{{ old('agama') }}"
@@ -93,7 +93,7 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Email</label>
                     <input type="email" name="email" value="{{ old('email') }}"

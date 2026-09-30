@@ -6,10 +6,10 @@
 @section('content')
 <div class="max-w-4xl mx-auto">
 
-    <div class="bg-white rounded-[1.5rem] shadow-[0_4px_24px_-8px_rgba(0,0,0,0.05)] border border-gray-50 p-6 lg:p-8">
+    <div class="bg-white rounded-[1.5rem] shadow-[0_4px_24px_-8px_rgba(0,0,0,0.05)] border border-gray-50 p-5 sm:p-6 lg:p-8">
         
         <!-- Header Form -->
-        <div class="flex justify-between items-center mb-6 pb-4 border-b border-ink/10">
+        <div class="flex flex-wrap justify-between items-center gap-3 mb-6 pb-4 border-b border-ink/10">
             <div>
                 <h3 class="text-xl font-extrabold text-[#2b3674]">Tambah Ekskul Baru</h3>
                 <p class="text-xs font-medium text-[#a3aed1] mt-1">Lengkapi formulir di bawah untuk menambahkan ekstrakurikuler baru.</p>
@@ -160,7 +160,7 @@
             </div>
 
             <!-- Tombol Aksi -->
-            <div class="mt-8 pt-6 border-t border-gray-100 flex items-center justify-end gap-3">
+            <div class="mt-8 pt-6 border-t border-gray-100 flex flex-wrap items-center justify-end gap-3">
                 <a href="{{ route('admin.ekskul.index') }}" class="px-6 py-2.5 bg-[#f4f7fe] hover:bg-[#e9edfb] text-[#2b3674] rounded-full text-sm font-bold transition-colors">
                     Batal
                 </a>

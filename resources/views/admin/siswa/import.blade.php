@@ -4,7 +4,7 @@
 @section('page-title', 'Data Siswa')
 
 @section('content')
-<div class="bg-white rounded-3xl shadow-[0_4px_24px_-8px_rgba(0,0,0,0.05)] border border-gray-50 p-8 max-w-2xl mx-auto">
+<div class="bg-white rounded-3xl shadow-[0_4px_24px_-8px_rgba(0,0,0,0.05)] border border-gray-50 p-5 sm:p-8 max-w-2xl mx-auto">
 
     <div class="flex items-center gap-3 mb-6">
         <div class="w-11 h-11 bg-[#0B409C] rounded-xl flex items-center justify-center text-white">

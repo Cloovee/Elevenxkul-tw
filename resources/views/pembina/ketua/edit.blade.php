@@ -53,7 +53,7 @@
 
             <p class="text-xs font-bold text-inksoft uppercase tracking-wide pt-2 border-t border-[#F1F1FA]">Biodata Siswa</p>
 
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">NISN <span class="text-red-500">*</span></label>
                     <input type="text" name="NISN" required value="{{ old('NISN', $siswa->NISN) }}"
@@ -72,7 +72,7 @@
                        class="w-full px-3.5 py-2.5 rounded-xl border border-[#E7E7F4] text-sm focus:outline-none focus:border-lavender">
             </div>
 
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Jenis Kelamin <span class="text-red-500">*</span></label>
                     <select name="jk" required class="w-full px-3.5 py-2.5 rounded-xl border border-[#E7E7F4] text-sm focus:outline-none focus:border-lavender">
@@ -87,7 +87,7 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Kelas <span class="text-red-500">*</span></label>
                     <select name="id_kelas" required class="w-full px-3.5 py-2.5 rounded-xl border border-[#E7E7F4] text-sm focus:outline-none focus:border-lavender">
@@ -103,7 +103,7 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Email <span class="text-red-500">*</span></label>
                     <input type="email" name="email" required value="{{ old('email', $siswa->email) }}"
@@ -124,7 +124,7 @@
 
             <p class="text-xs font-bold text-inksoft uppercase tracking-wide pt-2 border-t border-[#F1F1FA]">Akun Login</p>
 
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Username <span class="text-red-500">*</span></label>
                     <input type="text" name="username" required value="{{ old('username', $siswa->user->username ?? '') }}"

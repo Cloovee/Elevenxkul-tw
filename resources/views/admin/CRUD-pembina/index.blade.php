@@ -4,7 +4,7 @@
 @section('page-title', 'Data Pembina')
 
 @section('content')
-<div class="bg-white rounded-3xl shadow-[0_4px_24px_-8px_rgba(0,0,0,0.05)] border border-gray-50 p-6">
+<div class="bg-white rounded-3xl shadow-[0_4px_24px_-8px_rgba(0,0,0,0.05)] border border-gray-50 p-4 sm:p-6">
 
     <!-- Header: Judul + Search + Aksi -->
     <div class="flex flex-wrap justify-between items-center gap-4 mb-4">
@@ -40,7 +40,7 @@
 
     <!-- Table -->
     <div class="overflow-x-auto">
-        <table class="min-w-full text-sm">
+        <table class="rtable min-w-full text-sm">
             <thead>
                 <tr class="text-left text-[#7C8DB5] text-[11px] font-bold uppercase tracking-wider border-b border-gray-100">
                     <th class="px-3 py-3">No</th>
@@ -60,9 +60,9 @@
                 @forelse($pembina as $key => $p)
                 @php $initial = strtoupper(substr($p->nama_pembina, 0, 1)); @endphp
                 <tr class="hover:bg-[#F2F7FF]/60 transition-colors">
-                    <td class="px-3 py-3 text-[#7C8DB5] font-medium">{{ $pembina->firstItem() + $key }}</td>
+                    <td data-label="No" class="px-3 py-3 text-[#7C8DB5] font-medium">{{ $pembina->firstItem() + $key }}</td>
 
-                    <td class="px-3 py-3">
+                    <td data-label="Pembina" data-primary class="px-3 py-3">
                         <div class="flex items-center gap-3">
                             <div class="w-9 h-9 rounded-full bg-teal-50 text-teal-600 flex items-center justify-center font-display font-bold text-sm ring-2 ring-teal-100 flex-shrink-0 overflow-hidden">
                                 @if($p->foto_url)
@@ -75,7 +75,7 @@
                         </div>
                     </td>
 
-                    <td class="px-3 py-3">
+                    <td data-label="Username" class="px-3 py-3">
                         @if($p->user)
                             <p class="text-[#10316B] text-xs font-semibold">{{ $p->user->username ?? '-' }}</p>
                         @else
@@ -85,7 +85,7 @@
                         @endif
                     </td>
 
-                    <td class="px-3 py-3">
+                    <td data-label="JK" class="px-3 py-3">
                         @if($p->jk)
                         <span class="px-2 py-1 rounded-full text-[10px] font-bold {{ $p->jk == 'L' ? 'bg-sky/15 text-sky-500' : 'bg-pink-50 text-pink-500' }}">
                             {{ $p->jk }}
@@ -94,13 +94,13 @@
                             <span class="text-[#7C8DB5]">-</span>
                         @endif
                     </td>
-                    <td class="px-3 py-3 text-[#7C8DB5] whitespace-nowrap">{{ $p->agama ?? '-' }}</td>
-                    <td class="px-3 py-3 text-[#7C8DB5] whitespace-nowrap">{{ $p->nomor_hp ?? '-' }}</td>
-                    <td class="px-3 py-3 text-[#7C8DB5] whitespace-nowrap">{{ $p->email ?? '-' }}</td>
-                    <td class="px-3 py-3 text-[#7C8DB5] whitespace-nowrap">{{ $p->medsos ?? '-' }}</td>
-                    <td class="px-3 py-3 text-[#7C8DB5] max-w-xs truncate" title="{{ $p->alamat }}">{{ $p->alamat ?? '-' }}</td>
+                    <td data-label="Agama" class="px-3 py-3 text-[#7C8DB5] whitespace-nowrap">{{ $p->agama ?? '-' }}</td>
+                    <td data-label="No. HP" class="px-3 py-3 text-[#7C8DB5] whitespace-nowrap">{{ $p->nomor_hp ?? '-' }}</td>
+                    <td data-label="Email" class="px-3 py-3 text-[#7C8DB5] whitespace-nowrap">{{ $p->email ?? '-' }}</td>
+                    <td data-label="MedSos" class="px-3 py-3 text-[#7C8DB5] whitespace-nowrap">{{ $p->medsos ?? '-' }}</td>
+                    <td data-label="Alamat" class="px-3 py-3 text-[#7C8DB5] max-w-xs truncate" title="{{ $p->alamat }}">{{ $p->alamat ?? '-' }}</td>
 
-                    <td class="px-3 py-3">
+                    <td data-label="Ekskul Dibina" class="px-3 py-3">
                         <div class="flex flex-wrap gap-1 max-w-[220px]">
                             @forelse($p->ekskuls as $e)
                                 <span class="inline-block px-2 py-1 rounded-full text-[10px] font-bold bg-periwinkle/20 text-[#5E5CC7] whitespace-nowrap">{{ $e->nama_ekskul }}</span>
@@ -110,7 +110,7 @@
                         </div>
                     </td>
 
-                    <td class="px-3 py-3">
+                    <td data-label="Aksi" class="px-3 py-3">
                         <div class="flex gap-2">
                             <a href="{{ route('admin.pembina.edit', $p->id_pembina) }}" class="w-8 h-8 flex items-center justify-center rounded-lg bg-amber-50 text-amber-500 hover:bg-amber-500 hover:text-white transition-colors" title="Edit">
                                 <i class="fas fa-pen text-xs"></i>

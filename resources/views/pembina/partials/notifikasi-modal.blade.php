@@ -142,7 +142,7 @@
                         <h3 class="text-[11px] font-bold tracking-[0.1em] uppercase text-inksoft">Absensi peserta hari ini</h3>
                         <span class="text-[11px] text-inksoft">{{ now()->translatedFormat('d M Y') }}</span>
                     </div>
-                    <div class="grid grid-cols-4 gap-2">
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
                         @foreach($statusStyle as $key => $st)
                             <div class="rounded-2xl px-2 py-3 text-center {{ $st['cls'] }}">
                                 <div class="font-display text-xl font-bold leading-none">{{ $n['hari_ini'][$key] }}</div>
@@ -270,7 +270,7 @@
             </div>
 
             {{-- FOOTER --}}
-            <div class="grid grid-cols-2 gap-2 px-5 py-4 border-t border-ink/5 bg-white">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 px-5 py-4 border-t border-ink/5 bg-white">
                 <a href="{{ route('pembina.absensi.index') }}"
                    class="text-center text-xs font-semibold rounded-xl bg-lavender/10 text-lavender hover:bg-lavender/20 py-2.5 transition-colors">
                     Semua absensi peserta

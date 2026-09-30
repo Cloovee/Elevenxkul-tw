@@ -24,10 +24,10 @@
         }
     </style>
 </head>
-<body class="font-body bg-bgsoft text-ink min-h-screen"
+<body class="overflow-x-hidden font-body bg-bgsoft text-ink min-h-screen"
       style="background-image: radial-gradient(circle at 100% 0%, rgba(174,226,255,0.35), transparent 45%), radial-gradient(circle at 0% 100%, rgba(217,249,223,0.4), transparent 40%);">
 
-<div class="flex gap-5 p-5 min-h-screen">
+<div class="flex flex-col lg:flex-row gap-5 p-5 min-h-screen">
 
     @include('pembina.partials.sidebar', ['active' => 'profile'])
 
