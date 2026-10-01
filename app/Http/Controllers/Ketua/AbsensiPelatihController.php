@@ -4,10 +4,9 @@ namespace App\Http\Controllers\Ketua;
 
 use App\Http\Controllers\Controller;
 use App\Models\AbsensiPelatih;
-use App\Models\Pelatih;
+use App\Models\Ekskul;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 
 class AbsensiPelatihController extends Controller
 {
@@ -24,6 +23,8 @@ class AbsensiPelatihController extends Controller
 
     /**
      * Use case: Ketua mencatat/mengirim laporan absensi pelatih.
+     * Pelatih TIDAK dipilih/diketik oleh Ketua: otomatis pelatih yang sudah
+     * ditentukan Pembina untuk ekskul ini (ekskuls.id_pelatih).
      * Riwayat/validasi laporan ditampilkan di halaman Pembina, bukan di sini.
      */
     public function index()
@@ -35,20 +36,18 @@ class AbsensiPelatihController extends Controller
                 ->with('error', 'Akun kamu belum ditugaskan sebagai ketua ekskul manapun. Hubungi admin untuk menugaskanmu dulu.');
         }
 
-        // Cuma pelatih yang terhubung ke ekskul yang dipimpin Ketua ini.
-        $pelatihs = Pelatih::whereHas('ekskuls', function ($q) use ($idEkskul) {
-                $q->where('id_ekskul', $idEkskul);
-            })
-            ->orderBy('nama_pelatih')
-            ->get();
+        $ekskul = Ekskul::with('pelatih')->find($idEkskul);
 
         return view('dashboard-ketua.absensi-pelatih', [
-            'pelatihs' => $pelatihs,
+            'ekskul'  => $ekskul,
+            'pelatih' => optional($ekskul)->pelatih,
         ]);
     }
 
     /**
      * Simpan laporan absensi pelatih baru.
+     * id_pelatih diambil dari ekskul yang dipimpin Ketua (bukan dari input form),
+     * jadi Ketua tidak bisa mengabsen pelatih ekskul lain.
      * status_validasi otomatis "Menunggu" dan akan divalidasi oleh Pembina
      * ekskul terkait di halaman validasi-pelatih.
      */
@@ -61,22 +60,14 @@ class AbsensiPelatihController extends Controller
                 ->with('error', 'Akun kamu belum ditugaskan sebagai ketua ekskul manapun. Hubungi admin untuk menugaskanmu dulu.');
         }
 
+        $pelatih = optional(Ekskul::with('pelatih')->find($idEkskul))->pelatih;
+
+        if (! $pelatih) {
+            return redirect()->route('ketua.absensi-pelatih')
+                ->with('error', 'Ekskul kamu belum punya pelatih. Minta pembina menentukan pelatihnya dulu.');
+        }
+
         $validated = $request->validate([
-            'id_pelatih' => [
-                'required',
-                'exists:pelatih,id_pelatih',
-                // Pastikan pelatih yang dipilih beneran pelatih ekskul ini, bukan ekskul lain.
-                function ($attribute, $value, $fail) use ($idEkskul) {
-                    $milikEkskulIni = Pelatih::where('id_pelatih', $value)
-                        ->whereHas('ekskuls', function ($q) use ($idEkskul) {
-                            $q->where('id_ekskul', $idEkskul);
-                        })
-                        ->exists();
-                    if (! $milikEkskulIni) {
-                        $fail('Pelatih tersebut bukan pelatih ekskul kamu.');
-                    }
-                },
-            ],
             'tanggal_absensi' => ['required', 'date'],
             'kegiatan' => ['nullable', 'string', 'max:100'],
             'status_kehadiran' => ['required', 'in:hadir,izin,sakit,alpha'],
@@ -88,6 +79,7 @@ class AbsensiPelatihController extends Controller
                 ->store('absensi-pelatih', 'public');
         }
 
+        $validated['id_pelatih'] = $pelatih->id_pelatih;
         $validated['status_validasi'] = 'Menunggu';
 
         AbsensiPelatih::create($validated);

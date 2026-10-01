@@ -8,6 +8,7 @@ use App\Models\Pelatih;
 use App\Models\Pembina;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
@@ -93,18 +94,29 @@ class PelatihController extends Controller
             'email' => 'nullable|email|max:100',
             'alamat' => 'nullable|string',
             'medsos' => 'nullable|string|max:100',
+            'foto' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'hapus_foto' => 'nullable|boolean',
         ], [
             'id_ekskul.required' => 'Pilih ekskul kamu yang akan dilatih pelatih ini.',
             'id_ekskul.in' => 'Ekskul tersebut bukan ekskul yang kamu bina.',
+            'foto.image' => 'Foto pelatih harus berupa gambar.',
+            'foto.mimes' => 'Foto pelatih harus berformat JPG, PNG, atau WEBP.',
+            'foto.max' => 'Ukuran foto pelatih maksimal 2MB.',
         ]);
 
         if ($validator->fails()) {
             return back()->withErrors($validator)->withInput();
         }
 
-        $pelatih = Pelatih::create($request->only([
+        $data = $request->only([
             'nama_pelatih', 'jk', 'agama', 'nomor_hp', 'email', 'alamat', 'medsos',
-        ]));
+        ]);
+
+        if ($request->hasFile('foto')) {
+            $data['foto'] = $request->file('foto')->store('pelatih-photos', 'public');
+        }
+
+        $pelatih = Pelatih::create($data);
 
         // Kaitkan pelatih baru ke ekskul milik pembina ini (menggantikan pelatih lama kalau ada).
         Ekskul::where('id_ekskul', $request->id_ekskul)
@@ -151,18 +163,34 @@ class PelatihController extends Controller
             'email' => 'nullable|email|max:100',
             'alamat' => 'nullable|string',
             'medsos' => 'nullable|string|max:100',
+            'foto' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'hapus_foto' => 'nullable|boolean',
         ], [
             'id_ekskul.required' => 'Pilih ekskul kamu untuk pelatih ini.',
             'id_ekskul.in' => 'Ekskul tersebut bukan ekskul yang kamu bina.',
+            'foto.image' => 'Foto pelatih harus berupa gambar.',
+            'foto.mimes' => 'Foto pelatih harus berformat JPG, PNG, atau WEBP.',
+            'foto.max' => 'Ukuran foto pelatih maksimal 2MB.',
         ]);
 
         if ($validator->fails()) {
             return back()->withErrors($validator)->withInput();
         }
 
-        $pelatih->update($request->only([
+        $data = $request->only([
             'nama_pelatih', 'jk', 'agama', 'nomor_hp', 'email', 'alamat', 'medsos',
-        ]));
+        ]);
+
+        if ($request->hasFile('foto')) {
+            // Foto baru menggantikan foto lama.
+            $this->hapusFoto($pelatih);
+            $data['foto'] = $request->file('foto')->store('pelatih-photos', 'public');
+        } elseif ($request->boolean('hapus_foto')) {
+            $this->hapusFoto($pelatih);
+            $data['foto'] = null;
+        }
+
+        $pelatih->update($data);
 
         // Lepaskan pelatih ini dari ekskul lain milik pembina ini yang bukan pilihan sekarang.
         Ekskul::whereIn('id_ekskul', $ekskulIds)
@@ -198,6 +226,7 @@ class PelatihController extends Controller
         $masihDipakaiEkskulLain = Ekskul::where('id_pelatih', $pelatih->id_pelatih)->exists();
 
         if (!$masihDipakaiEkskulLain) {
+            $this->hapusFoto($pelatih);
             $pelatih->delete();
             $pesan = 'Pelatih berhasil dihapus dari sistem.';
         } else {
@@ -205,5 +234,17 @@ class PelatihController extends Controller
         }
 
         return redirect()->route('pembina.pelatih.index')->with('success', $pesan);
+    }
+
+    /**
+     * Hapus file foto pelatih dari storage (kalau ada dan bukan link eksternal).
+     */
+    private function hapusFoto(Pelatih $pelatih): void
+    {
+        if ($pelatih->foto
+            && ! str_starts_with($pelatih->foto, 'http')
+            && Storage::disk('public')->exists($pelatih->foto)) {
+            Storage::disk('public')->delete($pelatih->foto);
+        }
     }
 }

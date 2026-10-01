@@ -36,7 +36,7 @@
             </div>
         @endif
 
-        <form method="POST" action="{{ route('pembina.pelatih.update', $pelatih->id_pelatih) }}" class="flex flex-col gap-4">
+        <form method="POST" action="{{ route('pembina.pelatih.update', $pelatih->id_pelatih) }}" enctype="multipart/form-data" class="flex flex-col gap-4">
             @csrf
             @method('PUT')
 
@@ -55,6 +55,29 @@
                     @endforeach
                 </select>
                 <p class="mt-1 text-xs text-inksoft">Hanya ekskul yang kamu bina yang muncul di sini.</p>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Foto Pelatih</label>
+                <div class="flex items-center gap-4 mb-2.5">
+                    @if($pelatih->foto_url)
+                        <img src="{{ $pelatih->foto_url }}" alt="Foto {{ $pelatih->nama_pelatih }}"
+                             class="w-16 h-16 rounded-2xl object-cover ring-1 ring-black/5 flex-shrink-0">
+                    @else
+                        <div class="w-16 h-16 rounded-2xl bg-lavender text-white flex items-center justify-center font-extrabold text-lg flex-shrink-0">
+                            {{ $pelatih->inisial }}
+                        </div>
+                    @endif
+                    @if($pelatih->foto_url)
+                        <label class="inline-flex items-center gap-2 text-xs font-semibold text-inksoft cursor-pointer">
+                            <input type="checkbox" name="hapus_foto" value="1" class="rounded border-[#E7E7F4]">
+                            Hapus foto saat ini
+                        </label>
+                    @endif
+                </div>
+                <input type="file" name="foto" accept="image/png,image/jpeg,image/webp"
+                       class="w-full text-sm text-inksoft border border-[#E7E7F4] rounded-xl p-1.5 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-bgsoft file:text-ink file:font-semibold file:cursor-pointer">
+                <p class="mt-1 text-xs text-inksoft">Opsional. Pilih file baru untuk mengganti foto. JPG, PNG, atau WEBP, maks 2MB.</p>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">

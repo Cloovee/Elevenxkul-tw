@@ -34,7 +34,7 @@
             </div>
         @endif
 
-        <form method="POST" action="{{ route('pembina.pelatih.store') }}" class="flex flex-col gap-4">
+        <form method="POST" action="{{ route('pembina.pelatih.store') }}" enctype="multipart/form-data" class="flex flex-col gap-4">
             @csrf
 
             <div>
@@ -51,6 +51,13 @@
                     @endforelse
                 </select>
                 <p class="mt-1 text-xs text-inksoft">Hanya ekskul yang kamu bina yang muncul di sini.</p>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Foto Pelatih</label>
+                <input type="file" name="foto" accept="image/png,image/jpeg,image/webp"
+                       class="w-full text-sm text-inksoft border border-[#E7E7F4] rounded-xl p-1.5 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-bgsoft file:text-ink file:font-semibold file:cursor-pointer">
+                <p class="mt-1 text-xs text-inksoft">Opsional. JPG, PNG, atau WEBP, maks 2MB. Foto ini tampil di halaman absensi pelatih milik ketua ekskul.</p>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">

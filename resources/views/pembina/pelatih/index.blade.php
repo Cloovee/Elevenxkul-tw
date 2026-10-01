@@ -103,9 +103,14 @@
 
                             <td class="px-3 py-3">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-9 h-9 rounded-full bg-lavender text-white flex items-center justify-center font-extrabold text-sm flex-shrink-0">
-                                        {{ $initial }}
-                                    </div>
+                                    @if($p->foto_url)
+                                        <img src="{{ $p->foto_url }}" alt="Foto {{ $p->nama_pelatih }}" loading="lazy"
+                                             class="w-9 h-9 rounded-full object-cover flex-shrink-0">
+                                    @else
+                                        <div class="w-9 h-9 rounded-full bg-lavender text-white flex items-center justify-center font-extrabold text-sm flex-shrink-0">
+                                            {{ $initial }}
+                                        </div>
+                                    @endif
                                     <p class="text-ink font-bold whitespace-nowrap">{{ $p->nama_pelatih }}</p>
                                 </div>
                             </td>

@@ -26,12 +26,18 @@
                     <div>
                         <p class="text-xs text-gray-400 tracking-wide uppercase font-semibold">Ketua</p>
                         <h1 class="text-2xl font-extrabold text-ink">Absensi Pelatih</h1>
-                        <p class="text-sm text-gray-500 mt-1">Catat apakah pelatih hadir/melatih hari ini. Laporan akan divalidasi oleh pembina ekskul terkait.</p>
+                        <p class="text-sm text-gray-500 mt-1">Catat apakah pelatih ekskulmu hadir/melatih. Laporan akan divalidasi oleh pembina ekskul terkait.</p>
                     </div>
 
                     @if (session('success'))
                         <div class="bg-emerald-50 text-emerald-700 text-sm font-semibold px-4 py-3 rounded-2xl">
                             {{ session('success') }}
+                        </div>
+                    @endif
+
+                    @if (session('error'))
+                        <div class="bg-red-50 text-red-500 text-sm font-semibold px-4 py-3 rounded-2xl">
+                            {{ session('error') }}
                         </div>
                     @endif
 
@@ -48,6 +54,33 @@
                     <form method="POST" action="{{ route('ketua.absensi-pelatih.store') }}" enctype="multipart/form-data"
                           class="grid grid-cols-1 lg:grid-cols-2 gap-6" x-data="{ preview: null }">
                         @csrf
+
+                        <!-- Pelatih: otomatis dari ekskul ini (ditentukan pembina), tidak perlu dipilih -->
+                        <div class="lg:col-span-2 bg-white rounded-3xl shadow-xl shadow-periwinkle/10 ring-1 ring-black/5 p-6">
+                            <h2 class="font-semibold text-ink border-b border-gray-100 pb-3 mb-4">Pelatih</h2>
+
+                            @if ($pelatih)
+                                <div class="flex items-center gap-4">
+                                    @if ($pelatih->foto_url)
+                                        <img src="{{ $pelatih->foto_url }}" alt="Foto {{ $pelatih->nama_pelatih }}"
+                                             class="w-20 h-20 rounded-2xl object-cover ring-1 ring-black/5 shadow-md flex-shrink-0">
+                                    @else
+                                        <div class="w-20 h-20 rounded-2xl bg-periwinkle text-white flex items-center justify-center font-bold text-2xl shadow-md flex-shrink-0" aria-hidden="true">
+                                            {{ $pelatih->inisial }}
+                                        </div>
+                                    @endif
+                                    <div class="min-w-0">
+                                        <p class="text-lg font-extrabold text-ink break-words">{{ $pelatih->nama_pelatih }}</p>
+                                        <p class="text-sm text-inksoft mt-0.5">Pelatih ekskul {{ $ekskul->nama_ekskul }}</p>
+                                    </div>
+                                </div>
+                            @else
+                                <div class="bg-amber-50 text-amber-700 text-sm font-medium px-4 py-3 rounded-2xl">
+                                    Ekskul <span class="font-semibold">{{ optional($ekskul)->nama_ekskul }}</span> belum punya pelatih.
+                                    Minta pembina menentukan pelatihnya dulu, lalu absensi bisa dikirim.
+                                </div>
+                            @endif
+                        </div>
 
                         <!-- Foto bukti absensi -->
                         <div class="bg-white rounded-3xl shadow-xl shadow-periwinkle/10 ring-1 ring-black/5 p-6">
@@ -88,23 +121,6 @@
 
                             <div class="space-y-4">
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Pelatih</label>
-                                    <select name="id_pelatih" required
-                                        class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-periwinkle focus:border-periwinkle transition"
-                                    >
-                                        <option value="">Pilih pelatih</option>
-                                        @foreach ($pelatihs as $pelatih)
-                                            <option value="{{ $pelatih->id_pelatih }}" @selected((string) old('id_pelatih') === (string) $pelatih->id_pelatih)>
-                                                {{ $pelatih->nama_pelatih }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    @if ($pelatihs->isEmpty())
-                                        <p class="text-xs text-red-500 mt-1.5">Belum ada pelatih terdaftar untuk ekskul kamu. Hubungi pembina/admin.</p>
-                                    @endif
-                                </div>
-
-                                <div>
                                     <label class="block text-sm font-medium text-ink mb-1.5">Tanggal</label>
                                     <input type="date" name="tanggal_absensi" required value="{{ old('tanggal_absensi', now()->toDateString()) }}"
                                         class="w-full px-4 py-2.5 rounded-xl border border-ink/15 bg-white focus:outline-none focus:ring-2 focus:ring-periwinkle focus:border-periwinkle transition"
@@ -135,8 +151,8 @@
 
                         <!-- Tombol kirim -->
                         <div class="lg:col-span-2">
-                            <button type="submit"
-                                class="w-full py-3 rounded-xl bg-periwinkle text-white font-semibold hover:opacity-90 transition shadow-lg shadow-periwinkle/30"
+                            <button type="submit" @disabled(! $pelatih)
+                                class="w-full py-3 rounded-xl bg-periwinkle text-white font-semibold hover:opacity-90 transition shadow-lg shadow-periwinkle/30 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 Kirim Absensi
                             </button>
