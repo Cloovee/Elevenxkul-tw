@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Dashboard Admin') - Elevenxkul</title>
 
@@ -22,7 +22,7 @@
 {{-- Format layout disamakan dengan tampilan role ketua --}}
 <body class="font-sans antialiased bg-bgsoft text-ink">
 
-    <div class="py-8 px-4 sm:px-6 lg:px-10 min-h-screen relative overflow-hidden">
+    <div class="ekk-admin-wrap py-8 px-4 sm:px-6 lg:px-10 min-h-screen relative overflow-hidden">
 
         <div class="absolute -top-20 right-0 w-96 h-96 rounded-full bg-periwinkle/10 blur-3xl pointer-events-none"></div>
         <div class="absolute top-1/2 -left-20 w-72 h-72 rounded-full bg-mint/20 blur-3xl pointer-events-none"></div>

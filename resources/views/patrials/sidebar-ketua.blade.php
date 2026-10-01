@@ -10,6 +10,9 @@
       di belakangnya di-blur lewat .ekk-sidebar-backdrop. Lebar <aside> tetap lg:w-20
       sehingga konten tidak bergeser.
     - CSS ditulis mentah (bukan Tailwind) supaya tidak bergantung pada build.
+    - Mobile/tablet (< lg): rail horizontal menempel di BAWAH layar (fixed, bisa digeser ke
+      samping). Ruang kosong di bawah konten ditambahkan otomatis oleh CSS (lewat :has pada
+      wrapper yang memuat <aside>), jadi tidak perlu mengubah tiap halaman ketua.
     - Tambah menu baru: tambahkan satu baris di array $menuItems.
 --}}
 <style>
@@ -95,9 +98,40 @@
     .ekk-sidebar-rail::-webkit-scrollbar { display: none; }
     .ekk-sidebar-rail a, .ekk-sidebar-rail img { -webkit-user-drag: none; }
 
+    /* Mobile/tablet: rail horizontal menempel di BAWAH layar (hormati safe-area gesture bar) */
+    @media (max-width: 1023.98px) {
+        .ekk-sidebar-rail {
+            position: fixed;
+            top: auto;
+            bottom: calc(.75rem + env(safe-area-inset-bottom, 0px));
+            left: .75rem;
+            right: .75rem;
+            z-index: 30;
+            padding: .5rem;
+            gap: .25rem;
+            overflow-x: auto;
+            overflow-y: hidden;
+            overscroll-behavior-x: contain;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+        }
+        /* <aside> hanya pembungkus: lepas dari alur flex supaya tidak menyisakan celah (gap) di atas konten */
+        .ekk-aside { position: absolute; width: 0; height: 0; }
+        /* ruang kosong di bawah halaman supaya konten terakhir tidak tertutup rail */
+        div:has(> .ekk-aside) { padding-bottom: calc(6.75rem + env(safe-area-inset-bottom, 0px)); }
+    }
+    @media (max-width: 1023.98px) {
+        @supports not selector(:has(*)) {
+            body { padding-bottom: calc(6.75rem + env(safe-area-inset-bottom, 0px)); }
+        }
+    }
+
     /* Mobile: rail horizontal, label disembunyikan */
     .ekk-nav-ico { width: 2.75rem; height: 2.75rem; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
     @media (max-width: 1023.98px) { .ekk-nav-label { display: none; } }
+
+    /* Jarak antara foto profil (kotak penuh 2.75rem) dan teks di sebelahnya */
+    .ekk-nav-label-avatar { margin-left: .75rem; }
 
     .ekk-nav-link .ekk-nav-icon { transition: transform .2s ease; }
     .ekk-nav-link:hover .ekk-nav-icon { transform: scale(1.15); }
@@ -125,10 +159,10 @@
     ];
 @endphp
 
-<aside class="lg:w-20 shrink-0">
+<aside class="ekk-aside lg:w-20 shrink-0">
     <div class="ekk-sidebar-rail bg-periwinkle rounded-3xl p-3
                 flex lg:flex-col items-center gap-2 overflow-x-auto lg:overflow-visible
-                shadow-2xl shadow-periwinkle/30 ring-1 ring-white/20">
+                shadow-2xl shadow-periwinkle/30 ring-1 ring-white/20" id="ekk-rail">
 
         {{-- Avatar Ketua --}}
         <a href="{{ route('dashboard.ketua') }}" aria-label="Ketua" draggable="false"
@@ -136,7 +170,7 @@
             <span class="ekk-nav-ico">
                 <span class="w-11 h-11 rounded-2xl bg-white flex items-center justify-center font-bold text-periwinkle shadow-md">K</span>
             </span>
-            <span class="ekk-nav-label">
+            <span class="ekk-nav-label ekk-nav-label-avatar">
                 <span class="ekk-nav-title">Ketua</span>
             </span>
         </a>
@@ -179,3 +213,13 @@
     {{-- Backdrop blur: harus SAUDARA (sibling) langsung setelah rail agar bisa dipicu lewat :hover --}}
     <div class="ekk-sidebar-backdrop" aria-hidden="true"></div>
 </aside>
+
+<script>
+    /* Mobile/tablet: rail bisa digeser, jadi pastikan tombol menu yang sedang aktif langsung terlihat */
+    (function () {
+        var rail = document.getElementById('ekk-rail');
+        if (!rail || !window.matchMedia('(max-width: 1023.98px)').matches) return;
+        var a = rail.querySelector('[aria-current="page"]');
+        if (a) rail.scrollLeft = a.offsetLeft - (rail.clientWidth - a.offsetWidth) / 2;
+    })();
+</script>

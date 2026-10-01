@@ -29,6 +29,10 @@
     lg:w-20, jadi konten halaman tidak bergeser — rail melebar menimpa konten.
     CSS ditulis mentah (bukan Tailwind) supaya tidak bergantung pada build.
     Untuk menambah menu baru cukup tambahkan satu baris di array $menuItems.
+
+    Mobile/tablet (< lg): rail horizontal menempel di BAWAH layar (fixed, bisa digeser ke samping).
+    Ruang kosong di bawah konten ditambahkan otomatis oleh CSS di bawah (lewat :has pada wrapper
+    yang memuat <aside>), jadi tidak perlu mengubah tiap halaman pembina.
 --}}
 @php
     $sidebarPembina = auth()->user()?->pembina;
@@ -110,6 +114,35 @@
         .ekk-nav-title { display: block; font-size: .92rem; font-weight: 600; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; }
     }
 
+    /* Mobile/tablet: rail horizontal menempel di BAWAH layar (hormati safe-area gesture bar) */
+    @media (max-width: 1023.98px) {
+        .ekk-sidebar-rail {
+            position: fixed;
+            top: auto;
+            bottom: calc(.75rem + env(safe-area-inset-bottom, 0px));
+            left: .75rem;
+            right: .75rem;
+            z-index: 30;
+            padding: .5rem;
+            gap: .25rem;
+            overflow-x: auto;
+            overflow-y: hidden;
+            overscroll-behavior-x: contain;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+        }
+        .ekk-sidebar-rail::-webkit-scrollbar { display: none; }   /* menimpa scrollbar tema di partials/scrollbar */
+        /* <aside> hanya pembungkus: lepas dari alur flex supaya tidak menyisakan celah (gap) di atas konten */
+        .ekk-aside { position: absolute; width: 0; height: 0; }
+        /* ruang kosong di bawah halaman supaya konten terakhir tidak tertutup rail */
+        div:has(> .ekk-aside) { padding-bottom: calc(6.75rem + env(safe-area-inset-bottom, 0px)); }
+    }
+    @media (max-width: 1023.98px) {
+        @supports not selector(:has(*)) {
+            body { padding-bottom: calc(6.75rem + env(safe-area-inset-bottom, 0px)); }
+        }
+    }
+
     /* Mobile: rail horizontal, label disembunyikan */
     .ekk-nav-ico { width: 2.75rem; height: 2.75rem; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
     @media (max-width: 1023.98px) { .ekk-nav-label { display: none; } }
@@ -145,10 +178,10 @@
     ];
 @endphp
 
-<aside class="lg:w-20 shrink-0">
+<aside class="ekk-aside lg:w-20 shrink-0">
     <div class="ekk-sidebar-rail bg-periwinkle rounded-3xl p-3
                 flex lg:flex-col items-center gap-2 overflow-x-auto lg:overflow-visible
-                shadow-2xl shadow-periwinkle/30 ring-1 ring-white/20">
+                shadow-2xl shadow-periwinkle/30 ring-1 ring-white/20" id="ekk-rail">
 
         {{-- Avatar / Profil Saya --}}
         <a href="{{ route('pembina.profile.index') }}" aria-label="Profil Saya"
@@ -203,3 +236,13 @@
     </div>
     <div class="ekk-sidebar-backdrop" aria-hidden="true"></div>
 </aside>
+
+<script>
+    /* Mobile/tablet: rail bisa digeser, jadi pastikan tombol menu yang sedang aktif langsung terlihat */
+    (function () {
+        var rail = document.getElementById('ekk-rail');
+        if (!rail || !window.matchMedia('(max-width: 1023.98px)').matches) return;
+        var a = rail.querySelector('[aria-current="page"]');
+        if (a) rail.scrollLeft = a.offsetLeft - (rail.clientWidth - a.offsetWidth) / 2;
+    })();
+</script>

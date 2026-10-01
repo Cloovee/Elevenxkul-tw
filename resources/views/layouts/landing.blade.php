@@ -9,7 +9,7 @@
 <head>
     <script>try{if(localStorage.getItem('rail-folded')==='1')document.documentElement.classList.add('rail-folded')}catch(e){}</script>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>Ekstrakurikuler {{ $sekolah['nama'] }}</title>
     <meta name="description" content="Daftar ekstrakurikuler, pembina, galeri kegiatan, video, dan lokasi {{ $sekolah['nama'] }}.">
     <link rel="icon" href="{{ $logo }}">
@@ -54,8 +54,8 @@
         /* ---------- Sidebar rail (gaya sama dengan sidebar Admin/Pembina/Ketua) ---------- */
         :root{--rail:0px}
         @media(min-width:1024px){:root{--rail:9rem}}
-        @media(max-width:1023px){html{scroll-padding-top:5.5rem}}
-        .rail{position:fixed;z-index:60;top:.75rem;left:.75rem;right:.75rem;display:flex;align-items:center;gap:.5rem;padding:.6rem;border-radius:1.5rem;background:var(--blue);box-shadow:0 25px 50px -12px rgba(11,64,156,.35);outline:1px solid rgba(255,255,255,.2);overflow-x:auto;scrollbar-width:none;user-select:none}
+        @media(max-width:1023px){html{scroll-padding-top:1.5rem}}
+        .rail{position:fixed;z-index:60;top:auto;bottom:calc(.75rem + env(safe-area-inset-bottom,0px));left:.75rem;right:.75rem;display:flex;align-items:center;gap:.5rem;padding:.6rem;border-radius:1.5rem;background:var(--blue);box-shadow:0 25px 50px -12px rgba(11,64,156,.35);outline:1px solid rgba(255,255,255,.2);overflow-x:auto;scrollbar-width:none;user-select:none}
         .rail::-webkit-scrollbar{display:none}
         .r-link{flex:none;display:flex;align-items:center;height:2.75rem;border-radius:1rem;color:rgba(255,255,255,.9);background:none;border:0;font:inherit;cursor:pointer;overflow:hidden;white-space:nowrap;transition:width .32s cubic-bezier(.4,0,.2,1),margin .32s cubic-bezier(.4,0,.2,1),padding .32s cubic-bezier(.4,0,.2,1),background .2s,box-shadow .2s}
         .r-link:hover{background:rgba(255,255,255,.25);box-shadow:0 4px 8px -2px rgba(0,0,0,.15)}
@@ -93,9 +93,9 @@
         .rail{transition:width .32s cubic-bezier(.4,0,.2,1),box-shadow .32s,transform .55s var(--ease),opacity .35s}
         @media(min-width:1024px){.rail{transform-origin:0 100%}}
         html.rail-folded{--rail:0px}
-        html.rail-folded .rail{opacity:0;pointer-events:none;transform:translateY(-130%)}
+        html.rail-folded .rail{opacity:0;pointer-events:none;transform:translateY(160%)}
         @media(min-width:1024px){html.rail-folded .rail{transform:scale(.06)}}
-        .rail-fab{position:fixed;z-index:61;left:1rem;bottom:1rem;width:3.5rem;height:3.5rem;border:0;border-radius:1.25rem;background:var(--blue);color:#fff;display:grid;place-items:center;cursor:pointer;box-shadow:0 20px 40px -12px rgba(11,64,156,.65);outline:1px solid rgba(255,255,255,.25);opacity:0;transform:scale(.4);pointer-events:none;transition:opacity .3s,transform .55s var(--ease),background .25s}
+        .rail-fab{position:fixed;z-index:61;left:1rem;bottom:calc(1rem + env(safe-area-inset-bottom,0px));width:3.5rem;height:3.5rem;border:0;border-radius:1.25rem;background:var(--blue);color:#fff;display:grid;place-items:center;cursor:pointer;box-shadow:0 20px 40px -12px rgba(11,64,156,.65);outline:1px solid rgba(255,255,255,.25);opacity:0;transform:scale(.4);pointer-events:none;transition:opacity .3s,transform .55s var(--ease),background .25s}
         .rail-fab svg{width:1.5rem;height:1.5rem;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
         html.rail-folded .rail-fab{opacity:1;transform:none;pointer-events:auto;transition-delay:.18s,.18s,0s}
         html.rail-folded .rail-fab:hover{background:var(--navy);transform:translateY(-3px);transition-delay:0s}
@@ -103,10 +103,10 @@
         @media(min-width:1024px){.rail-fab{left:2.5rem;bottom:2rem}}
         /* konten ikut bergeser halus saat sidebar dilipat/dibuka */
         .content,.hero-top,.cf,.cf-meta,footer{transition:padding .5s var(--ease),margin .5s var(--ease)}
-        @media(min-width:1024px){.hero{padding-top:3rem}}
+        @media(min-width:1024px){.hero{padding-bottom:4.5rem}}
 
         /* ---------- Hero: carousel ekskul (coverflow 3D) ---------- */
-        .hero{position:relative;min-height:100vh;min-height:100svh;display:flex;flex-direction:column;color:#fff;overflow:hidden;isolation:isolate;background:var(--navy);padding:6.5rem 0 4.5rem}
+        .hero{position:relative;min-height:100vh;min-height:100svh;display:flex;flex-direction:column;color:#fff;overflow:hidden;isolation:isolate;background:var(--navy);padding:3rem 0 6.5rem}
         /* Latar hero: foto sekolah dengan opasitas 70% (ubah --hero-bg-opacity kalau mau lebih pekat/transparan) */
         :root{--hero-bg-opacity:.7}
         .hero-bg{position:absolute;left:0;top:-20%;width:100%;height:140%;z-index:-2;background:url('{{ $foto }}') center/cover no-repeat;opacity:var(--hero-bg-opacity);will-change:transform}
@@ -138,7 +138,7 @@
         .cf-meta span{color:rgba(255,255,255,.6);font-weight:500}
         .folded .cf-arrow,.folded .cf-go{pointer-events:none}
         @media(max-width:600px){
-            .hero{padding:5.6rem 0 4rem}
+            .hero{padding:2.2rem 0 6rem}
             .hero-top{padding-inline:calc(var(--rail) + 1.1rem) 1.1rem}
             .cf{--ch:clamp(300px,58svh,520px);--cw:calc(var(--ch)*.68)}
             .cf-cap{width:calc(var(--cw) - 1.8rem);bottom:calc(50% - var(--ch)/2 + 1.1rem)}
@@ -321,6 +321,7 @@
         .ft-ct a:hover{color:var(--gold)}
         .ft-bar{margin-top:clamp(2rem,4vw,2.8rem);padding-top:1.9rem;border-top:1px solid rgba(255,255,255,.16);color:rgba(255,255,255,.8)}
         .ft-bar b{color:#fff;font-weight:700}
+        @media(max-width:1023px){footer{padding-bottom:calc(6.5rem + env(safe-area-inset-bottom,0px))}}
         @media(max-width:960px){.ft-grid{grid-template-columns:1fr 1fr}.ft-col-brand{grid-column:1/-1}}
         @media(max-width:600px){.ft-grid{grid-template-columns:1fr}footer h4,.ft-brand h3{font-size:1.4rem}}
 
