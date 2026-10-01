@@ -9,14 +9,14 @@ use Maatwebsite\Excel\Concerns\WithMapping;
 
 /**
  * Export data siswa dengan urutan kolom yang sama persis dengan template
- * import, jadi hasil export bisa langsung diedit lalu diimport lagi.
- * Kolom "Kelas" berisi id_kelas.
+ * import (tanpa kolom Kelas), jadi hasil export bisa langsung diedit lalu
+ * diimport lagi. Kelas tujuan dipilih lewat dropdown di form import.
  */
 class SiswaExport implements FromCollection, WithHeadings, WithMapping
 {
-    protected $idKelas;
+    protected int|string|null $idKelas;
 
-    public function __construct($idKelas = null)
+    public function __construct(int|string|null $idKelas = null)
     {
         $this->idKelas = $idKelas;
     }
@@ -31,7 +31,7 @@ class SiswaExport implements FromCollection, WithHeadings, WithMapping
 
     public function headings(): array
     {
-        return ['NISN', 'NIS', 'Nama', 'JK', 'Agama', 'Kelas', 'No. HP', 'Email', 'Medsos', 'Alamat'];
+        return ['NISN', 'NIS', 'Nama', 'JK', 'Agama', 'No. HP', 'Email', 'Medsos', 'Alamat'];
     }
 
     public function map($siswa): array
@@ -42,8 +42,7 @@ class SiswaExport implements FromCollection, WithHeadings, WithMapping
             $siswa->nama_siswa,
             $siswa->jk,
             $siswa->agama,
-            $siswa->id_kelas,
-            $siswa->nomor_hp,
+            (string) $siswa->nomor_hp,
             $siswa->email,
             $siswa->medsos,
             $siswa->alamat,

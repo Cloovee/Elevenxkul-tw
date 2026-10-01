@@ -112,7 +112,11 @@ class SiswaController extends Controller
 
     public function showImportForm()
     {
-        $kelas = Kelas::all();
+        $kelas = Kelas::orderBy('tingkat')
+            ->orderBy('program_keahlian')
+            ->orderBy('rombel')
+            ->get();
+
         return view('admin.siswa.import', compact('kelas'));
     }
 
@@ -120,28 +124,31 @@ class SiswaController extends Controller
     {
         $request->validate([
             'file' => 'required|mimes:xlsx,xls,csv|max:5120',
-            'id_kelas' => 'nullable|exists:kelas,id_kelas',
+            'id_kelas' => 'required|exists:kelas,id_kelas',
+        ], [
+            'id_kelas.required' => 'Pilih kelas tujuan dulu sebelum import.',
+            'id_kelas.exists' => 'Kelas yang dipilih tidak ditemukan.',
         ]);
 
         try {
             $import = new SiswaImport($request->id_kelas);
             Excel::import($import, $request->file('file'));
 
-            $errors = $import->getBarisError();
-            $failures = $import->failures(); // tambahan ini
+            $barisError = $import->getBarisError();
 
-            if (!empty($errors) || $failures->isNotEmpty()) {
-                $failMessages = [];
-                foreach ($failures as $failure) {
-                    $failMessages[] = "Baris {$failure->row()}: " . implode(', ', $failure->errors());
-                }
-                
+            foreach ($import->failures() as $failure) {
+                $barisError[] = [
+                    'baris' => $failure->row(),
+                    'error' => implode(', ', $failure->errors()),
+                ];
+            }
 
-    return back()->with([
-        'warning' => 'Sebagian/semua data gagal diimport.',
-        'errors' => array_merge($errors, array_map(fn($m, $i) => ['baris' => $i, 'error' => $m], $failMessages, array_keys($failMessages)))
-    ]);
-}
+            if (!empty($barisError)) {
+                return back()->with([
+                    'warning' => 'Sebagian/semua data gagal diimport.',
+                    'baris_error' => $barisError,
+                ]);
+            }
 
             return redirect()->route('admin.siswa.index')
                 ->with('success', 'Data siswa berhasil diimport!');
@@ -163,34 +170,12 @@ class SiswaController extends Controller
 
     public function downloadTemplate()
     {
-        $daftarKelas = Kelas::orderBy('tingkat')->orderBy('program_keahlian')->orderBy('rombel')->get();
-
-        // Kolom Kelas diisi id_kelas. Contoh baris pakai ID Kelas asli kalau datanya sudah ada.
-        $contohId1 = $daftarKelas->get(0)?->id_kelas ?? '';
-        $contohId2 = $daftarKelas->get(1)?->id_kelas ?? $contohId1;
-
-        $siswaRows = [
-            ['NISN', 'NIS', 'Nama', 'JK', 'Agama', 'Kelas', 'No. HP', 'Email', 'Medsos', 'Alamat'],
-            ['1234567890', '10001', 'Budi Santoso', 'L', 'Islam', $contohId1, '08123456789', 'budi@email.com', '@budi', 'Jl. Merdeka No.1'],
-            ['1234567891', '10002', 'Siti Rahayu', 'P', 'Islam', $contohId2, '08123456788', 'siti@email.com', '@siti', 'Jl. Merdeka No.2'],
+        // Template TANPA kolom Kelas: kelas dipilih lewat dropdown di form import.
+        $data = [
+            ['NISN', 'NIS', 'Nama', 'JK', 'Agama', 'No. HP', 'Email', 'Medsos', 'Alamat'],
+            ['1234567890', '10001', 'Budi Santoso', 'L', 'Islam', '08123456789', 'budi@email.com', '@budi', 'Jl. Merdeka No.1'],
+            ['1234567891', '10002', 'Siti Rahayu', 'P', 'Islam', '08123456788', 'siti@email.com', '@siti', 'Jl. Merdeka No.2'],
         ];
-
-        // Daftar referensi ID Kelas ditaruh di kolom kanan sheet yang SAMA
-        // (setelah 1 kolom pemisah kosong), biar user tinggal lihat ke samping.
-        // Baris yang cuma berisi referensi ini otomatis dilewati saat import
-        // (lihat SiswaImport::isEmptyWhen).
-        $refRows = [['Ref: ID Kelas', 'Ref: Tingkat', 'Ref: Program Keahlian', 'Ref: Rombel']];
-        foreach ($daftarKelas as $k) {
-            $refRows[] = [$k->id_kelas, $k->tingkat, $k->program_keahlian, $k->rombel];
-        }
-
-        $totalRows = max(count($siswaRows), count($refRows));
-        $data = [];
-        for ($i = 0; $i < $totalRows; $i++) {
-            $left = $siswaRows[$i] ?? array_fill(0, 10, '');
-            $right = $refRows[$i] ?? array_fill(0, 4, '');
-            $data[] = array_merge($left, [''], $right);
-        }
 
         return Excel::download(
             new class($data) implements \Maatwebsite\Excel\Concerns\FromArray {

@@ -13,17 +13,6 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
-/**
- * CRUD Pembina (sisi Admin).
- *
- * Format input dari Admin:
- *   | nama | jk | agama | no hp | email | alamat | username | password | ekskul yang dibina (bisa > 1) |
- *
- * Satu kali submit otomatis mengisi 2 tabel sekaligus:
- *   - users   : akun login (role "Pembina", username + password)
- *   - pembina : biodata (nama, jk, agama, no hp, email, alamat) yang terhubung ke akun di atas
- * dan menghubungkan pembina ke ekskul pilihan lewat kolom ekskuls.id_pembina.
- */
 class PembinaController extends Controller
 {
     public function index(Request $request)
@@ -52,8 +41,7 @@ class PembinaController extends Controller
 
     public function create()
     {
-        // Semua ekskul ditampilkan sebagai checklist, termasuk yang sudah
-        // punya pembina lain -- admin boleh "ambil alih" dari sini.
+    
         $ekskuls = Ekskul::with('pembina')->orderBy('nama_ekskul')->get();
 
         return view('admin.CRUD-pembina.create', compact('ekskuls'));
@@ -84,8 +72,7 @@ class PembinaController extends Controller
             : null;
 
         DB::transaction(function () use ($request, $fotoPath) {
-            // 1. Akun login dibuat otomatis bareng biodata -- email di form ini
-            //    yang jadi username buat login (role Pembina).
+           
             $user = User::create([
                 'name' => $request->nama_pembina,
                 'email' => $request->email,
@@ -93,7 +80,6 @@ class PembinaController extends Controller
                 'role' => 'Pembina',
             ]);
 
-            // 2. Biodata pembina
             $pembina = Pembina::create([
                 'id_user' => $user->id,
                 'nama_pembina' => $request->nama_pembina,
@@ -106,11 +92,6 @@ class PembinaController extends Controller
                 'alamat' => $request->alamat,
             ]);
 
-            // 3. Assign Ekskul yang dicentang ke pembina baru ini. Boleh "ambil
-            //    alih" dari pembina lain -- kalau pembina-nya berubah, pelatih
-            //    yang sebelumnya terkait ekskul itu ikut dilepas (sama seperti
-            //    logic di CRUD Ekskul), karena CRUD pelatih pembina lama tidak
-            //    boleh lagi mengelolanya.
             $ekskulIds = $request->input('ekskul_ids', []);
             if (!empty($ekskulIds)) {
                 Ekskul::whereIn('id_ekskul', $ekskulIds)->update([
@@ -158,14 +139,6 @@ class PembinaController extends Controller
             return back()->withErrors($validator)->withInput();
         }
 
-        $ekskulIds = collect($request->input('ekskul', []))->unique()->values();
-
-        if ($this->adaEkskulMilikPembinaLain($ekskulIds, $pembina->id_pembina)) {
-            return back()
-                ->withErrors(['ekskul' => 'Ada ekskul pilihan yang sudah dibina pembina lain.'])
-                ->withInput();
-        }
-
         $data = $request->only([
             'nama_pembina', 'jk', 'agama', 'nomor_hp', 'email', 'medsos', 'alamat',
         ]);
@@ -189,8 +162,6 @@ class PembinaController extends Controller
         DB::transaction(function () use ($request, $pembina, $data) {
             $pembina->update($data);
 
-            // Sinkronkan akun login: nama & email ikut berubah, password cuma
-            // diupdate kalau diisi.
             if ($pembina->user) {
                 $userData = [
                     'name' => $request->nama_pembina,
@@ -202,9 +173,6 @@ class PembinaController extends Controller
                 $pembina->user->update($userData);
             }
 
-            // Sinkronkan Ekskul yang dibina: lepas yang tidak dicentang lagi,
-            // ambil alih yang baru dicentang (boleh dari pembina lain). Pelatih
-            // ikut dilepas untuk ekskul yang pembinanya berubah.
             $selectedIds = $request->input('ekskul_ids', []);
 
             Ekskul::where('id_pembina', $pembina->id_pembina)
@@ -232,9 +200,6 @@ class PembinaController extends Controller
             Storage::disk('public')->delete($pembina->foto);
         }
 
-        // Cuma hapus biodatanya. Akun user TETAP ada (masih bisa login dengan role Pembina),
-        // cuma statusnya balik jadi "belum ada biodata" di CRUD User. Ekskul yang tadinya
-        // dibina jadi tidak punya pembina (id_pembina null), pelatihnya ikut dilepas.
         Ekskul::where('id_pembina', $pembina->id_pembina)
             ->update(['id_pembina' => null, 'id_pelatih' => null]);
 
@@ -242,21 +207,6 @@ class PembinaController extends Controller
 
         return redirect()->route('admin.pembina.index')
             ->with('success', 'Pembina beserta akun login-nya berhasil dihapus. Ekskul yang dibina kini tanpa pembina.');
-    }
-
-    /**
-     * Apakah ada ekskul di daftar yang sedang dibina pembina LAIN?
-     */
-    private function adaEkskulMilikPembinaLain($ekskulIds, ?int $idPembinaSaatIni): bool
-    {
-        if ($ekskulIds->isEmpty()) {
-            return false;
-        }
-
-        return Ekskul::whereIn('id_ekskul', $ekskulIds)
-            ->whereNotNull('id_pembina')
-            ->when($idPembinaSaatIni, fn ($q) => $q->where('id_pembina', '!=', $idPembinaSaatIni))
-            ->exists();
     }
 
     private function pesan(): array
