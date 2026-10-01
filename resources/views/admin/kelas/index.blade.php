@@ -4,7 +4,12 @@
 @section('page-title', 'Data Kelas')
 
 @section('content')
-<div class="bg-white rounded-3xl shadow-[0_4px_24px_-8px_rgba(0,0,0,0.05)] border border-gray-50 p-4 sm:p-6">
+<div x-data="{
+        open: false, kelas: { url: '', siswaUrl: '', nama: '', jumlah: 0 },
+        hapus(k) { this.kelas = k; this.open = true; }
+     }"
+     @keydown.escape.window="open = false"
+     class="bg-white rounded-3xl shadow-[0_4px_24px_-8px_rgba(0,0,0,0.05)] border border-gray-50 p-4 sm:p-6">
 
     <!-- Header: Judul + Search -->
     <div class="flex flex-wrap justify-between items-center gap-4 mb-4">
@@ -93,15 +98,17 @@
                     </td>
                     <td data-label="Aksi" class="px-3 py-3">
                         <div class="flex gap-2">
+                            <a href="{{ route('admin.kelas.siswa', $k->id_kelas) }}" class="w-8 h-8 flex items-center justify-center rounded-lg bg-sky-50 text-sky-500 hover:bg-sky-500 hover:text-white transition-colors" title="Lihat siswa di kelas ini">
+                                <i class="fas fa-eye text-xs"></i>
+                            </a>
                             <a href="{{ route('admin.kelas.edit', $k->id_kelas) }}" class="w-8 h-8 flex items-center justify-center rounded-lg bg-amber-50 text-amber-500 hover:bg-amber-500 hover:text-white transition-colors" title="Edit">
                                 <i class="fas fa-pen text-xs"></i>
                             </a>
-                            <form action="{{ route('admin.kelas.destroy', $k->id_kelas) }}" method="POST" onsubmit="return confirm('Yakin hapus kelas ini?')">
-                                @csrf @method('DELETE')
-                                <button type="submit" class="w-8 h-8 flex items-center justify-center rounded-lg bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-colors" title="Hapus">
-                                    <i class="fas fa-trash text-xs"></i>
-                                </button>
-                            </form>
+                            <button type="button"
+                                @click="hapus({ url: '{{ route('admin.kelas.destroy', $k->id_kelas) }}', siswaUrl: '{{ route('admin.kelas.siswa', $k->id_kelas) }}', nama: @js($k->nama_kelas), jumlah: {{ $k->siswa_count }} })"
+                                class="w-8 h-8 flex items-center justify-center rounded-lg bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-colors" title="Hapus">
+                                <i class="fas fa-trash text-xs"></i>
+                            </button>
                         </div>
                     </td>
                 </tr>
@@ -121,6 +128,39 @@
 
     <div class="mt-6">
         {{ $kelas->withQueryString()->links() }}
+    </div>
+    <!-- Modal Konfirmasi Hapus Kelas -->
+    <div x-show="open" x-cloak x-transition.opacity class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#10316B]/40 backdrop-blur-sm" @click.self="open = false">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md p-6 text-center">
+            <!-- Kelas masih ada siswa: tidak bisa dihapus -->
+            <template x-if="kelas.jumlah > 0">
+                <div>
+                    <div class="w-14 h-14 mx-auto mb-4 rounded-full bg-amber-50 text-amber-500 flex items-center justify-center text-2xl"><i class="fas fa-triangle-exclamation"></i></div>
+                    <h4 class="text-lg font-extrabold text-[#10316B] mb-2">Kelas belum bisa dihapus</h4>
+                    <p class="text-sm text-[#7C8DB5] mb-6">
+                        Kelas <b class="text-[#10316B]" x-text="kelas.nama"></b> masih berisi
+                        <b class="text-[#10316B]" x-text="kelas.jumlah"></b> siswa. Pindahkan atau hapus semua siswanya dulu di halaman daftar siswa.
+                    </p>
+                    <div class="flex gap-2 justify-center">
+                        <button type="button" @click="open = false" class="px-5 py-2 bg-[#F2F7FF] hover:bg-[#DDE8FB] text-[#10316B] rounded-full text-sm font-bold">Batal</button>
+                        <a :href="kelas.siswaUrl" class="px-5 py-2 bg-[#0B409C] text-white rounded-full text-sm font-bold shadow-md shadow-[#0B409C]/30 hover:opacity-90"><i class="fas fa-eye mr-1"></i> Lihat Siswa</a>
+                    </div>
+                </div>
+            </template>
+            <!-- Kelas kosong: konfirmasi hapus -->
+            <template x-if="kelas.jumlah === 0">
+                <form :action="kelas.url" method="POST">
+                    @csrf @method('DELETE')
+                    <div class="w-14 h-14 mx-auto mb-4 rounded-full bg-red-50 text-red-500 flex items-center justify-center text-2xl"><i class="fas fa-trash"></i></div>
+                    <h4 class="text-lg font-extrabold text-[#10316B] mb-2">Hapus kelas ini?</h4>
+                    <p class="text-sm text-[#7C8DB5] mb-6">Kelas <b class="text-[#10316B]" x-text="kelas.nama"></b> akan dihapus permanen dan tidak bisa dikembalikan.</p>
+                    <div class="flex gap-2 justify-center">
+                        <button type="button" @click="open = false" class="px-5 py-2 bg-[#F2F7FF] hover:bg-[#DDE8FB] text-[#10316B] rounded-full text-sm font-bold">Batal</button>
+                        <button type="submit" class="px-5 py-2 bg-red-500 hover:bg-red-600 text-white rounded-full text-sm font-bold shadow-md shadow-red-500/30">Ya, Hapus</button>
+                    </div>
+                </form>
+            </template>
+        </div>
     </div>
 </div>
 @endsection

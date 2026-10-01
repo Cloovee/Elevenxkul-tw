@@ -158,6 +158,11 @@ Route::prefix('/admin')
             Route::get('/{id}/edit', [KelasController::class, 'edit'])->name('edit');
             Route::put('/{id}', [KelasController::class, 'update'])->name('update');
             Route::delete('/{id}', [KelasController::class, 'destroy'])->name('destroy');
+
+            // Daftar siswa di dalam satu kelas + aksi massal (pindah / hapus siswa terpilih)
+            Route::get('/{id}/siswa', [KelasController::class, 'siswa'])->name('siswa');
+            Route::post('/{id}/siswa/pindah', [KelasController::class, 'pindahSiswa'])->name('siswa.pindah');
+            Route::delete('/{id}/siswa', [KelasController::class, 'hapusSiswa'])->name('siswa.hapus');
         });
 
         // Kelola Ekskul — pakai resource, otomatis generate semua route CRUD

@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Kelas;
+use App\Models\Siswa;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
@@ -90,16 +92,118 @@ class KelasController extends Controller
 
     public function destroy(int $id)
     {
-        $kelas = Kelas::findOrFail($id);
+        $kelas = Kelas::withCount('siswa')->findOrFail($id);
 
-        if ($kelas->siswa()->count() > 0) {
-            return back()->with('error', 'Kelas tidak bisa dihapus karena masih ada siswa di dalamnya.');
+        if ($kelas->siswa_count > 0) {
+            return redirect()->route('admin.kelas.siswa', $kelas->id_kelas)
+                ->with('error', "Kelas {$kelas->nama_kelas} tidak bisa dihapus karena masih ada {$kelas->siswa_count} siswa di dalamnya. Pindahkan atau hapus siswanya dulu.");
         }
 
+        $nama = $kelas->nama_kelas;
         $kelas->delete();
 
         return redirect()->route('admin.kelas.index')
-            ->with('success', 'Kelas berhasil dihapus!');
+            ->with('success', "Kelas {$nama} berhasil dihapus!");
+    }
+
+    /**
+     * Daftar siswa yang ada di satu kelas.
+     * Dari sini admin bisa edit siswa, memindahkan siswa ke kelas lain,
+     * atau menghapus siswa (satu per satu / pilih semua) supaya kelas bisa dihapus.
+     */
+    public function siswa(Request $request, int $id)
+    {
+        $kelas = Kelas::withCount('siswa')->findOrFail($id);
+
+        $query = $kelas->siswa()->getQuery();
+
+        if ($request->search) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('nama_siswa', 'LIKE', "%{$search}%")
+                  ->orWhere('NISN', 'LIKE', "%{$search}%")
+                  ->orWhere('NIS', 'LIKE', "%{$search}%");
+            });
+        }
+
+        $siswa = $query->orderBy('nama_siswa')->paginate(50)->withQueryString();
+
+        // Pilihan kelas tujuan untuk fitur "Pindahkan" (kelas ini sendiri dikecualikan).
+        $kelasLain = Kelas::where('id_kelas', '!=', $kelas->id_kelas)
+            ->orderBy('tingkat')->orderBy('program_keahlian')->orderBy('rombel')
+            ->get();
+
+        // Semua id siswa di kelas ini -> dipakai tombol "Pilih semua siswa di kelas" (lintas halaman).
+        $semuaId = $kelas->siswa()->pluck('id_siswa');
+
+        return view('admin.kelas.siswa', compact('kelas', 'siswa', 'kelasLain', 'semuaId'));
+    }
+
+    /**
+     * Pindahkan siswa terpilih ke kelas lain.
+     */
+    public function pindahSiswa(Request $request, int $id)
+    {
+        $kelas = Kelas::findOrFail($id);
+
+        $request->validate([
+            'id_siswa' => ['required', 'array', 'min:1'],
+            'id_siswa.*' => ['integer'],
+            'id_kelas_tujuan' => ['required', 'exists:kelas,id_kelas', Rule::notIn([$kelas->id_kelas])],
+        ], [
+            'id_siswa.required' => 'Pilih minimal 1 siswa dulu.',
+            'id_kelas_tujuan.required' => 'Pilih kelas tujuan dulu.',
+            'id_kelas_tujuan.not_in' => 'Kelas tujuan harus berbeda dengan kelas asal.',
+        ]);
+
+        // Hanya siswa yang memang berada di kelas ini yang boleh dipindah.
+        $jumlah = Siswa::where('id_kelas', $kelas->id_kelas)
+            ->whereIn('id_siswa', $request->id_siswa)
+            ->update(['id_kelas' => $request->id_kelas_tujuan]);
+
+        $tujuan = Kelas::find($request->id_kelas_tujuan);
+
+        return redirect()->route('admin.kelas.siswa', $kelas->id_kelas)
+            ->with('success', "{$jumlah} siswa berhasil dipindahkan ke kelas {$tujuan->nama_kelas}.");
+    }
+
+    /**
+     * Hapus siswa terpilih dari kelas ini (data siswanya ikut terhapus).
+     */
+    public function hapusSiswa(Request $request, int $id)
+    {
+        $kelas = Kelas::findOrFail($id);
+
+        $request->validate([
+            'id_siswa' => ['required', 'array', 'min:1'],
+            'id_siswa.*' => ['integer'],
+        ], [
+            'id_siswa.required' => 'Pilih minimal 1 siswa dulu.',
+        ]);
+
+        $daftar = Siswa::with('user')
+            ->where('id_kelas', $kelas->id_kelas)
+            ->whereIn('id_siswa', $request->id_siswa)
+            ->get();
+
+        DB::transaction(function () use ($daftar) {
+            foreach ($daftar as $s) {
+                // Akun login (kalau siswa ini dijadikan Ketua) ikut dihapus supaya tidak yatim.
+                $user = $s->user;
+                $s->delete();
+                if ($user) {
+                    $user->delete();
+                }
+            }
+        });
+
+        $sisa = $kelas->siswa()->count();
+        $pesan = "{$daftar->count()} siswa berhasil dihapus dari kelas {$kelas->nama_kelas}.";
+        if ($sisa === 0) {
+            $pesan .= ' Kelas sudah kosong, sekarang kelas ini bisa dihapus.';
+        }
+
+        return redirect()->route('admin.kelas.siswa', $kelas->id_kelas)->with('success', $pesan);
     }
 
     /**
