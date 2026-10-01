@@ -18,19 +18,26 @@
 
         <div class="mb-5">
             <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Tingkat <span class="text-red-500">*</span></label>
-            <input type="text" name="tingkat" placeholder="Contoh: X" class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C] @error('tingkat') ring-2 ring-red-400 @enderror" value="{{ old('tingkat') }}" required>
+            <select name="tingkat" id="tingkat-select" class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C] @error('tingkat') ring-2 ring-red-400 @enderror" required>
+                <option value="">-- Pilih Tingkat --</option>
+                @foreach(\App\Models\Kelas::TINGKAT_OPTIONS as $t)
+                    <option value="{{ $t }}" @selected(old('tingkat') === $t)>{{ $t }}</option>
+                @endforeach
+            </select>
             @error('tingkat')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
         </div>
 
         <div class="mb-5">
-            <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Jurusan <span class="text-red-500">*</span></label>
-            <input type="text" name="program_keahlian" placeholder="Contoh: IPA" class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C] @error('program_keahlian') ring-2 ring-red-400 @enderror" value="{{ old('program_keahlian') }}" required>
+            <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Program Keahlian <span class="text-red-500">*</span></label>
+            <select name="program_keahlian" id="program-keahlian-select" class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C] @error('program_keahlian') ring-2 ring-red-400 @enderror" required>
+                <option value="">-- Pilih Tingkat dulu --</option>
+            </select>
             @error('program_keahlian')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
         </div>
 
         <div class="mb-6">
             <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Rombel <span class="text-red-500">*</span></label>
-            <input type="text" name="rombel" placeholder="Contoh: 10" class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C] @error('rombel') ring-2 ring-red-400 @enderror" value="{{ old('rombel') }}" required>
+            <input type="text" name="rombel" placeholder="Contoh: 1" class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C] @error('rombel') ring-2 ring-red-400 @enderror" value="{{ old('rombel') }}" required>
             @error('rombel')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
         </div>
 
@@ -44,4 +51,36 @@
         </div>
     </form>
 </div>
+
+<script>
+    // Program Keahlian WAJIB dropdown dan tergantung Tingkat yang dipilih
+    // (nama Program Keahlian berubah saat naik dari tingkat 10 ke 11/12).
+    const programKeahlianPerTingkat = @json(\App\Models\Kelas::PROGRAM_KEAHLIAN_PER_TINGKAT);
+    const tingkatSelect = document.getElementById('tingkat-select');
+    const programSelect = document.getElementById('program-keahlian-select');
+    const programLamaDariServer = @json(old('program_keahlian'));
+
+    function isiDropdownProgramKeahlian(tingkatTerpilih, programTerpilih) {
+        programSelect.innerHTML = '';
+
+        const daftar = programKeahlianPerTingkat[tingkatTerpilih] || [];
+
+        if (daftar.length === 0) {
+            programSelect.appendChild(new Option('-- Pilih Tingkat dulu --', ''));
+            return;
+        }
+
+        programSelect.appendChild(new Option('-- Pilih Program Keahlian --', ''));
+        daftar.forEach(function (pk) {
+            const option = new Option(pk, pk, false, pk === programTerpilih);
+            programSelect.appendChild(option);
+        });
+    }
+
+    tingkatSelect.addEventListener('change', function () {
+        isiDropdownProgramKeahlian(this.value, null);
+    });
+
+    isiDropdownProgramKeahlian(tingkatSelect.value, programLamaDariServer);
+</script>
 @endsection

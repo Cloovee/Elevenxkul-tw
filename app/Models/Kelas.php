@@ -18,6 +18,14 @@ class Kelas extends Model
         'rombel',
     ];
 
+    public const TINGKAT_OPTIONS = ['10', '11', '12'];
+
+    public const PROGRAM_KEAHLIAN_PER_TINGKAT = [
+        '10' => ['PPLG', 'MPLB', 'AKL', 'TJKT', 'PM', 'DKV'],
+        '11' => ['RPL', 'MLOG', 'MP', 'AK', 'TKJ', 'BR', 'DKV'],
+        '12' => ['RPL', 'MLOG', 'MP', 'AK', 'TKJ', 'BR', 'DKV'],
+    ];
+
     public function siswa()
     {
         return $this->hasMany(Siswa::class, 'id_kelas', 'id_kelas');

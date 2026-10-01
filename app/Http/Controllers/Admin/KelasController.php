@@ -46,18 +46,10 @@ class KelasController extends Controller
 
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'tingkat' => [
-                'required', 'string', 'max:10',
-                Rule::unique('kelas')->where(function ($q) use ($request) {
-                    return $q->where('program_keahlian', $request->program_keahlian)
-                             ->where('rombel', $request->rombel);
-                }),
-            ],
-            'program_keahlian' => 'required|string|max:50',
-            'rombel' => 'required|string|max:20',
-        ], [
+        $validator = Validator::make($request->all(), $this->aturanValidasi($request), [
             'tingkat.unique' => 'Kelas dengan tingkat, program keahlian, dan rombel yang sama sudah ada.',
+            'tingkat.in' => 'Tingkat harus salah satu dari: 10, 11, 12.',
+            'program_keahlian.in' => 'Program Keahlian tidak sesuai dengan Tingkat yang dipilih.',
         ]);
 
         if ($validator->fails()) {
@@ -80,18 +72,10 @@ class KelasController extends Controller
     {
         $kelas = Kelas::findOrFail($id);
 
-        $validator = Validator::make($request->all(), [
-            'tingkat' => [
-                'required', 'string', 'max:10',
-                Rule::unique('kelas')->ignore($kelas->id_kelas, 'id_kelas')->where(function ($q) use ($request) {
-                    return $q->where('program_keahlian', $request->program_keahlian)
-                             ->where('rombel', $request->rombel);
-                }),
-            ],
-            'program_keahlian' => 'required|string|max:50',
-            'rombel' => 'required|string|max:20',
-        ], [
+        $validator = Validator::make($request->all(), $this->aturanValidasi($request, $kelas->id_kelas), [
             'tingkat.unique' => 'Kelas dengan tingkat, program keahlian, dan rombel yang sama sudah ada.',
+            'tingkat.in' => 'Tingkat harus salah satu dari: 10, 11, 12.',
+            'program_keahlian.in' => 'Program Keahlian tidak sesuai dengan Tingkat yang dipilih.',
         ]);
 
         if ($validator->fails()) {
@@ -116,5 +100,34 @@ class KelasController extends Controller
 
         return redirect()->route('admin.kelas.index')
             ->with('success', 'Kelas berhasil dihapus!');
+    }
+
+    /**
+     * Aturan validasi Create & Edit Kelas (disatukan supaya dua form itu
+     * konsisten, sesuai requirement). Tingkat WAJIB salah satu dari
+     * Kelas::TINGKAT_OPTIONS, dan Program Keahlian WAJIB salah satu dari
+     * daftar yang valid UNTUK tingkat yang dipilih (Kelas::PROGRAM_KEAHLIAN_PER_TINGKAT) --
+     * jadi kombinasi seperti "10"+"RPL" atau "11"+"PPLG" otomatis ditolak.
+     * Rombel sengaja tetap bebas teks (bukan dropdown), sesuai requirement.
+     */
+    private function aturanValidasi(Request $request, ?int $ignoreId = null): array
+    {
+        $tingkat = $request->input('tingkat');
+        $pilihanProgram = Kelas::PROGRAM_KEAHLIAN_PER_TINGKAT[$tingkat] ?? [];
+
+        $uniqueRule = Rule::unique('kelas')->where(function ($q) use ($request) {
+            return $q->where('program_keahlian', $request->program_keahlian)
+                     ->where('rombel', $request->rombel);
+        });
+
+        if ($ignoreId) {
+            $uniqueRule = $uniqueRule->ignore($ignoreId, 'id_kelas');
+        }
+
+        return [
+            'tingkat' => ['required', Rule::in(Kelas::TINGKAT_OPTIONS), $uniqueRule],
+            'program_keahlian' => ['required', 'string', Rule::in($pilihanProgram)],
+            'rombel' => ['required', 'string', 'max:20'],
+        ];
     }
 }
