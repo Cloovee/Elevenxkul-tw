@@ -45,6 +45,19 @@
                         </div>
                     </div>
 
+                    @if (session('success'))
+                        <div class="bg-mint text-[#1F7A3D] text-sm font-semibold px-4 py-3 rounded-2xl">{{ session('success') }}</div>
+                    @endif
+                    @if (session('error'))
+                        <div class="bg-red-50 text-red-600 text-sm font-semibold px-4 py-3 rounded-2xl">{{ session('error') }}</div>
+                    @endif
+                    @if (!empty($belumDitugaskan))
+                        <div class="bg-amber-50 text-amber-700 text-sm px-4 py-3 rounded-2xl">
+                            <b>Akun kamu belum ditugaskan memimpin ekskul/organisasi manapun.</b>
+                            Menu lain belum bisa dipakai. Minta Pembina menetapkan kamu sebagai ketua lewat menu <i>Kelola Ketua</i>.
+                        </div>
+                    @endif
+
                     <!-- Sapaan -->
                     <div class="bg-periwinkle rounded-3xl shadow-xl shadow-periwinkle/20 p-6 sm:p-8 relative overflow-hidden">
                         <div class="relative z-10 flex items-center gap-4">

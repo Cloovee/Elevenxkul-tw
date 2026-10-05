@@ -213,15 +213,19 @@ Route::prefix('/ketua')
 
 // 5. Dashboard Ketua
 Route::get('/dashboard-ketua', function () {
-    // Sementara: Ketua mengelola ekskul dengan id_ekskul = 1
-    $jumlahPeserta = App\Models\Peserta::where('id_ekskul', 1)->count();
+    // Ekskul diambil dari akun Ketua yang login (siswa -> ekskulDipimpin), BUKAN hardcode.
+    // Kalau akun belum ditugaskan, dashboard tetap terbuka (supaya tidak loop) dan menampilkan peringatan.
+    $idEkskul = optional(optional(auth()->user()->siswa)->ekskulDipimpin)->id_ekskul;
+    $idPelatih = $idEkskul ? \App\Models\Ekskul::where('id_ekskul', $idEkskul)->value('id_pelatih') : null;
+    $jumlahPeserta = App\Models\Peserta::where('id_ekskul', $idEkskul)->count();
 
-    $totalPeserta = App\Models\Peserta::where('id_ekskul', 1)
+    $totalPeserta = App\Models\Peserta::where('id_ekskul', $idEkskul)
         ->where('status', 'aktif')
         ->count();
 
     // Riwayat aktivitas: gabungan dari 3 sumber, diurutkan dari yang terbaru.
     $riwayatPelatih = App\Models\AbsensiPelatih::with('pelatih')
+        ->where('id_pelatih', $idPelatih)
         ->latest('created_at')
         ->take(5)
         ->get()
@@ -231,7 +235,7 @@ Route::get('/dashboard-ketua', function () {
             'waktu' => $r->created_at,
         ]);
 
-    $riwayatPeserta = App\Models\AbsensiPeserta::whereHas('peserta', fn ($q) => $q->where('id_ekskul', 1))
+    $riwayatPeserta = App\Models\AbsensiPeserta::whereHas('peserta', fn ($q) => $q->where('id_ekskul', $idEkskul))
         ->selectRaw('tanggal_absensi, COUNT(*) as jumlah, MAX(created_at) as waktu')
         ->groupBy('tanggal_absensi')
         ->orderByDesc('waktu')
@@ -244,7 +248,7 @@ Route::get('/dashboard-ketua', function () {
         ]);
 
     $riwayatAnggota = App\Models\Peserta::with('siswa')
-        ->where('id_ekskul', 1)
+        ->where('id_ekskul', $idEkskul)
         ->latest('created_at')
         ->take(5)
         ->get()
@@ -265,24 +269,25 @@ Route::get('/dashboard-ketua', function () {
         'jumlahPeserta' => $jumlahPeserta,
         'totalPeserta' => $totalPeserta,
         'riwayat' => $riwayat,
+        'belumDitugaskan' => ! $idEkskul,
     ]);
 })->middleware(['auth', 'verified', 'role:Ketua'])->name('dashboard.ketua');
 
 
 Route::get('/absensi-pelatih', [App\Http\Controllers\Ketua\AbsensiPelatihController::class, 'index'])
-    ->middleware(['auth', 'verified'])->name('ketua.absensi-pelatih');
+    ->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])->name('ketua.absensi-pelatih');
 
 Route::post('/absensi-pelatih', [App\Http\Controllers\Ketua\AbsensiPelatihController::class, 'store'])
-    ->middleware(['auth', 'verified'])->name('ketua.absensi-pelatih.store');
+    ->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])->name('ketua.absensi-pelatih.store');
 
 Route::get('/absensi-peserta', [App\Http\Controllers\Ketua\AbsensiPesertaController::class, 'index'])
-    ->middleware(['auth', 'verified'])->name('ketua.absensi-peserta');
+    ->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])->name('ketua.absensi-peserta');
 
 Route::post('/absensi-peserta', [App\Http\Controllers\Ketua\AbsensiPesertaController::class, 'store'])
-    ->middleware(['auth', 'verified'])->name('ketua.absensi-peserta.store');
+    ->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])->name('ketua.absensi-peserta.store');
 
 Route::get('/riwayat-absensi', [RiwayatAbsensiController::class, 'index'])
-    ->middleware(['auth', 'verified', 'role:Ketua'])->name('ketua.riwayat-absensi');
+    ->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])->name('ketua.riwayat-absensi');
 
 Route::get('/kelola-anggota', function () {
 
@@ -302,7 +307,7 @@ Route::get('/kelola-anggota', function () {
         compact('anggota')
     );
 
-})->middleware(['auth', 'verified', 'role:Ketua'])
+})->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])
   ->name('ketua.kelola-anggota');
 
 
@@ -329,7 +334,7 @@ Route::get('/kelola-anggota/tambah', function () {
     $daftarKelas = \App\Models\Kelas::orderBy('tingkat')->orderBy('program_keahlian')->orderBy('rombel')->get();
 
     return view('dashboard-ketua.kelola-anggota.tambah', compact('daftarSiswa', 'daftarKelas'));
-})->middleware(['auth', 'verified', 'role:Ketua'])
+})->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])
   ->name('ketua.kelola-anggota.tambah');
 
 
@@ -390,7 +395,7 @@ Route::post('/kelola-anggota/tambah', function (\Illuminate\Http\Request $reques
         ->route('ketua.kelola-anggota')
         ->with('success', $pesan);
 
-})->middleware(['auth', 'verified', 'role:Ketua'])
+})->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])
   ->name('ketua.kelola-anggota.store');
 
 
@@ -413,7 +418,7 @@ Route::get('/kelola-anggota/{id}', function ($id) {
         compact('anggota')
     );
 
-})->middleware(['auth', 'verified', 'role:Ketua'])
+})->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])
   ->name('ketua.kelola-anggota.detail');
 
 Route::delete('/kelola-anggota/{id}', function ($id) {
@@ -444,7 +449,7 @@ Route::delete('/kelola-anggota/{id}', function ($id) {
         ->route('ketua.kelola-anggota')
         ->with('success', "{$namaSiswa} berhasil dihapus dari anggota.");
 
-})->middleware(['auth', 'verified', 'role:Ketua'])
+})->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])
   ->name('ketua.kelola-anggota.destroy');
 
 /*

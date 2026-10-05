@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Ekskul;
 use App\Models\Kelas;
 use App\Models\Pembina;
+use App\Models\Peserta;
 use App\Models\Siswa;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -97,9 +98,45 @@ class KetuaController extends Controller
         $pembina = $this->pembinaOrFail();
 
         $ekskuls = $pembina->ekskuls()->with('ketua')->orderBy('nama_ekskul')->get();
-        $kelas = Kelas::orderBy('tingkat')->orderBy('program_keahlian')->orderBy('rombel')->get();
+        $ekskulIds = $ekskuls->pluck('id_ekskul');
 
-        return view('pembina.ketua.create', compact('ekskuls', 'kelas'));
+        // Siswa yang sudah jadi ketua di ekskul manapun tidak ditawarkan lagi
+        // (satu siswa hanya boleh jadi ketua di satu ekskul).
+        $sudahKetua = Ekskul::whereNotNull('id_ketua')->pluck('id_ketua')->all();
+
+        // Anggota (peserta) aktif per ekskul yang dibina pembina ini.
+        $anggotaPerEkskul = Peserta::with('siswa.kelas')
+            ->whereIn('id_ekskul', $ekskulIds)
+            ->where('status', 'aktif')
+            ->get()
+            ->groupBy('id_ekskul')
+            ->map(fn ($rows) => $rows->pluck('id_siswa')->values());
+
+        // Semua siswa aktif yang belum jadi ketua. Dipakai sebagai daftar utama (anggota)
+        // dan juga pilihan cadangan "siswa yang belum jadi anggota" di dropdown.
+        $siswaList = Siswa::with('kelas')
+            ->where('status', Siswa::STATUS_AKTIF)
+            ->whereNotIn('id_siswa', $sudahKetua)
+            ->orderBy('nama_siswa')
+            ->get()
+            ->map(fn ($s) => [
+                'id' => $s->id_siswa,
+                'nama' => $s->nama_siswa,
+                'nisn' => $s->NISN,
+                'nis' => $s->NIS,
+                'kelas' => $s->kelas ? $s->kelas->nama_kelas : '-',
+                'email' => $s->email,
+                'punya_akun' => $s->id_user !== null,
+            ]);
+
+        $ekskulData = $ekskuls->map(fn ($e) => [
+            'id' => $e->id_ekskul,
+            'nama' => $e->nama_ekskul,
+            'ketua_lama' => optional($e->ketua)->nama_siswa,
+            'anggota_ids' => ($anggotaPerEkskul[$e->id_ekskul] ?? collect())->all(),
+        ])->values();
+
+        return view('pembina.ketua.create', compact('ekskuls', 'ekskulData', 'siswaList'));
     }
 
     public function store(Request $request)
@@ -107,57 +144,71 @@ class KetuaController extends Controller
         $pembina = $this->pembinaOrFail();
         $ekskulIds = $this->ekskulIds($pembina);
 
-        $validator = Validator::make($request->all(), [
+        $request->validate([
             'id_ekskul' => ['required', Rule::in($ekskulIds)],
-            'NISN' => 'required|string|max:20|unique:siswa,NISN',
-            'NIS' => 'required|string|max:20|unique:siswa,NIS',
-            'nama_siswa' => 'required|string|max:100',
-            'jk' => 'required|in:L,P',
-            'agama' => 'nullable|string|max:20',
-            'id_kelas' => 'required|exists:kelas,id_kelas',
-            'nomor_hp' => 'nullable|string|max:15',
-            'email' => 'required|email|max:100|unique:users,email',
-            'medsos' => 'nullable|string|max:100',
-            'alamat' => 'nullable|string',
-            'username' => 'required|string|max:50|alpha_dash|unique:users,username',
-            'password' => 'required|string|min:8|confirmed',
+            'id_siswa' => ['required', 'exists:siswa,id_siswa'],
         ], [
-            'id_ekskul.required' => 'Pilih ekskul kamu yang akan dipimpin ketua ini.',
+            'id_ekskul.required' => 'Pilih ekskul/organisasi yang akan dipimpin dulu.',
             'id_ekskul.in' => 'Ekskul tersebut bukan ekskul yang kamu bina.',
-            'NISN.unique' => 'NISN ini sudah terdaftar.',
-            'NIS.unique' => 'NIS ini sudah terdaftar.',
-            'email.unique' => 'Email ini sudah dipakai akun lain.',
-            'username.unique' => 'Username ini sudah dipakai akun lain.',
+            'id_siswa.required' => 'Pilih siswa yang akan dijadikan ketua.',
+            'id_siswa.exists' => 'Siswa yang dipilih tidak ditemukan.',
         ]);
 
-        if ($validator->fails()) {
-            return back()->withErrors($validator)->withInput();
+        $siswa = Siswa::findOrFail($request->id_siswa);
+
+        if ($siswa->status !== Siswa::STATUS_AKTIF) {
+            return back()->withErrors(['id_siswa' => 'Hanya siswa berstatus aktif yang bisa dijadikan ketua.'])->withInput();
         }
 
-        DB::transaction(function () use ($request) {
-            // 1) Akun login (masuk ke tabel users, role Ketua) -- otomatis dibuat.
-            $user = User::create([
-                'name' => $request->nama_siswa,
-                'email' => $request->email,
-                'username' => $request->username,
-                'password' => Hash::make($request->password),
-                'role' => 'Ketua',
+        if (Ekskul::where('id_ketua', $siswa->id_siswa)->exists()) {
+            return back()->withErrors(['id_siswa' => 'Siswa ini sudah menjadi ketua di ekskul/organisasi lain.'])->withInput();
+        }
+
+        // Akun login hanya perlu diisi kalau siswa ini belum punya akun.
+        $butuhAkun = $siswa->id_user === null;
+
+        if ($butuhAkun) {
+            $validator = Validator::make($request->all(), [
+                'email' => 'required|email|max:100|unique:users,email',
+                'username' => 'required|string|max:50|alpha_dash|unique:users,username',
+                'password' => 'required|string|min:8|confirmed',
+            ], [
+                'email.unique' => 'Email ini sudah dipakai akun lain.',
+                'username.unique' => 'Username ini sudah dipakai akun lain.',
             ]);
 
-            // 2) Biodata siswa, langsung terhubung ke akun di atas.
-            $siswa = Siswa::create([
-                'id_kelas' => $request->id_kelas,
-                'id_user' => $user->id,
-                'NISN' => $request->NISN,
-                'NIS' => $request->NIS,
-                'nama_siswa' => $request->nama_siswa,
-                'jk' => $request->jk,
-                'agama' => $request->agama,
-                'nomor_hp' => $request->nomor_hp,
-                'email' => $request->email,
-                'medsos' => $request->medsos,
-                'alamat' => $request->alamat,
-            ]);
+            if ($validator->fails()) {
+                return back()->withErrors($validator)->withInput();
+            }
+        }
+
+        $ketuaLama = optional(Ekskul::with('ketua')->find($request->id_ekskul))->ketua;
+
+        DB::transaction(function () use ($request, $siswa, $butuhAkun) {
+            // 1) Akun login (role Ketua) dibuat otomatis dari data siswa yang dipilih.
+            if ($butuhAkun) {
+                $user = User::create([
+                    'name' => $siswa->nama_siswa,
+                    'email' => $request->email,
+                    'username' => $request->username,
+                    'password' => Hash::make($request->password),
+                    'role' => 'Ketua',
+                ]);
+
+                $siswa->forceFill(['id_user' => $user->id])->save();
+
+                // Pengaman: kalau tautan akun -> siswa tidak tersimpan, batalkan semuanya
+                // (jangan sampai ada akun Ketua yatim yang tidak bisa memakai menu apa pun).
+                if ((int) Siswa::where('id_siswa', $siswa->id_siswa)->value('id_user') !== (int) $user->id) {
+                    throw new \RuntimeException('Akun login gagal dihubungkan ke data siswa.');
+                }
+            }
+
+            // 2) Kalau siswa belum tercatat sebagai anggota ekskul ini, otomatis didaftarkan.
+            Peserta::firstOrCreate(
+                ['id_siswa' => $siswa->id_siswa, 'id_ekskul' => $request->id_ekskul],
+                ['tanggal_bergabung' => now()->toDateString(), 'status' => 'aktif']
+            );
 
             // 3) Jadikan siswa ini Ketua di ekskul pilihan (menggantikan ketua lama kalau ada).
             Ekskul::where('id_ekskul', $request->id_ekskul)
@@ -165,7 +216,10 @@ class KetuaController extends Controller
         });
 
         return redirect()->route('pembina.ketua.index')
-            ->with('success', 'Ketua baru berhasil ditambahkan beserta akun login-nya.');
+            ->with('success', "{$siswa->nama_siswa} berhasil dijadikan ketua."
+                . ($ketuaLama && $ketuaLama->id_siswa !== $siswa->id_siswa
+                    ? " Ketua sebelumnya ({$ketuaLama->nama_siswa}) tidak lagi memimpin ekskul ini."
+                    : ''));
     }
 
     public function edit(int $id)

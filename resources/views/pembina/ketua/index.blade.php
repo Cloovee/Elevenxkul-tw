@@ -35,7 +35,7 @@
                 <div>
                     <p class="text-xs font-bold uppercase tracking-wide text-[#3F41B0]">Data Ketua</p>
                     <h1 class="font-display text-2xl font-semibold mt-1">Kelola Ketua</h1>
-                    <p class="text-sm text-inksoft mt-1 max-w-md">Daftarkan Ketua baru untuk ekskul yang kamu bina. Akun login-nya (role Ketua) dibuat otomatis.</p>
+                    <p class="text-sm text-inksoft mt-1 max-w-md">Pilih ketua dari anggota ekskul/organisasi yang kamu bina lewat dropdown. Akun login-nya (role Ketua) dibuat otomatis.</p>
                 </div>
                 <div class="flex items-center gap-3">
                     <div class="bg-white/70 rounded-2xl px-4 py-2.5 text-center">
