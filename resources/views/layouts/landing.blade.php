@@ -10,9 +10,9 @@
     <script>try{if(localStorage.getItem('rail-folded')==='1')document.documentElement.classList.add('rail-folded')}catch(e){}</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <title>Ekstrakurikuler {{ $sekolah['nama'] }}</title>
+    <title>@yield('title', 'Beranda') - ElevenXkul</title>
+    @include('partials.favicon')
     <meta name="description" content="Daftar ekstrakurikuler, pembina, galeri kegiatan, video, dan lokasi {{ $sekolah['nama'] }}.">
-    <link rel="icon" href="{{ $logo }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     {{-- Font sama dengan dashboard: Fredoka (judul) + Plus Jakarta Sans (isi) --}}

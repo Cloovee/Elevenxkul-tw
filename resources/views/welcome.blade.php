@@ -1,4 +1,6 @@
 <head>
+    <title>Welcome - ElevenXkul</title>
+    @include('partials.favicon')
     @vite('resources/css/app.css') {{-- wajib pakai ini --}}
 </head>
 <body class="bg-gray-100 min-h-screen flex items-center justify-center">

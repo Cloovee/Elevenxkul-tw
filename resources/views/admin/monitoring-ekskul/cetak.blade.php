@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Laporan Ekskul {{ $ekskul->nama_ekskul }}</title>
+    <title>Laporan Ekskul {{ $ekskul->nama_ekskul }} - ElevenXkul</title>
+    @include('partials.favicon')
     <style>
         * { box-sizing: border-box; }
         body { font-family: "Times New Roman", Times, serif; color: #000; margin: 0; background: #f3f4f6; font-size: 12pt; }
