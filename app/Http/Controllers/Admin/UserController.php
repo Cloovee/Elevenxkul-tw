@@ -77,8 +77,13 @@ class UserController extends Controller
             }
         });
 
+        $pesan = 'Akun user berhasil ditambahkan!';
+        if ($request->role === 'Ketua') {
+            $pesan .= ' Catatan: akun Ketua baru bisa memakai menu ketua setelah siswanya ditetapkan memimpin ekskul (lewat Kelola Ekskul atau Kelola Ketua milik Pembina).';
+        }
+
         return redirect()->route('admin.user.index')
-            ->with('success', 'Akun user berhasil ditambahkan!');
+            ->with('success', $pesan);
     }
 
     public function edit(int $id)

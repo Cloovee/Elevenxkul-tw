@@ -6,16 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\AbsensiPelatih;
 use App\Models\AbsensiPeserta;
 use App\Models\Ekskul;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class RiwayatAbsensiController extends Controller
 {
-    /**
-     * Sementara: ketua mengelola ekskul dengan id_ekskul = 1.
-     * (Sama seperti pola hardcode yang dipakai di controller ketua lainnya.)
-     */
-    private const ID_EKSKUL = 1;
-
     /**
      * GET /riwayat-absensi
      *
@@ -25,16 +20,19 @@ class RiwayatAbsensiController extends Controller
      * berjalan — dua tab terpisah: Histori Absensi Peserta & Histori
      * Absensi Pelatih.
      */
-    public function index(): View
+    public function index(Request $request): View
     {
+        // Ekskul yang dipimpin ketua yang login (diset middleware 'ketua.ekskul').
+        $idEkskul = $request->attributes->get('ekskul_ketua')->id_ekskul;
+
         $riwayatPeserta = AbsensiPeserta::with('peserta.siswa')
-            ->whereHas('peserta', fn ($q) => $q->where('id_ekskul', self::ID_EKSKUL))
+            ->whereHas('peserta', fn ($q) => $q->where('id_ekskul', $idEkskul))
             ->orderByDesc('tanggal_absensi')
             ->orderByDesc('id_absensi')
             ->get();
 
         // Satu ekskul dilatih oleh satu pelatih (lihat relasi Ekskul::pelatih()).
-        $idPelatih = Ekskul::where('id_ekskul', self::ID_EKSKUL)->value('id_pelatih');
+        $idPelatih = Ekskul::where('id_ekskul', $idEkskul)->value('id_pelatih');
 
         $riwayatPelatih = AbsensiPelatih::with('pelatih')
             ->where('id_pelatih', $idPelatih)

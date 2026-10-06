@@ -26,6 +26,10 @@ class Siswa extends Model
 
     protected $fillable = [
         'id_kelas',
+        // WAJIB ada: tautan ke akun login (users.id). Kalau tidak ada di sini, Laravel diam-diam
+        // membuang id_user saat create()/update(), akun Ketua jadi tidak terhubung ke siswa
+        // -> semua menu sidebar Ketua gagal karena ekskul yang dipimpin tidak ditemukan.
+        'id_user',
         'NISN',
         'NIS',
         'nama_siswa',
