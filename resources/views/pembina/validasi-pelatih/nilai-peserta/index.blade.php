@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nilai Peserta — Elevenxkul</title>
+    <title>Nilai Peserta - ElevenXkul</title>
+    @include('partials.favicon')
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="font-body antialiased bg-bgsoft text-ink">

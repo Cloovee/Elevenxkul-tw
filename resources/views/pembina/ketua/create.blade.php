@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="{{ asset('images/smkn11logo.png') }}" type="image/png">
-    <title>Tambah Ketua — ElevenXkul</title>
+    <title>Tambah Ketua - ElevenXkul</title>
+    @include('partials.favicon')
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="font-body bg-bgsoft text-ink min-h-screen flex items-center justify-center p-5"

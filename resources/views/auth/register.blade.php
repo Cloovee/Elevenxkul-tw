@@ -1,4 +1,4 @@
-<x-guest-layout>
+<x-guest-layout title="Daftar">
     <div class="mb-8 hidden lg:block">
         <h2 class="text-2xl sm:text-3xl font-display font-bold text-ink mb-2">Selamat Datang</h2>
         <p class="text-inksoft text-sm">Masuk untuk mengelola kegiatan ekstrakurikuler sekolahmu.</p>

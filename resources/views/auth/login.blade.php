@@ -1,4 +1,4 @@
-<x-guest-login-layout>
+<x-guest-login-layout title="Login">
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
     <h2 class="text-3xl font-display font-bold text-ink mb-1.5">Masuk</h2>
