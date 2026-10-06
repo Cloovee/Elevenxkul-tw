@@ -130,9 +130,19 @@ class SiswaController extends Controller
             'id_kelas.exists' => 'Kelas yang dipilih tidak ditemukan.',
         ]);
 
+        // Simpan dulu file upload-nya ke storage/app (bukan langsung pakai path
+        // temp upload PHP). Di beberapa hosting shared dengan open_basedir aktif,
+        // PhpSpreadsheet gagal baca file .xlsx langsung dari path temp upload
+        // (error "file_exists(): open_basedir restriction... xl/worksheets/sheet1.xml")
+        // karena path temp-nya di luar folder yang diizinkan. Menyimpan file ke
+        // storage/app/temp-import dulu (pasti di dalam folder project) menghindari
+        // masalah ini.
+        $pathTersimpan = $request->file('file')->store('temp-import');
+        $pathFull = \Illuminate\Support\Facades\Storage::path($pathTersimpan);
+
         try {
             $import = new SiswaImport($request->id_kelas);
-            Excel::import($import, $request->file('file'));
+            Excel::import($import, $pathFull);
 
             $barisError = $import->getBarisError();
 
@@ -155,6 +165,10 @@ class SiswaController extends Controller
 
         } catch (\Exception $e) {
             return back()->with('error', 'Gagal import: ' . $e->getMessage());
+        } finally {
+            // File sementara selalu dihapus, baik import sukses, sebagian gagal,
+            // maupun exception -- tidak boleh numpuk di storage.
+            \Illuminate\Support\Facades\Storage::delete($pathTersimpan);
         }
     }
 
