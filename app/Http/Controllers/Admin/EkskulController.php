@@ -57,16 +57,26 @@ class EkskulController extends Controller
             'id_ketua' => 'nullable|exists:siswa,id_siswa',
             'poster' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
             'hapus_poster' => 'nullable|boolean',
+            // Logo ekskul: tampil di kop surat laporan cetak (sisi kanan).
+            'logo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'hapus_logo' => 'nullable|boolean',
         ], [
             'poster.image' => 'Poster harus berupa gambar.',
             'poster.mimes' => 'Poster harus berformat JPG, PNG, atau WEBP.',
             'poster.max' => 'Ukuran poster maksimal 4 MB.',
+            'logo.image' => 'Logo harus berupa gambar.',
+            'logo.mimes' => 'Logo harus berformat JPG, PNG, atau WEBP.',
+            'logo.max' => 'Ukuran logo maksimal 2 MB.',
         ]);
 
-        unset($validated['hapus_poster']);
+        unset($validated['hapus_poster'], $validated['hapus_logo']);
 
         if ($request->hasFile('poster')) {
             $validated['poster'] = $request->file('poster')->store('poster-ekskul', 'public');
+        }
+
+        if ($request->hasFile('logo')) {
+            $validated['logo'] = $request->file('logo')->store('logo-ekskul', 'public');
         }
 
         Ekskul::create($validated);
@@ -100,10 +110,16 @@ class EkskulController extends Controller
             'id_ketua' => 'nullable|exists:siswa,id_siswa',
             'poster' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
             'hapus_poster' => 'nullable|boolean',
+            // Logo ekskul: tampil di kop surat laporan cetak (sisi kanan).
+            'logo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'hapus_logo' => 'nullable|boolean',
         ], [
             'poster.image' => 'Poster harus berupa gambar.',
             'poster.mimes' => 'Poster harus berformat JPG, PNG, atau WEBP.',
             'poster.max' => 'Ukuran poster maksimal 4 MB.',
+            'logo.image' => 'Logo harus berupa gambar.',
+            'logo.mimes' => 'Logo harus berformat JPG, PNG, atau WEBP.',
+            'logo.max' => 'Ukuran logo maksimal 2 MB.',
         ]);
 
         // Kalau pembina diganti/dilepas, pelatih yang sebelumnya terkait ekskul ini ikut
@@ -126,6 +142,20 @@ class EkskulController extends Controller
             unset($validated['poster']);
         }
 
+        // Logo: sama seperti poster -- ganti kalau ada file baru, hapus kalau dicentang.
+        $hapusLogo = ! empty($validated['hapus_logo']);
+        unset($validated['hapus_logo']);
+
+        if ($request->hasFile('logo')) {
+            $this->hapusFileLogo($ekskul);
+            $validated['logo'] = $request->file('logo')->store('logo-ekskul', 'public');
+        } elseif ($hapusLogo) {
+            $this->hapusFileLogo($ekskul);
+            $validated['logo'] = null;
+        } else {
+            unset($validated['logo']);
+        }
+
         $ekskul->update($validated);
 
         return redirect()->route('admin.ekskul.index')
@@ -135,6 +165,7 @@ class EkskulController extends Controller
     public function destroy(Ekskul $ekskul)
     {
         $this->hapusFilePoster($ekskul);
+        $this->hapusFileLogo($ekskul);
         $ekskul->delete();
 
         return redirect()->route('admin.ekskul.index')
@@ -148,6 +179,16 @@ class EkskulController extends Controller
     {
         if ($ekskul->poster && ! str_starts_with($ekskul->poster, 'http')) {
             Storage::disk('public')->delete($ekskul->poster);
+        }
+    }
+
+    /**
+     * Hapus file logo dari storage (abaikan kalau berupa URL luar).
+     */
+    private function hapusFileLogo(Ekskul $ekskul): void
+    {
+        if ($ekskul->logo && ! str_starts_with($ekskul->logo, 'http')) {
+            Storage::disk('public')->delete($ekskul->logo);
         }
     }
 

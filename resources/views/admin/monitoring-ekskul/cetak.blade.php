@@ -16,6 +16,14 @@
         h1 { text-align: center; font-size: 16pt; margin: 0 0 4px; letter-spacing: 1px; }
         .sub { text-align: center; margin: 0 0 16px; font-size: 11pt; }
         hr { border: 0; border-top: 2px solid #000; margin: 0 0 16px; }
+
+        /* Kop surat: logo SMKN 11 (kiri) - judul (tengah) - logo ekskul (kanan) */
+        .kop { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin: 0 0 12px; }
+        .kop-logo { width: 24mm; height: 24mm; flex: none; display: flex; align-items: center; justify-content: center; }
+        .kop-logo img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
+        .kop-tengah { flex: 1; min-width: 0; }
+        .kop-tengah h1 { margin: 0 0 4px; }
+        .kop-tengah .sub { margin: 0; }
         h2 { font-size: 12pt; margin: 20px 0 6px; text-transform: uppercase; }
         table { width: 100%; border-collapse: collapse; font-size: 11pt; }
         th, td { border: 1px solid #000; padding: 4px 6px; text-align: left; vertical-align: top; }
@@ -35,6 +43,7 @@
             .toolbar, .no-print { display: none !important; }
             .page { box-shadow: none; margin: 0; padding: 0; max-width: none; }
             th { background: #e5e7eb !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .kop-logo img { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         }
     </style>
 </head>
@@ -46,8 +55,24 @@
     </div>
 
     <div class="page">
-        <h1>LAPORAN EKSTRAKURIKULER</h1>
-        <p class="sub">Dicetak pada {{ now()->translatedFormat('d F Y') }}</p>
+        {{-- Kop surat: logo SMKN 11 di kiri, logo ekskul di kanan (kalau belum diunggah, sisi kanan dikosongkan
+             supaya judul tetap berada di tengah). Logo ekskul diunggah di halaman Tambah/Edit Ekskul. --}}
+        <div class="kop">
+            <div class="kop-logo">
+                <img src="{{ asset('images/smkn11logo.png') }}" alt="Logo SMKN 11 Bandung" onerror="this.style.display='none'">
+            </div>
+
+            <div class="kop-tengah">
+                <h1>LAPORAN EKSTRAKURIKULER</h1>
+                <p class="sub">Dicetak pada {{ now()->translatedFormat('d F Y') }}</p>
+            </div>
+
+            <div class="kop-logo">
+                @if($ekskul->logo_url)
+                    <img src="{{ $ekskul->logo_url }}" alt="Logo {{ $ekskul->nama_ekskul }}" onerror="this.style.display='none'">
+                @endif
+            </div>
+        </div>
         <hr>
 
         <table class="info">
