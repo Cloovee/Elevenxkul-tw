@@ -47,19 +47,25 @@
             @error('file')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
         </div>
 
-        <div class="mb-6">
-            <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Kelas Tujuan <span class="text-red-500">*</span></label>
-            <select name="id_kelas" required
-                class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C] @error('id_kelas') ring-2 ring-red-400 @enderror">
-                <option value="">-- Pilih Kelas --</option>
-                @foreach($kelas as $k)
-                    <option value="{{ $k->id_kelas }}" @selected(old('id_kelas') == $k->id_kelas)>
-                        {{ $k->tingkat }} {{ $k->program_keahlian }} {{ $k->rombel }}
-                    </option>
-                @endforeach
-            </select>
-            @error('id_kelas')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
-            <p class="text-xs text-[#7C8DB5] mt-2">Semua siswa di file Excel akan dimasukkan ke kelas ini. Excel tidak perlu kolom Kelas.</p>
+        <div class="mb-6 p-4 bg-[#F2F7FF] rounded-2xl text-sm text-[#10316B]">
+            <p class="font-bold mb-1"><i class="fas fa-info-circle mr-1"></i> Kelas ditentukan dari kolom <span class="font-mono">Rombel</span> di Excel</p>
+            <p class="text-xs text-[#7C8DB5]">
+                Tulis kode rombel tiap siswa, contoh <span class="font-mono">10TJKT1</span>, <span class="font-mono">11RPL2</span>, <span class="font-mono">12AK3</span>
+                (tingkat + program keahlian + nomor rombel; huruf besar/kecil dan spasi tidak masalah).
+                Rombel harus <b>sudah terdaftar</b> di menu Kelas. Baris dengan rombel yang belum terdaftar akan ditolak.
+                Nama kolom <span class="font-mono">Rombel Saat Ini</span> juga dikenali.
+            </p>
+
+            <details class="mt-3">
+                <summary class="cursor-pointer text-xs font-bold text-[#0B409C]">Lihat {{ $kelas->count() }} rombel yang terdaftar</summary>
+                <div class="flex flex-wrap gap-1.5 mt-2">
+                    @forelse($kelas as $k)
+                        <span class="px-2 py-0.5 bg-white rounded-full text-xs font-mono text-[#10316B]">{{ $k->kode_rombel }}</span>
+                    @empty
+                        <span class="text-xs text-red-500">Belum ada rombel. Tambahkan dulu di menu Kelas.</span>
+                    @endforelse
+                </div>
+            </details>
         </div>
 
         <div class="flex flex-wrap gap-3">
