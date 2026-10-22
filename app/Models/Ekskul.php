@@ -18,6 +18,7 @@ class Ekskul extends Model
         'kategori',
         'deskripsi',
         'poster',
+        'logo',
     ];
 
     /**
@@ -74,6 +75,23 @@ class Ekskul extends Model
         }
 
         return asset('storage/' . ltrim($this->poster, '/'));
+    }
+
+    /**
+     * URL logo ekskul yang diunggah admin (disk "public"), atau null kalau belum ada.
+     * Dipakai di kop surat laporan cetak.
+     */
+    public function getLogoUrlAttribute(): ?string
+    {
+        if (! $this->logo) {
+            return null;
+        }
+
+        if (str_starts_with($this->logo, 'http://') || str_starts_with($this->logo, 'https://')) {
+            return $this->logo;
+        }
+
+        return asset('storage/' . ltrim($this->logo, '/'));
     }
 
     /**

@@ -142,6 +142,40 @@
                     </div>
                 </div>
 
+                <!-- Logo ekskul (tampil di kop surat laporan cetak, sisi kanan) -->
+                <div class="md:col-span-2" x-data="{ preview: @js(null), hapus: false }">
+                    <label for="logo" class="block text-xs font-bold text-[#2b3674] uppercase tracking-wider mb-2">
+                        Logo Ekskul
+                    </label>
+
+                    <div class="flex flex-col sm:flex-row gap-5 items-start">
+                        <div class="w-36 shrink-0 aspect-square rounded-2xl overflow-hidden bg-[#f4f7fe] ring-1 ring-[#10316B]/10 flex items-center justify-center">
+                            <template x-if="preview && !hapus">
+                                <img :src="preview" alt="Pratinjau logo" class="w-full h-full object-contain p-3">
+                            </template>
+                            <div x-show="!preview || hapus" class="text-center px-3 text-[#a3aed1]">
+                                <i class="fas fa-shield-halved text-2xl"></i>
+                                <p class="text-[11px] font-semibold mt-2">Belum ada logo</p>
+                            </div>
+                        </div>
+
+                        <div class="flex-1 min-w-0">
+                            <input type="file" name="logo" id="logo" accept="image/png,image/jpeg,image/webp"
+                                @change="const f = $event.target.files[0]; if (f) { preview = URL.createObjectURL(f); hapus = false }"
+                                class="block w-full text-sm text-[#2b3674] file:mr-4 file:py-2.5 file:px-5 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-[#0B409C] file:text-white hover:file:opacity-90 file:cursor-pointer bg-[#f4f7fe] rounded-xl @error('logo') ring-2 ring-red-500 @enderror">
+                            <p class="mt-1.5 text-xs text-[#a3aed1]">
+                                JPG, PNG, atau WEBP, maksimal 2 MB. Paling bagus berbentuk persegi dan berlatar transparan (PNG), misalnya 500&times;500 px.
+                                Logo ini muncul di sisi kanan kop surat saat laporan ekskul dicetak, berdampingan dengan logo SMKN 11 di sisi kiri.
+                            </p>
+                            @error('logo')
+                                <p class="mt-1.5 text-xs text-red-500 font-semibold flex items-center gap-1">
+                                    <i class="fas fa-exclamation-circle"></i> {{ $message }}
+                                </p>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Deskripsi -->
                 <div class="md:col-span-2">
                     <label for="deskripsi" class="block text-xs font-bold text-[#2b3674] uppercase tracking-wider mb-2">
