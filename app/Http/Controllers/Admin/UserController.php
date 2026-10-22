@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
@@ -20,6 +21,7 @@ class UserController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'LIKE', "%{$search}%")
+                  ->orWhere('username', 'LIKE', "%{$search}%")
                   ->orWhere('email', 'LIKE', "%{$search}%");
             });
         }
@@ -45,12 +47,12 @@ class UserController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:users,email',
+            'username' => 'required|string|min:3|max:50|alpha_dash:ascii|unique:users,username',
             'password' => 'required|string|min:8|confirmed',
             'role' => 'required|in:Admin,Pembina,Ketua',
             // wajib diisi HANYA kalau role = Ketua
             'id_siswa' => 'required_if:role,Ketua|nullable|exists:siswa,id_siswa',
-        ]);
+        ], $this->pesan());
 
         if ($validator->fails()) {
             return back()->withErrors($validator)->withInput();
@@ -67,7 +69,7 @@ class UserController extends Controller
         DB::transaction(function () use ($request) {
             $user = User::create([
                 'name' => $request->name,
-                'email' => $request->email,
+                'username' => $request->username,
                 'password' => Hash::make($request->password),
                 'role' => $request->role,
             ]);
@@ -105,11 +107,11 @@ class UserController extends Controller
 
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:users,email,' . $user->id,
+            'username' => ['required', 'string', 'min:3', 'max:50', 'alpha_dash:ascii', Rule::unique('users', 'username')->ignore($user->id)],
             'password' => 'nullable|string|min:8|confirmed',
             'role' => 'required|in:Admin,Pembina,Ketua',
             'id_siswa' => 'required_if:role,Ketua|nullable|exists:siswa,id_siswa',
-        ]);
+        ], $this->pesan());
 
         if ($validator->fails()) {
             return back()->withErrors($validator)->withInput();
@@ -126,7 +128,7 @@ class UserController extends Controller
         DB::transaction(function () use ($request, $user) {
             $userData = [
                 'name' => $request->name,
-                'email' => $request->email,
+                'username' => $request->username,
                 'role' => $request->role,
             ];
 
@@ -163,5 +165,15 @@ class UserController extends Controller
 
         return redirect()->route('admin.user.index')
             ->with('success', 'Akun user berhasil dihapus!');
+    }
+
+    private function pesan(): array
+    {
+        return [
+            'username.required' => 'Username wajib diisi.',
+            'username.min' => 'Username minimal 3 karakter.',
+            'username.unique' => 'Username ini sudah dipakai akun lain.',
+            'username.alpha_dash' => 'Username hanya boleh huruf, angka, strip (-) dan underscore (_), tanpa spasi dan tanpa @.',
+        ];
     }
 }

@@ -34,10 +34,16 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
             <div>
-                <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Email (Username Login) <span class="text-red-500">*</span></label>
-                <input type="email" name="email" class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C] @error('email') ring-2 ring-red-400 @enderror" value="{{ old('email') }}" required>
+                <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Username (Login) <span class="text-red-500">*</span></label>
+                <input type="text" name="username" minlength="3" maxlength="50" pattern="[A-Za-z0-9_\-]+" title="Hanya huruf, angka, strip (-) dan underscore (_), tanpa spasi dan tanpa @" autocomplete="off" autocapitalize="none" spellcheck="false" class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C] @error('username') ring-2 ring-red-400 @enderror" value="{{ old('username') }}" required>
+                @error('username')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                <p class="text-xs text-[#7C8DB5] mt-1.5">Dipakai untuk login. Cukup huruf, angka, - atau _ (tanpa @ dan .com).</p>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Email <span class="text-xs normal-case font-normal text-[#7C8DB5]">(opsional, hanya kontak)</span></label>
+                <input type="email" name="email" class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C] @error('email') ring-2 ring-red-400 @enderror" value="{{ old('email') }}">
                 @error('email')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
-                <p class="text-xs text-[#7C8DB5] mt-1.5">Email ini otomatis jadi akun login pembina (role Pembina).</p>
             </div>
 
             <div>

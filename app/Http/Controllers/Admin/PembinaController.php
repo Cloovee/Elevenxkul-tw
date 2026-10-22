@@ -55,13 +55,14 @@ class PembinaController extends Controller
             'jk' => 'required|in:L,P',
             'agama' => 'nullable|string|max:20',
             'nomor_hp' => 'nullable|string|max:15',
-            'email' => 'required|email|max:100|unique:users,email',
+            'username' => 'required|string|min:3|max:50|alpha_dash:ascii|unique:users,username',
+            'email' => 'nullable|email|max:100',
             'medsos' => 'nullable|string|max:100',
             'alamat' => 'nullable|string',
             'password' => 'required|string|min:8|confirmed',
             'ekskul_ids' => 'nullable|array',
             'ekskul_ids.*' => 'exists:ekskuls,id_ekskul',
-        ]);
+        ], $this->pesan());
 
         if ($validator->fails()) {
             return back()->withErrors($validator)->withInput();
@@ -75,7 +76,7 @@ class PembinaController extends Controller
            
             $user = User::create([
                 'name' => $request->nama_pembina,
-                'email' => $request->email,
+                'username' => $request->username,
                 'password' => Hash::make($request->password),
                 'role' => 'Pembina',
             ]);
@@ -119,6 +120,7 @@ class PembinaController extends Controller
     public function update(Request $request, int $id)
     {
         $pembina = Pembina::with('user')->findOrFail($id);
+        $punyaAkun = (bool) $pembina->user;
 
         $validator = Validator::make($request->all(), [
             'nama_pembina' => 'required|string|max:100',
@@ -127,13 +129,18 @@ class PembinaController extends Controller
             'jk' => 'required|in:L,P',
             'agama' => 'nullable|string|max:20',
             'nomor_hp' => 'nullable|string|max:15',
-            'email' => 'required|email|max:100|unique:users,email,' . $pembina->id_user,
+            'username' => [
+                $punyaAkun ? 'required' : 'nullable',
+                'string', 'min:3', 'max:50', 'alpha_dash:ascii',
+                Rule::unique('users', 'username')->ignore($pembina->id_user),
+            ],
+            'email' => 'nullable|email|max:100',
             'medsos' => 'nullable|string|max:100',
             'alamat' => 'nullable|string',
             'password' => 'nullable|string|min:8|confirmed',
             'ekskul_ids' => 'nullable|array',
             'ekskul_ids.*' => 'exists:ekskuls,id_ekskul',
-        ]);
+        ], $this->pesan());
 
         if ($validator->fails()) {
             return back()->withErrors($validator)->withInput();
@@ -165,7 +172,7 @@ class PembinaController extends Controller
             if ($pembina->user) {
                 $userData = [
                     'name' => $request->nama_pembina,
-                    'email' => $request->email,
+                    'username' => $request->username,
                 ];
                 if ($request->filled('password')) {
                     $userData['password'] = Hash::make($request->password);
@@ -213,7 +220,8 @@ class PembinaController extends Controller
     {
         return [
             'jk.required' => 'Pilih jenis kelamin.',
-            'email.unique' => 'Email ini sudah dipakai akun lain.',
+            'username.required' => 'Username wajib diisi.',
+            'username.min' => 'Username minimal 3 karakter.',
             'username.unique' => 'Username ini sudah dipakai akun lain.',
             'username.alpha_dash' => 'Username hanya boleh huruf, angka, strip (-) dan underscore (_).',
             'password.required' => 'Password wajib diisi.',

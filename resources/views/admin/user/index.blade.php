@@ -13,7 +13,7 @@
         <form method="GET" class="flex flex-wrap items-center gap-2">
             <div class="relative">
                 <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-[#7C8DB5] text-sm"></i>
-                <input type="text" name="search" placeholder="Cari nama/email..." value="{{ request('search') }}"
+                <input type="text" name="search" placeholder="Cari nama/username..." value="{{ request('search') }}"
                     class="pl-10 pr-4 py-2 bg-[#F2F7FF] border-none rounded-full text-sm text-[#10316B] placeholder-[#7C8DB5] focus:ring-2 focus:ring-[#0B409C] w-56">
             </div>
 
@@ -91,7 +91,7 @@
                             </div>
                             <div>
                                 <p class="text-[#10316B] font-bold leading-tight">{{ $u->name }}</p>
-                                <p class="text-[#7C8DB5] text-xs">{{ $u->email }}</p>
+                                <p class="text-[#7C8DB5] text-xs">{{ $u->username ?? $u->email }}</p>
                             </div>
                         </div>
                     </td>
