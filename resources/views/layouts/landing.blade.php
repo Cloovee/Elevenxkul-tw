@@ -114,34 +114,35 @@
         .hero-top{padding-inline:calc(var(--rail) + 1.5rem) 1.5rem;position:relative;z-index:5;text-align:center}
         .hero h1{font-size:clamp(1.6rem,3vw,2.5rem);font-weight:700;max-width:26ch;margin-inline:auto;color:#fff;text-shadow:0 2px 16px rgba(0,0,0,.45)}
         .hero .sub{margin:.6rem auto 0;max-width:52ch;color:rgba(255,255,255,.9);text-shadow:0 1px 10px rgba(0,0,0,.45)}
-        .cf{position:relative;flex:1;display:grid;place-items:center;margin-left:var(--rail);perspective:1500px;touch-action:pan-y;user-select:none;--ch:clamp(340px,66svh,640px);--cw:calc(var(--ch)*.58);min-height:calc(var(--ch) + 3rem)}
+        .cf{position:relative;flex:1;display:grid;place-items:center;margin-left:var(--rail);touch-action:pan-y;user-select:none;--ch:clamp(340px,66svh,640px);--cw:calc(var(--ch)*.58);min-height:calc(var(--ch) + 3rem)}
         .cf:focus-visible{outline-offset:-8px}
         @supports not (height:100svh){.cf{--ch:clamp(340px,66vh,640px)}}
         .cf-card{position:absolute;left:50%;top:50%;width:var(--cw);height:var(--ch);margin:calc(var(--ch)/-2) 0 0 calc(var(--cw)/-2);border-radius:1.1rem;overflow:hidden;background:var(--blue);box-shadow:0 30px 50px -20px rgba(0,0,0,.6);cursor:pointer;will-change:transform,opacity}
         .cf-card.on{cursor:default}
         .cf-card img{width:100%;height:100%;object-fit:cover;pointer-events:none}
-        .cf-card::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 40%,rgba(8,26,66,.8));opacity:0;transition:opacity .6s}
-        .cf-card.on::after{opacity:1}
+        .cf-card::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 40%,rgba(8,26,66,.8));pointer-events:none}
         .cf-ph{position:absolute;inset:0;display:grid;place-items:center;font:700 5rem var(--display);color:rgba(255,255,255,.85);background:linear-gradient(160deg,var(--blue),var(--navy))}
-        .cf-cap{position:absolute;z-index:15;left:50%;bottom:calc(50% - var(--ch)/2 + 1.4rem);width:calc(var(--cw) - 2.4rem);transform:translateX(-50%);pointer-events:none;opacity:var(--o,0);transition:opacity .25s,transform .45s var(--ease)}
-        .cf-cap.swap{opacity:0;transform:translate(-50%,10px)}
+        /* Judul + deskripsi menempel di dalam kartu foto, jadi ikut bergeser bersama fotonya */
+        .cf-txt{position:absolute;z-index:2;left:1.2rem;right:1.2rem;bottom:1.4rem;margin:0;opacity:var(--o,0)}
         .cf-title{font:700 clamp(1.25rem,2.1vw,1.9rem) var(--display);text-transform:uppercase;letter-spacing:.04em;line-height:1.1;text-shadow:0 2px 18px rgba(0,0,0,.5)}
         .cf-line{width:2.2rem;height:2px;background:#fff;margin:.9rem 0 .6rem}
         .cf-sub{font-size:.95rem;text-shadow:0 1px 10px rgba(0,0,0,.5)}
         .cf-title,.cf-sub{overflow-wrap:anywhere}
-        .cf-go{pointer-events:auto;margin-top:.9rem;padding:.55rem 1.2rem;font-size:.85rem}
+        .cf-go{pointer-events:none;margin-top:.9rem;padding:.55rem 1.2rem;font-size:.85rem}
+        .cf-card.on .cf-go{pointer-events:auto}
+        .cf-card .cf-go:hover{transform:none}
         .cf-arrow{position:absolute;top:50%;translate:0 -50%;z-index:20;width:3rem;height:3rem;border:0;border-radius:50%;background:rgba(255,255,255,.14);backdrop-filter:blur(6px);color:#fff;cursor:pointer;display:grid;place-items:center;opacity:var(--o,0);transition:background .3s,color .3s,transform .3s var(--ease)}
         .cf-arrow svg{width:22px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
         .cf-arrow:hover{background:var(--gold);color:var(--navy)}.cf-arrow:active{transform:scale(.92)}
         .cf-arrow.pv{left:1rem}.cf-arrow.nx{right:1rem}
         .cf-meta{opacity:var(--o,0);margin-left:var(--rail);text-align:center;font:600 1rem var(--display);position:relative;z-index:5}
         .cf-meta span{color:rgba(255,255,255,.6);font-weight:500}
-        .folded .cf-arrow,.folded .cf-go{pointer-events:none}
+        .folded .cf-arrow,.folded .cf-card .cf-go{pointer-events:none}
         @media(max-width:600px){
             .hero{padding:2.2rem 0 6rem}
             .hero-top{padding-inline:calc(var(--rail) + 1.1rem) 1.1rem}
             .cf{--ch:clamp(300px,58svh,520px);--cw:calc(var(--ch)*.68)}
-            .cf-cap{width:calc(var(--cw) - 1.8rem);bottom:calc(50% - var(--ch)/2 + 1.1rem)}
+            .cf-txt{left:.9rem;right:.9rem;bottom:1.1rem}
             .cf-sub{font-size:.85rem}
         }
         .cf-empty{margin:auto;padding:2rem;text-align:center;color:rgba(255,255,255,.85)}
@@ -375,7 +376,6 @@
                 'img' => $e->cover_url,
                 'sub' => \Illuminate\Support\Str::limit(strip_tags((string) $e->deskripsi), 70) ?: ($kat[$e->kategori] ?? ucfirst($e->kategori)),
             ]);
-            $first = $slides->first();
         @endphp
         <div class="hero-bg" data-speed="0.25" data-clamp aria-hidden="true"></div>
 
@@ -389,18 +389,18 @@
         @else
         <div class="cf" id="cf" tabindex="0" aria-roledescription="carousel" aria-label="Daftar ekskul">
             @foreach($slides as $s)
-                <figure class="cf-card" data-nama="{{ $s['e']->nama_ekskul }}" data-sub="{{ $s['sub'] }}" data-href="#ekskul-{{ $s['e']->id_ekskul }}">
+                <figure class="cf-card">
                     @if($s['img'])<img src="{{ $s['img'] }}" alt="Kegiatan {{ $s['e']->nama_ekskul }}" draggable="false" loading="{{ $loop->index < 5 ? 'eager' : 'lazy' }}">
                     @else<span class="cf-ph" aria-hidden="true">{{ strtoupper(mb_substr($s['e']->nama_ekskul, 0, 1)) }}</span>@endif
+
+                    <figcaption class="cf-txt">
+                        <p class="cf-title">{{ $s['e']->nama_ekskul }}</p>
+                        <div class="cf-line"></div>
+                        <p class="cf-sub">{{ $s['sub'] }}</p>
+                        <a class="btn btn-gold cf-go" href="#ekskul-{{ $s['e']->id_ekskul }}" tabindex="-1">Lihat detail</a>
+                    </figcaption>
                 </figure>
             @endforeach
-
-            <div class="cf-cap" id="cf-cap" aria-live="polite">
-                <h2 class="cf-title" id="cf-title">{{ $first['e']->nama_ekskul }}</h2>
-                <div class="cf-line"></div>
-                <p class="cf-sub" id="cf-sub">{{ $first['sub'] }}</p>
-                <a class="btn btn-gold cf-go" id="cf-go" href="#ekskul-{{ $first['e']->id_ekskul }}">Lihat detail</a>
-            </div>
 
             @if($slides->count() > 1)
             <button class="cf-arrow pv" id="cf-prev" aria-label="Ekskul sebelumnya"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
@@ -810,37 +810,38 @@
         dlg.querySelector('.dlg-x').addEventListener('click', () => dlg.close());
     }
 
-    /* ===== Carousel ekskul (coverflow) =====
-       - Saat halaman dibuka, kartu bertumpuk lalu menyebar pelan selama INTRO ms.
-       - Saat di-scroll ke bawah, kartu melipat kembali jadi satu kartu sambil mundur ke belakang
-         (mengecil, miring, dan memudar), mengikuti posisi scroll (scroll ke atas = maju & menyebar lagi).
-       - Panah next/prev menggeser semua kartu satu posisi (kartu paling kiri pindah ke paling kanan). */
+    /* ===== Carousel ekskul (geser ke samping) =====
+       - Saat halaman dibuka, kartu bertumpuk lalu menyebar ke samping pelan selama INTRO ms.
+       - Kartu hanya bergerak horizontal (kiri/kanan). Tidak ada efek naik/turun atau mundur saat scroll.
+       - Judul + deskripsi + tombol ada di dalam tiap kartu, jadi selalu menempel pada fotonya.
+       - Panah next/prev menggeser semua kartu satu posisi (kartu paling kiri pindah ke paling kanan).
+       - Autoplay: otomatis geser ke kartu berikutnya tiap AUTO ms (lihat blok "Autoplay" di bawah). */
     const cf = document.getElementById('cf');
     if (cf) {
         const INTRO = 1800;                       /* durasi menyebar (ms) */
-        const RECEDE = 900, TILT = 12;            /* efek mundur saat scroll: jarak ke belakang (px) & kemiringan (derajat) */
         const hero = document.getElementById('beranda');
         const cards = [...cf.querySelectorAll('.cf-card')], n = cards.length;
-        const cap = document.getElementById('cf-cap');
-        const XD = [0, 1.04, 1.9, 2.6], XM = [0, .8, 1.4, 1.9], R = [0, 26, 34, 40], Z = [0, -90, -180, -260], S = [1, .86, .72, .6], B = [1, .62, .45, .35];
+        const XD = [0, 1.04, 1.9, 2.6], XM = [0, .8, 1.4, 1.9], S = [1, .86, .72, .6], B = [1, .62, .45, .35];
         const curve = (arr, a) => { const i = Math.min(Math.floor(a), 2), t = Math.min(a, 3) - i; return arr[i] + (arr[i + 1] - arr[i]) * t; };
         const easeIO = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
         const idx = () => ((Math.round(target) % n) + n) % n;
 
-        let target = 0, pos = 0, spread = reduce ? 1 : 0, fold = 0, t0 = Infinity, raf = 0, last = 0;
+        let target = 0, pos = 0, spread = reduce ? 1 : 0, t0 = Infinity, raf = 0, last = 0;
 
         const offset = i => { let d = i - pos; return d - n * Math.round(d / n); };
 
         const draw = () => {
-            const F = easeIO(spread) * (1 - fold), w = cards[0].offsetWidth, X = innerWidth < 700 ? XM : XD;
+            const F = easeIO(spread), w = cards[0].offsetWidth, X = innerWidth < 700 ? XM : XD;
             cards.forEach((el, i) => {
-                const d = offset(i), a = Math.abs(d), sg = Math.sign(d);
-                el.style.transform = `translate3d(${(sg * curve(X, a) * w * F).toFixed(1)}px,0,${(curve(Z, a) * F - RECEDE * fold).toFixed(1)}px) rotateX(${(TILT * fold).toFixed(2)}deg) rotateY(${(-sg * curve(R, a) * F).toFixed(2)}deg) scale(${(1 + (curve(S, a) - 1) * F).toFixed(4)})`;
-                el.style.opacity = (a <= 2 ? 1 : Math.max(0, 3 - a)) * (1 - .7 * fold);
-                el.style.filter = `brightness(${((1 + (curve(B, a) - 1) * F) * (1 - .35 * fold)).toFixed(3)})`;
+                const d = offset(i), a = Math.abs(d), sg = Math.sign(d), on = a < .5;
+                /* hanya translateX (geser ke samping) + sedikit mengecil untuk kartu di sisi */
+                el.style.transform = `translateX(${(sg * curve(X, a) * w * F).toFixed(1)}px) scale(${(1 + (curve(S, a) - 1) * F).toFixed(4)})`;
+                el.style.opacity = a <= 2 ? 1 : Math.max(0, 3 - a);
+                el.style.filter = `brightness(${(1 + (curve(B, a) - 1) * F).toFixed(3)})`;
                 el.style.zIndex = Math.max(0, Math.round(10 - a * 3));
                 el.style.pointerEvents = (a > 2 || F < .9) ? 'none' : 'auto';
-                el.classList.toggle('on', a < .5);
+                el.classList.toggle('on', on);
+                const go = el.querySelector('.cf-go'); if (go) go.tabIndex = on ? 0 : -1;   /* hanya tombol di kartu aktif yang bisa difokus */
             });
             const o = Math.min(1, Math.max(0, (F - .7) / .3));
             hero.style.setProperty('--o', o.toFixed(3));
@@ -859,30 +860,14 @@
         };
         const kick = () => { if (!raf) raf = requestAnimationFrame(frame); };
 
-        const caption = () => {
-            const c = cards[idx()];
-            cap.classList.add('swap');
-            setTimeout(() => {
-                document.getElementById('cf-title').textContent = c.dataset.nama;
-                document.getElementById('cf-sub').textContent = c.dataset.sub;
-                document.getElementById('cf-go').setAttribute('href', c.dataset.href);
-                const now = document.getElementById('cf-now'); if (now) now.textContent = idx() + 1;
-                cap.classList.remove('swap');
-            }, 240);
-        };
-        const go = delta => { if (n < 2 || !delta) return; target += delta; caption(); kick(); };
+        const counter = () => { const now = document.getElementById('cf-now'); if (now) now.textContent = idx() + 1; };
+        const go = delta => { if (n < 2 || !delta) return; target += delta; counter(); kick(); startAuto(); };   /* geser manual = hitungan 5 detik mulai ulang */
 
         draw();                                             /* posisi awal: semua kartu menumpuk */
         if (!reduce) {
             const imgs = [...cf.querySelectorAll('img')].slice(0, 5).map(i => i.decode ? i.decode().catch(() => {}) : Promise.resolve());
             Promise.race([Promise.all(imgs), new Promise(r => setTimeout(r, 1200))]).then(() => { t0 = performance.now() + 250; kick(); });
 
-            const onScroll = () => {
-                const f = Math.min(1, Math.max(0, scrollY / (hero.offsetHeight * .6)));
-                if (f !== fold) { fold = f; kick(); }
-            };
-            addEventListener('scroll', onScroll, { passive: true });
-            onScroll();
         }
         addEventListener('resize', kick);
 
@@ -901,10 +886,27 @@
         });
         cards.forEach((el, i) => el.addEventListener('click', () => { if (!swiped) go(Math.round(offset(i))); }));
 
+        /* Autoplay: geser otomatis ke kartu berikutnya tiap AUTO ms (ubah angkanya kalau mau lebih cepat/lambat).
+           Tetap jalan walau kursor ada di atas carousel. Berhenti sementara hanya saat fokus keyboard ada
+           di carousel, saat tab tidak aktif, atau saat hero sudah tidak terlihat. Mati otomatis kalau
+           pengguna memilih "kurangi gerakan" di perangkatnya (prefers-reduced-motion). */
+        const AUTO = 5000;
+        let timer = 0, held = false;
+        const stopAuto = () => { clearInterval(timer); timer = 0; };
+        const startAuto = () => {
+            stopAuto();
+            if (reduce || n < 2 || held || document.hidden) return;
+            timer = setInterval(() => { if (spread >= 1 && hero.getBoundingClientRect().bottom > 0) go(1); }, AUTO);
+        };
+        cf.addEventListener('focusin', e => { if (e.target.matches(':focus-visible')) { held = true; stopAuto(); } });   /* hanya fokus keyboard, bukan bekas klik */
+        cf.addEventListener('focusout', () => { held = false; startAuto(); });
+        document.addEventListener('visibilitychange', startAuto);
+        startAuto();
+
         /* "Lihat detail": buka bagian ekskul, pastikan kartunya tampil (reset filter/pencarian), lalu sorot */
-        document.getElementById('cf-go')?.addEventListener('click', e => {
+        cf.querySelectorAll('.cf-go').forEach(btn => btn.addEventListener('click', e => {
             e.preventDefault();
-            const t = document.querySelector(document.getElementById('cf-go').getAttribute('href'));
+            const t = document.querySelector(btn.getAttribute('href'));
             if (!t) return;
             if (ekPager) {
                 ekCat = 'all'; ekTerm = ''; if (ekQ) ekQ.value = '';
@@ -913,7 +915,7 @@
             }
             t.scrollIntoView({ block: 'center' });
             t.classList.remove('flash'); void t.offsetWidth; t.classList.add('flash');
-        });
+        }));
     }
 
     /* ===== Efek muncul saat scroll: tiap elemen memudar & bergeser masuk begitu terlihat ===== */

@@ -283,8 +283,13 @@ Route::post('/absensi-pelatih', [App\Http\Controllers\Ketua\AbsensiPelatihContro
 Route::get('/absensi-peserta', [App\Http\Controllers\Ketua\AbsensiPesertaController::class, 'index'])
     ->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])->name('ketua.absensi-peserta');
 
-Route::post('/absensi-peserta', [App\Http\Controllers\Ketua\AbsensiPesertaController::class, 'store'])
-    ->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])->name('ketua.absensi-peserta.store');
+// Scan QR kartu peserta (isi QR = NIS). Dipanggil lewat fetch/JSON dari halaman absensi peserta.
+Route::post('/absensi-peserta/scan', [App\Http\Controllers\Ketua\AbsensiPesertaController::class, 'scan'])
+    ->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])->name('ketua.absensi-peserta.scan');
+
+// Tutup absensi: peserta aktif yang tidak scan dicatat Alpha.
+Route::post('/absensi-peserta/selesai', [App\Http\Controllers\Ketua\AbsensiPesertaController::class, 'selesai'])
+    ->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])->name('ketua.absensi-peserta.selesai');
 
 Route::get('/riwayat-absensi', [RiwayatAbsensiController::class, 'index'])
     ->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])->name('ketua.riwayat-absensi');

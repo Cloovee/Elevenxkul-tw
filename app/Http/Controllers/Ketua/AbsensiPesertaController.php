@@ -5,100 +5,166 @@ namespace App\Http\Controllers\Ketua;
 use App\Http\Controllers\Controller;
 use App\Models\AbsensiPeserta;
 use App\Models\Peserta;
+use App\Models\Siswa;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Carbon;
+use Illuminate\View\View;
 
 class AbsensiPesertaController extends Controller
 {
     /**
-     * Id ekskul yang dipimpin oleh Ketua yang sedang login, diambil dari
-     * relasi Siswa->ekskulDipimpin (diisi Admin lewat CRUD Ekskul).
-     * Null kalau akun ini belum ditugaskan memimpin ekskul manapun.
+     * Ekskul yang dipimpin ketua yang login (diset middleware 'ketua.ekskul',
+     * jadi di sini pasti ada).
      */
-    private function idEkskulAktif(): ?int
+    private function idEkskul(Request $request): int
     {
-        $siswa = Auth::user()->siswa;
-
-        return optional(optional($siswa)->ekskulDipimpin)->id_ekskul;
+        return $request->attributes->get('ekskul_ketua')->id_ekskul;
     }
 
     /**
-     * Use case: Ketua mengisi absensi SEMUA peserta sekaligus untuk satu
-     * tanggal kegiatan (satu form = satu tabel Nama + H/S/I per peserta).
+     * Halaman absensi peserta: ketua scan QR kartu peserta (isi QR = NIS).
+     * Tidak ada tabel absensi lagi -- yang tampil hanya scanner dan daftar
+     * peserta yang SUDAH tercatat hadir pada tanggal yang dipilih.
      */
-    public function index()
+    public function index(Request $request): View
     {
-        $idEkskul = $this->idEkskulAktif();
+        $idEkskul = $this->idEkskul($request);
 
-        if (! $idEkskul) {
-            return redirect()->route('dashboard.ketua')
-                ->with('error', 'Akun kamu belum ditugaskan sebagai ketua ekskul manapun. Hubungi admin untuk menugaskanmu dulu.');
-        }
+        $request->validate([
+            'tanggal' => ['nullable', 'date', 'before_or_equal:today'],
+        ]);
 
-        $pesertas = Peserta::with(['siswa.kelas', 'ekskul'])
-            ->where('id_ekskul', $idEkskul)
-            ->where('status', 'aktif')
+        $tanggal = Carbon::parse($request->query('tanggal', now()))->toDateString();
+
+        $absensiHariIni = AbsensiPeserta::with('peserta.siswa.kelas')
+            ->whereDate('tanggal_absensi', $tanggal)
+            ->whereHas('peserta', fn ($q) => $q->where('id_ekskul', $idEkskul))
+            ->orderByDesc('updated_at')
             ->get();
 
+        $log = $absensiHariIni
+            ->where('status_kehadiran', 'hadir')
+            ->map(fn ($a) => [
+                'nama'  => $a->peserta->nama,
+                'nis'   => $a->peserta->siswa->NIS ?? '-',
+                'kelas' => $a->peserta->kelas ?? '-',
+                'waktu' => $a->updated_at->format('H:i'),
+            ])
+            ->values();
+
+        $totalPeserta = Peserta::where('id_ekskul', $idEkskul)
+            ->where('status', 'aktif')
+            ->count();
+
         return view('dashboard-ketua.absensi-peserta', [
-            'pesertas' => $pesertas,
+            'tanggal'      => $tanggal,
+            'deskripsi'    => $absensiHariIni->pluck('deskripsi_kegiatan')->filter()->first() ?? '',
+            'log'          => $log,
+            'totalPeserta' => $totalPeserta,
         ]);
     }
 
     /**
-     * Simpan absensi untuk semua peserta yang tampil di tabel dalam satu
-     * kali kirim. Peserta yang tidak dicentang H/S/I otomatis dianggap
-     * "alpha". Data ini langsung tampil sebagai riwayat read-only di
-     * halaman Absensi Peserta milik Pembina.
+     * Dipanggil (AJAX/JSON) setiap kali ketua scan satu QR.
+     * Isi QR = NIS siswa. Peserta yang valid dicatat "hadir".
      */
-    public function store(Request $request)
+    public function scan(Request $request): JsonResponse
     {
-        $idEkskul = $this->idEkskulAktif();
+        $idEkskul = $this->idEkskul($request);
 
-        if (! $idEkskul) {
-            return redirect()->route('dashboard.ketua')
-                ->with('error', 'Akun kamu belum ditugaskan sebagai ketua ekskul manapun. Hubungi admin untuk menugaskanmu dulu.');
-        }
-
-        $validated = $request->validate([
-            'tanggal_absensi' => ['required', 'date'],
+        $data = $request->validate([
+            'nis'                => ['required', 'string', 'max:20'],
+            'tanggal_absensi'    => ['required', 'date', 'before_or_equal:today'],
             'deskripsi_kegiatan' => ['nullable', 'string', 'max:1000'],
-            'ids' => ['required', 'array', 'min:1'],
-            // Batasi id_anggota yang boleh dikirim cuma yang beneran anggota ekskul ini,
-            // biar Ketua nggak bisa isi absensi buat anggota ekskul lain.
-            'ids.*' => [
-                'exists:data_anggota,id_anggota',
-                function ($attribute, $value, $fail) use ($idEkskul) {
-                    $milikEkskulIni = Peserta::where('id_anggota', $value)
-                        ->where('id_ekskul', $idEkskul)
-                        ->exists();
-                    if (! $milikEkskulIni) {
-                        $fail('Salah satu peserta bukan anggota ekskul kamu.');
-                    }
-                },
-            ],
-            'status' => ['nullable', 'array'],
-            'status.*' => ['in:hadir,sakit,izin'],
-            'catatan' => ['nullable', 'array'],
-            'catatan.*' => ['nullable', 'string', 'max:255'],
         ]);
 
-        foreach ($validated['ids'] as $idAnggota) {
-            AbsensiPeserta::updateOrCreate(
-                [
-                    'id_anggota' => $idAnggota,
-                    'tanggal_absensi' => $validated['tanggal_absensi'],
-                ],
-                [
-                    'status_kehadiran' => $validated['status'][$idAnggota] ?? 'alpha',
-                    'catatan' => $validated['catatan'][$idAnggota] ?? null,
-                    'deskripsi_kegiatan' => $validated['deskripsi_kegiatan'] ?? null,
-                ]
-            );
+        $nis = trim($data['nis']);
+
+        // Hanya anggota AKTIF dari ekskul yang dipimpin ketua ini yang boleh dicatat.
+        $peserta = Peserta::with('siswa.kelas')
+            ->where('id_ekskul', $idEkskul)
+            ->where('status', 'aktif')
+            ->whereHas('siswa', fn ($q) => $q->where('NIS', $nis))
+            ->first();
+
+        if (! $peserta) {
+            $siswaAda = Siswa::where('NIS', $nis)->exists();
+
+            return response()->json([
+                'message' => $siswaAda
+                    ? "NIS {$nis} bukan anggota aktif ekskul ini."
+                    : "NIS {$nis} tidak ditemukan.",
+            ], 404);
+        }
+
+        $absensi = AbsensiPeserta::firstOrNew([
+            'id_anggota'      => $peserta->id_anggota,
+            'tanggal_absensi' => $data['tanggal_absensi'],
+        ]);
+
+        $sudahHadir = $absensi->exists && $absensi->status_kehadiran === 'hadir';
+
+        if (! $sudahHadir) {
+            $absensi->fill([
+                'status_kehadiran'   => 'hadir',
+                'catatan'            => null,
+                'deskripsi_kegiatan' => $data['deskripsi_kegiatan'] ?? $absensi->deskripsi_kegiatan,
+            ])->save();
+        }
+
+        return response()->json([
+            'message'  => $sudahHadir
+                ? "{$peserta->nama} sudah tercatat hadir."
+                : "{$peserta->nama} tercatat hadir.",
+            'duplikat' => $sudahHadir,
+            'peserta'  => [
+                'nama'  => $peserta->nama,
+                'nis'   => $peserta->siswa->NIS,
+                'kelas' => $peserta->kelas ?? '-',
+                'waktu' => now()->format('H:i'),
+            ],
+        ]);
+    }
+
+    /**
+     * "Selesai absen": peserta aktif yang belum punya catatan di tanggal ini
+     * (tidak scan) dicatat Alpha. Catatan yang sudah ada tidak diubah.
+     */
+    public function selesai(Request $request): RedirectResponse
+    {
+        $idEkskul = $this->idEkskul($request);
+
+        $data = $request->validate([
+            'tanggal_absensi'    => ['required', 'date', 'before_or_equal:today'],
+            'deskripsi_kegiatan' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        $idBelumAbsen = Peserta::where('id_ekskul', $idEkskul)
+            ->where('status', 'aktif')
+            ->whereDoesntHave('absensi', fn ($q) => $q->whereDate('tanggal_absensi', $data['tanggal_absensi']))
+            ->pluck('id_anggota');
+
+        $now = now();
+        $rows = $idBelumAbsen->map(fn ($id) => [
+            'id_anggota'         => $id,
+            'tanggal_absensi'    => $data['tanggal_absensi'],
+            'status_kehadiran'   => 'alpha',
+            'catatan'            => null,
+            'deskripsi_kegiatan' => $data['deskripsi_kegiatan'] ?? null,
+            'created_at'         => $now,
+            'updated_at'         => $now,
+        ])->all();
+
+        if ($rows) {
+            AbsensiPeserta::insert($rows);
         }
 
         return redirect()
-            ->route('ketua.absensi-peserta')
-            ->with('success', 'Absensi peserta berhasil dikirim.');
+            ->route('ketua.absensi-peserta', ['tanggal' => $data['tanggal_absensi']])
+            ->with('success', count($rows) > 0
+                ? 'Absensi ditutup. ' . count($rows) . ' peserta yang tidak scan dicatat Alpha.'
+                : 'Absensi ditutup. Semua peserta aktif sudah tercatat.');
     }
 }
