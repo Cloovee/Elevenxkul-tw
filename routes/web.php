@@ -463,3 +463,28 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+/*
+|--------------------------------------------------------------------------
+| FALLBACK STORAGE (kalau symlink public/storage tidak ada di hosting)
+|--------------------------------------------------------------------------
+| Kalau public/storage sudah ada (hasil storage:link), web server melayani
+| file langsung dan route ini tidak pernah terpakai. Kalau belum ada,
+| route ini yang menyajikan foto dari storage/app/public.
+*/
+Route::get('/storage/{path}', function (string $path) {
+    $base = realpath(storage_path('app/public'));
+    $file = $base ? realpath($base . DIRECTORY_SEPARATOR . $path) : false;
+
+    // Cegah path traversal (../) dan pastikan file benar-benar ada
+    if (! $base) {
+        abort(404, 'FALLBACK AKTIF - folder tidak ada: ' . storage_path('app/public')); // DEBUG sementara
+    }
+    if (! $file || ! str_starts_with($file, $base . DIRECTORY_SEPARATOR) || ! is_file($file)) {
+        abort(404, 'FALLBACK AKTIF - file tidak ada: ' . $path . ' | dicari di: ' . $base); // DEBUG sementara
+    }
+
+    return response()->file($file, [
+        'Cache-Control' => 'public, max-age=86400',
+    ]);
+})->where('path', '.*')->name('storage.fallback');
