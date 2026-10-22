@@ -8,9 +8,9 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 
 /**
- * Export data siswa dengan urutan kolom yang sama persis dengan template
- * import (tanpa kolom Kelas), jadi hasil export bisa langsung diedit lalu
- * diimport lagi. Kelas tujuan dipilih lewat dropdown di form import.
+ * Export data siswa dengan kolom yang sama persis dengan template import
+ * (termasuk kolom Rombel, mis. 10TJKT1), jadi hasil export bisa langsung
+ * diedit lalu diimport lagi.
  */
 class SiswaExport implements FromCollection, WithHeadings, WithMapping
 {
@@ -24,6 +24,7 @@ class SiswaExport implements FromCollection, WithHeadings, WithMapping
     public function collection()
     {
         return Siswa::query()
+            ->with('kelas')
             ->when($this->idKelas, fn ($q) => $q->where('id_kelas', $this->idKelas))
             ->orderBy('nama_siswa')
             ->get();
@@ -31,7 +32,7 @@ class SiswaExport implements FromCollection, WithHeadings, WithMapping
 
     public function headings(): array
     {
-        return ['NISN', 'NIS', 'Nama', 'JK', 'Agama', 'No. HP', 'Email', 'Medsos', 'Alamat'];
+        return ['NISN', 'NIS', 'Nama', 'JK', 'Rombel', 'Agama', 'No. HP', 'Email', 'Medsos', 'Alamat'];
     }
 
     public function map($siswa): array
@@ -41,6 +42,7 @@ class SiswaExport implements FromCollection, WithHeadings, WithMapping
             (string) $siswa->NIS,
             $siswa->nama_siswa,
             $siswa->jk,
+            $siswa->kelas?->kode_rombel ?? '',
             $siswa->agama,
             (string) $siswa->nomor_hp,
             $siswa->email,

@@ -68,7 +68,6 @@
             <thead>
                 <tr class="text-left text-[#7C8DB5] text-[11px] font-bold uppercase tracking-wider border-b border-gray-100">
                     <th class="px-3 py-3">No</th>
-                    <th class="px-3 py-3">ID</th>
                     <th class="px-3 py-3">Tingkat</th>
                     <th class="px-3 py-3">Jurusan</th>
                     <th class="px-3 py-3">Rombel</th>
@@ -80,7 +79,6 @@
                 @forelse($kelas as $key => $k)
                 <tr class="hover:bg-[#F2F7FF]/60 transition-colors">
                     <td class="px-3 py-3 text-[#7C8DB5] font-medium">{{ $kelas->firstItem() + $key }}</td>
-                    <td class="px-3 py-3 text-[#7C8DB5] font-mono text-xs">#{{ $k->id_kelas }}</td>
                     <td class="px-3 py-3 text-[#10316B] font-semibold">{{ $k->tingkat }}</td>
                     <td class="px-3 py-3">
                         <div class="flex items-center gap-3">
@@ -114,7 +112,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="7" class="text-center py-12">
+                    <td colspan="6" class="text-center py-12">
                         <div class="flex flex-col items-center text-[#7C8DB5]">
                             <i class="fas fa-school text-3xl mb-2"></i>
                             <p class="font-bold text-sm">Belum ada data kelas.</p>

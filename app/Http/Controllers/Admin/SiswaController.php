@@ -112,6 +112,7 @@ class SiswaController extends Controller
 
     public function showImportForm()
     {
+        // Daftar rombel terdaftar ditampilkan sebagai referensi penulisan kode di Excel.
         $kelas = Kelas::orderBy('tingkat')
             ->orderBy('program_keahlian')
             ->orderBy('rombel')
@@ -124,11 +125,11 @@ class SiswaController extends Controller
     {
         $request->validate([
             'file' => 'required|mimes:xlsx,xls,csv|max:5120',
-            'id_kelas' => 'required|exists:kelas,id_kelas',
-        ], [
-            'id_kelas.required' => 'Pilih kelas tujuan dulu sebelum import.',
-            'id_kelas.exists' => 'Kelas yang dipilih tidak ditemukan.',
         ]);
+
+        if (! Kelas::exists()) {
+            return back()->with('error', 'Belum ada rombel terdaftar. Tambahkan dulu di menu Kelas sebelum import siswa.');
+        }
 
         // Simpan dulu file upload-nya ke storage/app (bukan langsung pakai path
         // temp upload PHP). Di beberapa hosting shared dengan open_basedir aktif,
@@ -141,27 +142,34 @@ class SiswaController extends Controller
         $pathFull = \Illuminate\Support\Facades\Storage::path($pathTersimpan);
 
         try {
-            $import = new SiswaImport($request->id_kelas);
+            // Kelas tiap siswa diambil dari kolom "Rombel" di Excel, dan rombel
+            // itu harus sudah terdaftar di tabel kelas (kalau tidak, baris ditolak).
+            $import = new SiswaImport();
             Excel::import($import, $pathFull);
 
-            $barisError = $import->getBarisError();
-
+            // Satu baris Excel bisa gagal di beberapa kolom -> gabungkan per baris.
+            $perBaris = [];
             foreach ($import->failures() as $failure) {
-                $barisError[] = [
-                    'baris' => $failure->row(),
-                    'error' => implode(', ', $failure->errors()),
-                ];
+                $perBaris[$failure->row()][] = implode(', ', $failure->errors());
             }
+            ksort($perBaris);
+
+            $barisError = [];
+            foreach ($perBaris as $baris => $pesan) {
+                $barisError[] = ['baris' => $baris, 'error' => implode(' | ', $pesan)];
+            }
+
+            $berhasil = $import->getJumlahBerhasil();
 
             if (!empty($barisError)) {
                 return back()->with([
-                    'warning' => 'Sebagian/semua data gagal diimport.',
+                    'warning' => "{$berhasil} siswa berhasil diimport, " . count($barisError) . ' baris dilewati karena bermasalah. Perbaiki baris di bawah lalu import ulang (baris yang sudah berhasil tidak perlu dikirim lagi).',
                     'baris_error' => $barisError,
                 ]);
             }
 
             return redirect()->route('admin.siswa.index')
-                ->with('success', 'Data siswa berhasil diimport!');
+                ->with('success', "{$berhasil} siswa berhasil diimport!");
 
         } catch (\Exception $e) {
             return back()->with('error', 'Gagal import: ' . $e->getMessage());
@@ -184,11 +192,17 @@ class SiswaController extends Controller
 
     public function downloadTemplate()
     {
-        // Template TANPA kolom Kelas: kelas dipilih lewat dropdown di form import.
+        // Kolom Rombel WAJIB diisi dengan rombel yang sudah terdaftar di menu Kelas.
+        // Contoh rombel diambil dari data kelas asli (kalau ada) supaya tidak membingungkan.
+        $contoh = Kelas::orderBy('tingkat')->orderBy('program_keahlian')->orderBy('rombel')->take(2)->get()
+            ->map(fn ($k) => $k->kode_rombel)->values();
+        $rombel1 = $contoh[0] ?? '10TJKT1';
+        $rombel2 = $contoh[1] ?? $rombel1;
+
         $data = [
-            ['NISN', 'NIS', 'Nama', 'JK', 'Agama', 'No. HP', 'Email', 'Medsos', 'Alamat'],
-            ['1234567890', '10001', 'Budi Santoso', 'L', 'Islam', '08123456789', 'budi@email.com', '@budi', 'Jl. Merdeka No.1'],
-            ['1234567891', '10002', 'Siti Rahayu', 'P', 'Islam', '08123456788', 'siti@email.com', '@siti', 'Jl. Merdeka No.2'],
+            ['NISN', 'NIS', 'Nama', 'JK', 'Rombel', 'Agama', 'No. HP', 'Email', 'Medsos', 'Alamat'],
+            ['1234567890', '10001', 'Budi Santoso', 'L', $rombel1, 'Islam', '08123456789', 'budi@email.com', '@budi', 'Jl. Merdeka No.1'],
+            ['1234567891', '10002', 'Siti Rahayu', 'P', $rombel2, 'Islam', '08123456788', 'siti@email.com', '@siti', 'Jl. Merdeka No.2'],
         ];
 
         return Excel::download(
