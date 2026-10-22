@@ -19,10 +19,22 @@ class DashAdminController extends Controller
         $totalPembina = Pembina::count();
         $totalKelas = Kelas::count();
 
+        // 5 ekskul terbaru + jumlah anggotanya (dipakai di daftar "Ekskul terbaru").
         $recentEkskuls = Ekskul::with(['pembina'])
+            ->withCount('peserta')
             ->latest()
             ->take(5)
             ->get();
+
+        // Bahan panel "Perlu perhatian": data ekskul yang belum lengkap.
+        $ekskulTanpaPembina = Ekskul::whereNull('id_pembina')->count();
+        $ekskulTanpaKetua = Ekskul::whereNull('id_ketua')->count();
+
+        // Bahan grafik "Sebaran kategori": ['organisasi' => 3, 'komunitas' => 2, ...]
+        $kategoriCounts = Ekskul::selectRaw('kategori, COUNT(*) as total')
+            ->groupBy('kategori')
+            ->pluck('total', 'kategori')
+            ->all();
 
         return view('admin.dashboard', compact(
             'totalSiswa',
@@ -30,7 +42,10 @@ class DashAdminController extends Controller
             'totalEkskul',
             'totalPembina',
             'totalKelas',
-            'recentEkskuls'
+            'recentEkskuls',
+            'ekskulTanpaPembina',
+            'ekskulTanpaKetua',
+            'kategoriCounts'
         ));
     }
 }

@@ -117,13 +117,13 @@
         .cf{position:relative;flex:1;display:grid;place-items:center;margin-left:var(--rail);touch-action:pan-y;user-select:none;--ch:clamp(340px,66svh,640px);--cw:calc(var(--ch)*.58);min-height:calc(var(--ch) + 3rem)}
         .cf:focus-visible{outline-offset:-8px}
         @supports not (height:100svh){.cf{--ch:clamp(340px,66vh,640px)}}
-        .cf-card{position:absolute;left:50%;top:50%;width:var(--cw);height:var(--ch);margin:calc(var(--ch)/-2) 0 0 calc(var(--cw)/-2);border-radius:1.1rem;overflow:hidden;background:var(--blue);box-shadow:0 30px 50px -20px rgba(0,0,0,.6);cursor:pointer;will-change:transform,opacity}
+        .cf-card{position:absolute;left:50%;top:50%;width:var(--cw);height:var(--ch);margin:calc(var(--ch)/-2) 0 0 calc(var(--cw)/-2);border-radius:1.1rem;overflow:hidden;background:var(--blue);box-shadow:0 30px 50px -20px rgba(0,0,0,.6),0 0 22px rgba(0,0,0,.45);cursor:pointer;will-change:transform,opacity}
         .cf-card.on{cursor:default}
         .cf-card img{width:100%;height:100%;object-fit:cover;pointer-events:none}
         .cf-card::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 40%,rgba(8,26,66,.8));pointer-events:none}
         .cf-ph{position:absolute;inset:0;display:grid;place-items:center;font:700 5rem var(--display);color:rgba(255,255,255,.85);background:linear-gradient(160deg,var(--blue),var(--navy))}
         /* Judul + deskripsi menempel di dalam kartu foto, jadi ikut bergeser bersama fotonya */
-        .cf-txt{position:absolute;z-index:2;left:1.2rem;right:1.2rem;bottom:1.4rem;margin:0;opacity:var(--o,0)}
+        .cf-txt{position:absolute;z-index:2;left:1.2rem;right:1.2rem;bottom:1.4rem;margin:0;opacity:calc(var(--o,0)*var(--t,1))}
         .cf-title{font:700 clamp(1.25rem,2.1vw,1.9rem) var(--display);text-transform:uppercase;letter-spacing:.04em;line-height:1.1;text-shadow:0 2px 18px rgba(0,0,0,.5)}
         .cf-line{width:2.2rem;height:2px;background:#fff;margin:.9rem 0 .6rem}
         .cf-sub{font-size:.95rem;text-shadow:0 1px 10px rgba(0,0,0,.5)}
@@ -812,7 +812,8 @@
 
     /* ===== Carousel ekskul (geser ke samping) =====
        - Saat halaman dibuka, kartu bertumpuk lalu menyebar ke samping pelan selama INTRO ms.
-       - Kartu hanya bergerak horizontal (kiri/kanan). Tidak ada efek naik/turun atau mundur saat scroll.
+       - Kartu hanya bergerak horizontal (kiri/kanan). Saat halaman di-scroll ke bawah, kartu yang menyebar
+         perlahan menyatu kembali jadi satu tumpukan di tengah, mengikuti jarak scroll (lihat `fold` / FOLD_DIST).
        - Judul + deskripsi + tombol ada di dalam tiap kartu, jadi selalu menempel pada fotonya.
        - Panah next/prev menggeser semua kartu satu posisi (kartu paling kiri pindah ke paling kanan).
        - Autoplay: otomatis geser ke kartu berikutnya tiap AUTO ms (lihat blok "Autoplay" di bawah). */
@@ -821,17 +822,21 @@
         const INTRO = 1800;                       /* durasi menyebar (ms) */
         const hero = document.getElementById('beranda');
         const cards = [...cf.querySelectorAll('.cf-card')], n = cards.length;
-        const XD = [0, 1.04, 1.9, 2.6], XM = [0, .8, 1.4, 1.9], S = [1, .86, .72, .6], B = [1, .62, .45, .35];
+        /* XD/XM = jarak geser tiap kartu (kelipatan lebar kartu). Angka kecil = makin rapat/menumpuk.
+           Kartu samping sengaja "masuk" ke belakang kartu tengah, jadi tidak ada celah di antara kartu. */
+        const XD = [0, .64, 1.02, 1.3], XM = [0, .52, .82, 1.04], S = [1, .86, .72, .6], B = [1, .62, .45, .35];
         const curve = (arr, a) => { const i = Math.min(Math.floor(a), 2), t = Math.min(a, 3) - i; return arr[i] + (arr[i + 1] - arr[i]) * t; };
         const easeIO = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
         const idx = () => ((Math.round(target) % n) + n) % n;
 
         let target = 0, pos = 0, spread = reduce ? 1 : 0, t0 = Infinity, raf = 0, last = 0;
+        let fold = 0;                              /* 0 = menyebar penuh, 1 = menumpuk jadi satu di tengah (mengikuti scroll) */
+        const FOLD_DIST = .7;                      /* kartu sudah menumpuk penuh setelah scroll sejauh 70% tinggi hero (kecilkan = lebih cepat) */
 
         const offset = i => { let d = i - pos; return d - n * Math.round(d / n); };
 
         const draw = () => {
-            const F = easeIO(spread), w = cards[0].offsetWidth, X = innerWidth < 700 ? XM : XD;
+            const F = easeIO(spread) * (1 - fold), w = cards[0].offsetWidth, X = innerWidth < 700 ? XM : XD;
             cards.forEach((el, i) => {
                 const d = offset(i), a = Math.abs(d), sg = Math.sign(d), on = a < .5;
                 /* hanya translateX (geser ke samping) + sedikit mengecil untuk kartu di sisi */
@@ -840,6 +845,7 @@
                 el.style.filter = `brightness(${(1 + (curve(B, a) - 1) * F).toFixed(3)})`;
                 el.style.zIndex = Math.max(0, Math.round(10 - a * 3));
                 el.style.pointerEvents = (a > 2 || F < .9) ? 'none' : 'auto';
+                el.style.setProperty('--t', Math.max(0, 1 - a * 1.6).toFixed(3));
                 el.classList.toggle('on', on);
                 const go = el.querySelector('.cf-go'); if (go) go.tabIndex = on ? 0 : -1;   /* hanya tombol di kartu aktif yang bisa difokus */
             });
@@ -862,6 +868,22 @@
 
         const counter = () => { const now = document.getElementById('cf-now'); if (now) now.textContent = idx() + 1; };
         const go = delta => { if (n < 2 || !delta) return; target += delta; counter(); kick(); startAuto(); };   /* geser manual = hitungan 5 detik mulai ulang */
+
+        /* Scroll -> kartu menyatu ke tengah. Makin jauh di-scroll, makin rapat; scroll balik ke atas = menyebar lagi. */
+        let foldTick = false;
+        const updateFold = () => {
+            foldTick = false;
+            if (reduce) return;
+            const r = hero.getBoundingClientRect();
+            const f = Math.min(1, Math.max(0, -r.top / (hero.offsetHeight * FOLD_DIST)));
+            if (Math.abs(f - fold) < .0005) return;
+            fold = f;
+            draw();
+        };
+        const onScroll = () => { if (!foldTick) { foldTick = true; requestAnimationFrame(updateFold); } };
+        addEventListener('scroll', onScroll, { passive: true });
+        addEventListener('resize', onScroll);
+        if (!reduce) { const r0 = hero.getBoundingClientRect(); fold = Math.min(1, Math.max(0, -r0.top / (hero.offsetHeight * FOLD_DIST))); }   /* kalau halaman dibuka sudah dalam posisi ter-scroll */
 
         draw();                                             /* posisi awal: semua kartu menumpuk */
         if (!reduce) {
