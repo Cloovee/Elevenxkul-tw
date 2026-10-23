@@ -32,13 +32,15 @@
 
             <div>
                 <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Password <span class="text-red-500">*</span></label>
-                <input type="password" name="password" class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C] @error('password') ring-2 ring-red-400 @enderror" required>
+                <input type="password" name="password" minlength="8" autocomplete="new-password" class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C] @error('password') ring-2 ring-red-400 @enderror" required>
                 @error('password')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                <p class="text-xs text-[#7C8DB5] mt-1.5">Minimal 8 karakter. Campur huruf dan angka supaya lebih aman.</p>
             </div>
 
             <div>
                 <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Konfirmasi Password <span class="text-red-500">*</span></label>
-                <input type="password" name="password_confirmation" class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C]" required>
+                <input type="password" name="password_confirmation" minlength="8" autocomplete="new-password" class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C]" required>
+                <p class="text-xs text-[#7C8DB5] mt-1.5">Ketik ulang password di atas, harus sama persis.</p>
             </div>
 
             <div class="md:col-span-2">
