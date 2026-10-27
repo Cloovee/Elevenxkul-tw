@@ -153,8 +153,13 @@
          'icon' => 'M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z'],
         ['active' => 'admin.monitoring-ekskul.*', 'route' => 'admin.monitoring-ekskul.index', 'label' => 'Lihat Semua Ekskul',
          'icon' => 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01'],
+        ['active' => 'admin.galeri.*',            'route' => 'admin.galeri.index',            'label' => 'Kelola Galeri',
+         'icon' => 'M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z'],
         ['active' => 'admin.tahun-ajaran.*',      'route' => 'admin.tahun-ajaran.index',      'label' => 'Tahun Ajaran',
          'icon' => 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z'],
+        // Buka landing page publik di TAB BARU supaya admin tetap di dashboard & bisa cek hasil perubahannya.
+        ['active' => null,               'route' => 'landing',             'label' => 'Lihat Beranda', 'target' => '_blank',
+         'icon' => 'M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9'],
         ['active' => 'profile.edit',     'route' => 'profile.edit',        'label' => 'Profil',
          'icon' => 'M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z'],
     ];
@@ -178,10 +183,12 @@
 
         @foreach($menuItems as $item)
             @php
-                $isActive = request()->routeIs($item['active']);
+                $isActive = !empty($item['active']) && request()->routeIs($item['active']);
+                $isExternal = ($item['target'] ?? null) === '_blank';
             @endphp
             <a href="{{ route($item['route']) }}" draggable="false"
-               aria-label="{{ $item['label'] }}"
+               @if($isExternal) target="_blank" rel="noopener" title="{{ $item['label'] }} (tab baru)" @endif
+               aria-label="{{ $item['label'] }}{{ $isExternal ? ' (buka di tab baru)' : '' }}"
                @if($isActive) aria-current="page" @endif
                class="ekk-nav-link shrink-0 rounded-2xl flex items-center transition-all {{ $isActive ? 'bg-white text-periwinkle shadow-lg shadow-black/10' : 'text-white/90 hover:bg-white/25 hover:shadow-md' }}">
                 <span class="ekk-nav-ico">

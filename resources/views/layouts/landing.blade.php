@@ -7,7 +7,6 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <script>try{if(localStorage.getItem('rail-folded')==='1')document.documentElement.classList.add('rail-folded')}catch(e){}</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>@yield('title', 'Beranda') - ElevenXkul</title>
@@ -51,62 +50,44 @@
         /* ---------- Latar lembut (sama seperti layout admin) ---------- */
         .blob{position:absolute;border-radius:50%;filter:blur(64px);pointer-events:none;z-index:0}
 
-        /* ---------- Sidebar rail (gaya sama dengan sidebar Admin/Pembina/Ketua) ---------- */
+        /* ---------- Navbar: melayang di tengah atas layar ---------- */
         :root{--rail:0px}
-        @media(min-width:1024px){:root{--rail:9rem}}
-        @media(max-width:1023px){html{scroll-padding-top:1.5rem}}
-        .rail{position:fixed;z-index:60;top:auto;bottom:calc(.75rem + env(safe-area-inset-bottom,0px));left:.75rem;right:.75rem;display:flex;align-items:center;gap:.5rem;padding:.6rem;border-radius:1.5rem;background:var(--blue);box-shadow:0 25px 50px -12px rgba(11,64,156,.35);outline:1px solid rgba(255,255,255,.2);overflow-x:auto;scrollbar-width:none;user-select:none}
+        html{scroll-padding-top:5.5rem}
+        .rail{position:fixed;z-index:60;top:calc(.75rem + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);max-width:calc(100vw - 1.5rem);display:flex;align-items:center;gap:.25rem;padding:.4rem;border-radius:1.5rem;background:rgba(11,64,156,.94);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:0 18px 40px -12px rgba(11,64,156,.45);outline:1px solid rgba(255,255,255,.2);overflow-x:auto;scrollbar-width:none;user-select:none}
         .rail::-webkit-scrollbar{display:none}
-        .r-link{flex:none;display:flex;align-items:center;height:2.75rem;border-radius:1rem;color:rgba(255,255,255,.9);background:none;border:0;font:inherit;cursor:pointer;overflow:hidden;white-space:nowrap;transition:width .32s cubic-bezier(.4,0,.2,1),margin .32s cubic-bezier(.4,0,.2,1),padding .32s cubic-bezier(.4,0,.2,1),background .2s,box-shadow .2s}
-        .r-link:hover{background:rgba(255,255,255,.25);box-shadow:0 4px 8px -2px rgba(0,0,0,.15)}
-        .r-link[aria-current=page]{background:#fff;color:var(--blue);box-shadow:0 10px 15px -3px rgba(0,0,0,.1)}
+        .r-link{flex:none;display:flex;align-items:center;height:2.75rem;border-radius:1rem;color:rgba(255,255,255,.9);background:none;border:0;font:inherit;text-decoration:none;cursor:pointer;white-space:nowrap;transition:background .2s,box-shadow .2s,color .2s}
+        .r-link:hover{background:rgba(255,255,255,.22)}
+        .r-link:focus-visible{outline:2px solid #fff;outline-offset:1px}
+        .r-link[aria-current=page]{background:#fff;color:var(--blue);box-shadow:0 8px 14px -4px rgba(0,0,0,.18)}
         .r-ico{width:2.75rem;height:2.75rem;flex:none;display:grid;place-items:center}
         .r-ico svg{width:1.25rem;height:1.25rem;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .2s}
-        .r-link:hover .r-ico svg{transform:scale(1.15)}
+        .r-link:hover .r-ico svg{transform:scale(1.12)}
         .r-logo{width:2.75rem;height:2.75rem;border-radius:1rem;background:#fff;display:grid;place-items:center;box-shadow:0 4px 8px -2px rgba(0,0,0,.2)}
         .r-logo img{width:1.7rem}
-        .r-txt{display:none;font-weight:600;font-size:.92rem;padding-right:.75rem}
-        .r-end{margin-left:auto}
-        .r-back{display:none}
+        .r-txt{display:none;font-weight:600;font-size:.92rem}
+        .r-end{margin-left:.25rem;background:rgba(255,255,255,.16);box-shadow:inset 0 0 0 1px rgba(255,255,255,.28)}
+        .r-end:hover{background:rgba(255,255,255,.3)}
+
+        /* Desktop: ikon + teks */
         @media(min-width:1024px){
-            .rail{top:2rem;bottom:2rem;left:2.5rem;right:auto;width:5rem;padding:.75rem;flex-direction:column;align-items:stretch;overflow:hidden;overscroll-behavior:contain;transition:width .32s cubic-bezier(.4,0,.2,1),box-shadow .32s}
-            .rail:hover,.rail:focus-within{width:17rem;box-shadow:0 30px 60px -15px rgba(16,49,107,.55)}
-            .r-link{width:2.75rem;margin-left:.375rem}
-            .rail:hover .r-link,.rail:focus-within .r-link{width:100%;margin-left:0;padding-left:.375rem}
-            .r-top{margin-bottom:1rem}.r-top .r-txt{margin-left:.75rem}
-            .r-end{margin-left:.375rem;margin-top:auto}
-            .rail:hover .r-end,.rail:focus-within .r-end{margin-left:0}
-            .r-txt{display:block;opacity:0;transform:translateX(-8px);transition:opacity .2s,transform .25s}
-            .rail:hover .r-txt,.rail:focus-within .r-txt{opacity:1;transform:none;transition-delay:.12s}
-            .r-back{display:block;position:fixed;inset:0;z-index:59;background:rgba(16,49,107,.18);backdrop-filter:blur(6px);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .3s,visibility .3s}
-            .rail:hover~.r-back,.rail:focus-within~.r-back{opacity:1;visibility:visible}
+            .r-ico{width:2.5rem}
+            .r-txt{display:block;margin-left:-.35rem;padding-right:.95rem}
+            .r-top{margin-right:.5rem}.r-top .r-ico{width:2.75rem}.r-top .r-txt{margin-left:.15rem;padding-right:1rem}
         }
-        .content{padding-left:var(--rail)}
+        /* Mobile/tablet: bar penuh di atas, hanya ikon */
         @media(max-width:1023px){
-            .rail{gap:.25rem;padding:.4rem;border-radius:1.25rem}
+            .rail{left:.75rem;right:.75rem;transform:none;max-width:none;justify-content:space-between;gap:.15rem;padding:.35rem;border-radius:1.25rem}
             .r-link{flex:1 1 0;min-width:0;max-width:2.75rem;justify-content:center}
             .r-ico{width:100%}
+            .r-end{margin-left:0}
         }
         @media(max-width:420px){.r-top{display:none}}
-
-        /* ---------- Lipat sidebar: jadi satu ikon melayang di pojok kiri bawah ---------- */
-        .rail{transition:width .32s cubic-bezier(.4,0,.2,1),box-shadow .32s,transform .55s var(--ease),opacity .35s}
-        @media(min-width:1024px){.rail{transform-origin:0 100%}}
-        html.rail-folded{--rail:0px}
-        html.rail-folded .rail{opacity:0;pointer-events:none;transform:translateY(160%)}
-        @media(min-width:1024px){html.rail-folded .rail{transform:scale(.06)}}
-        .rail-fab{position:fixed;z-index:61;left:1rem;bottom:calc(1rem + env(safe-area-inset-bottom,0px));width:3.5rem;height:3.5rem;border:0;border-radius:1.25rem;background:var(--blue);color:#fff;display:grid;place-items:center;cursor:pointer;box-shadow:0 20px 40px -12px rgba(11,64,156,.65);outline:1px solid rgba(255,255,255,.25);opacity:0;transform:scale(.4);pointer-events:none;transition:opacity .3s,transform .55s var(--ease),background .25s}
-        .rail-fab svg{width:1.5rem;height:1.5rem;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-        html.rail-folded .rail-fab{opacity:1;transform:none;pointer-events:auto;transition-delay:.18s,.18s,0s}
-        html.rail-folded .rail-fab:hover{background:var(--navy);transform:translateY(-3px);transition-delay:0s}
-        html.rail-folded .rail-fab:active{transform:scale(.94)}
-        @media(min-width:1024px){.rail-fab{left:2.5rem;bottom:2rem}}
         /* konten ikut bergeser halus saat sidebar dilipat/dibuka */
         .content,.hero-top,.cf,.cf-meta,footer{transition:padding .5s var(--ease),margin .5s var(--ease)}
         @media(min-width:1024px){.hero{padding-bottom:4.5rem}}
 
         /* ---------- Hero: carousel ekskul (coverflow 3D) ---------- */
-        .hero{position:relative;min-height:100vh;min-height:100svh;display:flex;flex-direction:column;color:#fff;overflow:hidden;isolation:isolate;background:var(--navy);padding:3rem 0 6.5rem}
+        .hero{position:relative;min-height:100vh;min-height:100svh;display:flex;flex-direction:column;color:#fff;overflow:hidden;isolation:isolate;background:var(--navy);padding:6.5rem 0 6.5rem}
         /* Latar hero: foto sekolah dengan opasitas 70% (ubah --hero-bg-opacity kalau mau lebih pekat/transparan) */
         :root{--hero-bg-opacity:.7}
         .hero-bg{position:absolute;left:0;top:-20%;width:100%;height:140%;z-index:-2;background:url('{{ $foto }}') center/cover no-repeat;opacity:var(--hero-bg-opacity);will-change:transform}
@@ -139,7 +120,7 @@
         .cf-meta span{color:rgba(255,255,255,.6);font-weight:500}
         .folded .cf-arrow,.folded .cf-card .cf-go{pointer-events:none}
         @media(max-width:600px){
-            .hero{padding:2.2rem 0 6rem}
+            .hero{padding:5.8rem 0 6rem}
             .hero-top{padding-inline:calc(var(--rail) + 1.1rem) 1.1rem}
             .cf{--ch:clamp(300px,58svh,520px);--cw:calc(var(--ch)*.68)}
             .cf-txt{left:.9rem;right:.9rem;bottom:1.1rem}
@@ -267,28 +248,38 @@
         .band h2{max-width:22ch;margin:0 auto}
         .band .cta{justify-content:center;margin-top:1.8rem}
 
-        /* ---------- Galeri ---------- */
-        .gal-panel{padding:clamp(1.5rem,4vw,3rem)}
-        .gal{display:grid;grid-template-columns:1.1fr 1fr;gap:clamp(2rem,5vw,4.5rem);align-items:center}
-        .stack{position:relative;aspect-ratio:4/3;width:min(100%,520px);margin-inline:auto;touch-action:pan-y;user-select:none;cursor:pointer}
-        .stack:focus-visible{outline-offset:12px}
-        .g-card{position:absolute;inset:0;margin:0;border-radius:1.6rem;overflow:hidden;background:#fff;border:6px solid #fff;box-shadow:0 20px 36px -18px rgba(16,49,107,.55);transition:transform .6s var(--ease),opacity .5s,filter .6s;will-change:transform}
-        .g-card img{width:100%;height:100%;object-fit:cover;border-radius:1.1rem;transition:transform .8s var(--ease);pointer-events:none}
-        .stack:hover .g-card.top img{transform:scale(1.05)}
-        .g-info .badge{display:inline-block;padding:.28rem .9rem;border-radius:999px;background:var(--gold);color:var(--navy);font-size:.78rem;font-weight:700}
-        .g-info h3{font-size:clamp(1.5rem,2.8vw,2rem);margin-top:.9rem}
-        .g-info .d{margin-top:.7rem;color:var(--mute);max-width:42ch;min-height:4.8em}
-        .g-txt{transition:opacity .3s,transform .45s var(--ease)}
-        .g-txt.swap{opacity:0;transform:translateY(10px)}
-        .ctrl{display:flex;align-items:center;gap:.8rem;margin-top:1.6rem}
-        .arrow{width:52px;height:52px;border-radius:50%;border:0;background:var(--cloud);color:var(--navy);cursor:pointer;display:grid;place-items:center;transition:background .3s,color .3s,transform .4s var(--ease)}
-        .arrow svg{width:20px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;transition:transform .35s var(--ease)}
-        .arrow:hover{background:var(--blue);color:#fff}
-        .arrow.nx:hover svg{transform:translateX(4px)}.arrow.pv:hover svg{transform:translateX(-4px)}
-        .arrow:active{transform:scale(.92)}
-        .num{margin-left:.5rem;font:600 1.05rem var(--display)}
-        .num span{color:var(--mute);font-weight:500}
-        @media(max-width:860px){.gal{grid-template-columns:1fr}.g-info{text-align:center}.g-info .d{margin-inline:auto}.ctrl{justify-content:center}.stack{width:min(88%,480px);margin-bottom:.8rem}}
+        /* ---------- Galeri (dikelompokkan per ekskul) ---------- */
+        .gx{margin-top:2.6rem}
+        .gx-head{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:1.1rem}
+        .gx-head h3{font-size:clamp(1.3rem,2.4vw,1.7rem);display:flex;align-items:center;gap:.7rem}
+        .gx-head h3::before{content:"";width:.5rem;height:1.6rem;border-radius:999px;background:var(--gold);box-shadow:0 0 0 2px var(--blue) inset}
+        .gx-n{padding:.28rem .9rem;border-radius:999px;background:var(--cloud);color:var(--blue);font-size:.78rem;font-weight:700}
+        .gx-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:1rem}
+        .gx-ph{position:relative;display:block;padding:0;border:5px solid #fff;border-radius:1.4rem;overflow:hidden;background:#fff;cursor:zoom-in;aspect-ratio:4/3;box-shadow:var(--card);transition:transform .5s var(--ease),box-shadow .5s var(--ease)}
+        .gx-ph img{width:100%;height:100%;object-fit:cover;display:block;border-radius:1rem;transition:transform .8s var(--ease)}
+        .gx-ph:hover{transform:translateY(-4px);box-shadow:var(--card-hover)}
+        .gx-ph:hover img{transform:scale(1.07)}
+        .gx-ph:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
+        .gx-ph.more{display:none}
+        .gx.open .gx-ph.more{display:block;animation:enter .55s var(--ease) both}
+        .gx-more{display:flex;margin:1.2rem auto 0;border:0;background:var(--cloud);color:var(--blue);font:700 .88rem var(--body);padding:.7rem 1.5rem;border-radius:999px;cursor:pointer;transition:background .25s,color .25s}
+        .gx-more:hover{background:var(--blue);color:#fff}
+
+        /* Lightbox foto */
+        .lb{border:0;padding:0;background:transparent;max-width:none;max-height:none;width:100vw;height:100vh;height:100dvh;color:#fff}
+        .lb::backdrop{background:rgba(8,20,48,.88);backdrop-filter:blur(6px)}
+        .lb[open]{display:flex;align-items:center;justify-content:center;animation:dlgIn .4s var(--ease)}
+        .lb-in{position:relative;width:min(960px,92vw);text-align:center}
+        .lb-in img{max-width:100%;max-height:72vh;border-radius:1.2rem;object-fit:contain;background:#0b1a3a;box-shadow:0 30px 60px -20px rgba(0,0,0,.6)}
+        .lb-cap{margin-top:1rem}
+        .lb-cap b{display:block;font:600 1.15rem var(--display)}
+        .lb-cap span{display:block;margin-top:.3rem;color:rgba(255,255,255,.75);font-size:.9rem}
+        .lb-cap small{display:block;margin-top:.5rem;color:var(--gold);font-weight:700}
+        .lb-btn{position:fixed;border:0;width:3rem;height:3rem;border-radius:50%;background:rgba(255,255,255,.16);color:#fff;cursor:pointer;display:grid;place-items:center;font-size:1.1rem;transition:background .25s}
+        .lb-btn:hover{background:rgba(255,255,255,.32)}
+        .lb-x{top:1rem;right:1rem}.lb-pv{left:1rem;top:50%;translate:0 -50%}.lb-nx{right:1rem;top:50%;translate:0 -50%}
+        .lb-btn svg{width:1.3rem;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+        @media(max-width:600px){.gx-grid{grid-template-columns:repeat(2,1fr);gap:.7rem}.gx-ph{border-width:3px;border-radius:1rem}.gx-ph img{border-radius:.75rem}.lb-pv{left:.4rem}.lb-nx{right:.4rem}.lb-btn{width:2.6rem;height:2.6rem}}
 
         /* ---------- Lokasi ---------- */
         .mapgrid{display:grid;grid-template-columns:1fr 1.7fr;gap:1.4rem;margin-top:2rem;align-items:stretch}
@@ -362,10 +353,7 @@
         @else
         <a href="{{ route('login') }}" class="r-link r-end" aria-label="Masuk"><span class="r-ico"><svg viewBox="0 0 24 24"><path d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg></span><span class="r-txt">Masuk</span></a>
         @endauth
-        <button type="button" class="r-link r-fold" id="rail-fold" aria-label="Lipat menu"><span class="r-ico"><svg viewBox="0 0 24 24"><path d="M11 17l-5-5 5-5M18 17l-5-5 5-5"/></svg></span><span class="r-txt">Lipat menu</span></button>
 </nav>
-<div class="r-back" aria-hidden="true"></div>
-<button type="button" class="rail-fab" id="rail-fab" aria-label="Buka menu" aria-controls="rail" aria-expanded="false" title="Buka menu" inert><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
 
 <main>
     {{-- ================= HERO: carousel ekskul ================= --}}
@@ -551,43 +539,53 @@
     </section>
 
     {{-- ================= GALERI ================= --}}
+    @php
+        // Galeri dikelompokkan per ekskul: nama ekskul, lalu foto kegiatannya.
+        $galeriGrup  = $ekskuls->filter(fn ($e) => $e->galeri->isNotEmpty())->values();
+        $galeriUmum  = $galeri->whereNull('id_ekskul')->values();
+        $grupGaleri  = $galeriGrup->map(fn ($e) => ['nama' => $e->nama_ekskul, 'foto' => $e->galeri->sortBy('urutan')->values()]);
+        if ($galeriUmum->isNotEmpty()) { $grupGaleri->push(['nama' => 'Kegiatan umum', 'foto' => $galeriUmum]); }
+    @endphp
     <section class="sec" id="galeri">
         <div class="wrap">
             <h2>Galeri kegiatan</h2>
-            <p class="lead">Klik foto atau tekan panah untuk melihat foto berikutnya.</p>
+            <p class="lead">Foto kegiatan setiap ekstrakurikuler. Klik foto untuk memperbesar.</p>
 
-            @if($galeri->isEmpty())
+            @if($grupGaleri->isEmpty())
                 <p class="empty" style="margin-top:2rem">Galeri masih kosong. Foto akan tampil di sini setelah admin mengunggahnya.</p>
             @else
-                <div class="panel gal-panel" style="margin-top:2rem">
-                    <div class="gal">
-                        <div class="stack" id="stack" tabindex="0" aria-roledescription="carousel" aria-label="Galeri foto ekskul">
-                            @foreach($galeri as $g)
-                                <figure class="g-card"
+                @foreach($grupGaleri as $grup)
+                    <div class="gx" data-gx>
+                        <div class="gx-head">
+                            <h3>{{ $grup['nama'] }}</h3>
+                            <span class="gx-n">{{ $grup['foto']->count() }} foto</span>
+                        </div>
+                        <div class="gx-grid">
+                            @foreach($grup['foto'] as $g)
+                                <button type="button" class="gx-ph {{ $loop->index >= 6 ? 'more' : '' }}"
+                                    data-src="{{ $g->foto_url }}"
                                     data-judul="{{ $g->judul }}"
-                                    data-ekskul="{{ $g->ekskul->nama_ekskul ?? 'Umum' }}"
-                                    data-ket="{{ $g->keterangan }}">
-                                    <img src="{{ $g->foto_url }}" alt="{{ $g->judul }}" loading="{{ $loop->index < 3 ? 'eager' : 'lazy' }}" draggable="false">
-                                </figure>
+                                    data-ket="{{ $g->keterangan }}"
+                                    aria-label="Perbesar foto: {{ $g->judul }}">
+                                    <img src="{{ $g->foto_url }}" alt="{{ $g->judul }}" loading="lazy" draggable="false">
+                                </button>
                             @endforeach
                         </div>
-
-                        <div class="g-info">
-                            <div class="g-txt" id="g-txt" aria-live="polite">
-                                <span class="badge" id="g-ekskul">{{ $galeri->first()->ekskul->nama_ekskul ?? 'Umum' }}</span>
-                                <h3 id="g-judul">{{ $galeri->first()->judul }}</h3>
-                                <p class="d" id="g-ket">{{ $galeri->first()->keterangan }}</p>
-                            </div>
-                            @if($galeri->count() > 1)
-                            <div class="ctrl">
-                                <button class="arrow pv" id="g-prev" aria-label="Foto sebelumnya"><svg viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
-                                <button class="arrow nx" id="g-next" aria-label="Foto berikutnya"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
-                                <div class="num"><b id="g-now">1</b> <span>/ {{ $galeri->count() }}</span></div>
-                            </div>
-                            @endif
-                        </div>
+                        @if($grup['foto']->count() > 6)
+                            <button type="button" class="gx-more" data-more>Lihat semua {{ $grup['foto']->count() }} foto</button>
+                        @endif
                     </div>
-                </div>
+                @endforeach
+
+                <dialog class="lb" id="lb" aria-label="Foto galeri">
+                    <div class="lb-in">
+                        <img id="lb-img" src="" alt="">
+                        <div class="lb-cap"><b id="lb-judul"></b><span id="lb-ket"></span><small id="lb-num"></small></div>
+                    </div>
+                    <button class="lb-btn lb-x" id="lb-x" aria-label="Tutup"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+                    <button class="lb-btn lb-pv" id="lb-pv" aria-label="Foto sebelumnya"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button>
+                    <button class="lb-btn lb-nx" id="lb-nx" aria-label="Foto berikutnya"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+                </dialog>
             @endif
         </div>
     </section>
@@ -944,7 +942,7 @@
     if (!reduce && 'IntersectionObserver' in window) {
         const groups = [
             ['up',    'section.sec h2, section.sec .lead, .toolbar, .empty, footer .wrap'],
-            ['zoom',  '.stats, .band, .gal-panel'],
+            ['zoom',  '.stats, .band'],
             ['left',  '.school .video, .mapgrid .addr'],
             ['right', '.school .school-info, .mapgrid .map']
         ];
@@ -970,21 +968,7 @@
         els.forEach(el => io.observe(el));
     }
 
-    /* ===== Lipat / buka sidebar (status disimpan di localStorage) ===== */
-    const rail = document.getElementById('rail'), fab = document.getElementById('rail-fab'), htmlEl = document.documentElement;
-    const setFold = (f, save = true) => {
-        htmlEl.classList.toggle('rail-folded', f);
-        rail.toggleAttribute('inert', f);
-        rail.setAttribute('aria-hidden', f);
-        fab.toggleAttribute('inert', !f);
-        fab.setAttribute('aria-expanded', !f);
-        if (save) { try { localStorage.setItem('rail-folded', f ? '1' : '0'); } catch (e) {} }
-    };
-    setFold(htmlEl.classList.contains('rail-folded'), false);
-    document.getElementById('rail-fold')?.addEventListener('click', () => { setFold(true); fab.focus({ preventScroll: true }); });
-    fab.addEventListener('click', () => setFold(false));
-
-    /* Tombol sidebar aktif mengikuti bagian halaman yang sedang dilihat */
+    /* Tombol navbar aktif mengikuti bagian halaman yang sedang dilihat */
     const rl = [...document.querySelectorAll('.rail a[href^="#"]')];
     const spy = new IntersectionObserver(es => es.forEach(e => {
         if (!e.isIntersecting) return;
@@ -992,84 +976,42 @@
     }), { rootMargin: '-45% 0px -50% 0px' });
     rl.forEach(a => { const t = document.querySelector(a.getAttribute('href')); if (t) spy.observe(t); });
 
-    /* Galeri bertumpuk: foto paling depan terlempar keluar, foto di belakangnya maju satu layer */
-    const stack = document.getElementById('stack');
-    if (!stack) return;
-    const cards = [...stack.querySelectorAll('.g-card')], n = cards.length;
-    const txt = document.getElementById('g-txt');
-    let cur = 0, busy = false;
-    const OUT = 'translate3d(-120%,-8%,0) rotate(-14deg)';
-
-    const place = (c, off) => {
-        const s = 1 - off * .06, side = off % 2 ? 1 : -1, k = Math.max(.35, Math.min(1, stack.offsetWidth / 520));
-        c.style.transform = off > 3
-            ? 'translate3d(0,0,0) scale(.8)'
-            : `translate3d(${(off * 28 * k).toFixed(1)}px,${(off * -9 * k).toFixed(1)}px,0) rotate(${side * off * 2.2}deg) scale(${s})`;
-        c.style.opacity = off > 3 ? 0 : 1;
-        c.style.filter = `brightness(${1 - off * .08})`;
-        c.style.zIndex = n - off;
-        c.classList.toggle('top', off === 0);
-    };
-    const render = skip => cards.forEach((c, i) => { if (c !== skip) place(c, (i - cur + n) % n); });
-
-    const caption = () => {
-        const c = cards[cur];
-        txt.classList.add('swap');
-        setTimeout(() => {
-            document.getElementById('g-judul').textContent = c.dataset.judul;
-            document.getElementById('g-ekskul').textContent = c.dataset.ekskul;
-            document.getElementById('g-ket').textContent = c.dataset.ket;
-            const now = document.getElementById('g-now'); if (now) now.textContent = cur + 1;
-            txt.classList.remove('swap');
-        }, 240);
-    };
-
-    const go = dir => {
-        if (busy || n < 2) return;
-        busy = true;
-        if (dir > 0) {
-            const out = cards[cur];
-            out.style.zIndex = n + 2; out.style.opacity = 0; out.style.transform = OUT;
-            cur = (cur + 1) % n;
-            render(out);
-            setTimeout(() => {        /* setelah terlempar, foto pindah diam-diam ke tumpukan paling belakang */
-                out.style.transition = 'none';
-                place(out, n - 1);
-                out.offsetWidth;
-                out.style.transition = '';
-                busy = false;
-            }, 620);
-        } else {
-            const back = cards[(cur - 1 + n) % n];
-            back.style.transition = 'none';
-            back.style.zIndex = n + 2; back.style.opacity = 0; back.style.transform = OUT;
-            back.offsetWidth;
-            back.style.transition = '';
-            cur = (cur - 1 + n) % n;
-            render();
-            setTimeout(() => busy = false, 620);
-        }
-        caption();
-    };
-
-    render();
-    addEventListener('resize', () => { if (!busy) render(); });
-    document.getElementById('g-next')?.addEventListener('click', e => { e.stopPropagation(); go(1); });
-    document.getElementById('g-prev')?.addEventListener('click', e => { e.stopPropagation(); go(-1); });
-    stack.addEventListener('keydown', e => {
-        if (e.key === 'ArrowRight') { e.preventDefault(); go(1); }
-        if (e.key === 'ArrowLeft') { e.preventDefault(); go(-1); }
+    /* Galeri per ekskul: tombol "lihat semua" + lightbox foto */
+    document.querySelectorAll('[data-gx]').forEach(g => {
+        const b = g.querySelector('[data-more]'); if (!b) return;
+        const all = b.textContent;
+        b.addEventListener('click', () => {
+            const open = g.classList.toggle('open');
+            b.textContent = open ? 'Tampilkan lebih sedikit' : all;
+        });
     });
 
-    /* Klik = foto berikutnya, geser (swipe) = maju/mundur */
-    let x0 = null, moved = false;
-    stack.addEventListener('pointerdown', e => { x0 = e.clientX; moved = false; });
-    stack.addEventListener('pointerup', e => {
-        if (x0 === null) return;
-        const dx = e.clientX - x0; x0 = null;
-        if (Math.abs(dx) > 50) { moved = true; go(dx < 0 ? 1 : -1); }
-    });
-    stack.addEventListener('click', () => { if (!moved) go(1); });
+    const lb = document.getElementById('lb');
+    if (lb) {
+        const im = document.getElementById('lb-img'), tj = document.getElementById('lb-judul'),
+              tk = document.getElementById('lb-ket'), tn = document.getElementById('lb-num');
+        let list = [], idx = 0;
+        const show = () => {
+            const p = list[idx];
+            im.src = p.dataset.src; im.alt = p.dataset.judul;
+            tj.textContent = p.dataset.judul; tk.textContent = p.dataset.ket || '';
+            tn.textContent = (idx + 1) + ' / ' + list.length;
+        };
+        const go = d => { idx = (idx + d + list.length) % list.length; show(); };
+        document.querySelectorAll('.gx-ph').forEach(p => p.addEventListener('click', () => {
+            list = [...p.closest('.gx').querySelectorAll('.gx-ph')];
+            idx = list.indexOf(p); show(); lb.showModal();
+        }));
+        const multi = () => list.length > 1;
+        document.getElementById('lb-x').addEventListener('click', () => lb.close());
+        document.getElementById('lb-pv').addEventListener('click', () => multi() && go(-1));
+        document.getElementById('lb-nx').addEventListener('click', () => multi() && go(1));
+        lb.addEventListener('click', e => { if (e.target === lb || e.target.classList.contains('lb-in')) lb.close(); });
+        lb.addEventListener('keydown', e => {
+            if (e.key === 'ArrowRight' && multi()) go(1);
+            if (e.key === 'ArrowLeft' && multi()) go(-1);
+        });
+    }
 })();
 </script>
 </body>

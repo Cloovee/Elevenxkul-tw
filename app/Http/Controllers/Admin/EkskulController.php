@@ -7,6 +7,8 @@ use App\Models\Ekskul;
 use App\Models\Pembina;
 use App\Models\Siswa;
 use Illuminate\Http\Request;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 
 class EkskulController extends Controller
@@ -67,6 +69,8 @@ class EkskulController extends Controller
             'logo.image' => 'Logo harus berupa gambar.',
             'logo.mimes' => 'Logo harus berformat JPG, PNG, atau WEBP.',
             'logo.max' => 'Ukuran logo maksimal 2 MB.',
+            'logo.uploaded' => 'Logo gagal diunggah. Ukuran file mungkin melebihi batas server, coba gambar yang lebih kecil atau kosongkan logo.',
+            'poster.uploaded' => 'Poster gagal diunggah. Ukuran file mungkin melebihi batas server, coba gambar yang lebih kecil.',
         ]);
 
         unset($validated['hapus_poster'], $validated['hapus_logo']);
@@ -75,8 +79,17 @@ class EkskulController extends Controller
             $validated['poster'] = $request->file('poster')->store('poster-ekskul', 'public');
         }
 
+        // Logo bersifat OPSIONAL: kalau tidak diisi, ekskul tetap tersimpan tanpa logo.
         if ($request->hasFile('logo')) {
+            if (! $this->pastikanKolomLogo()) {
+                return back()->withInput()->withErrors([
+                    'logo' => 'Kolom logo belum ada di database dan gagal dibuat otomatis. Kosongkan logo dulu, atau jalankan migration.',
+                ]);
+            }
+
             $validated['logo'] = $request->file('logo')->store('logo-ekskul', 'public');
+        } else {
+            unset($validated['logo']);
         }
 
         Ekskul::create($validated);
@@ -120,6 +133,8 @@ class EkskulController extends Controller
             'logo.image' => 'Logo harus berupa gambar.',
             'logo.mimes' => 'Logo harus berformat JPG, PNG, atau WEBP.',
             'logo.max' => 'Ukuran logo maksimal 2 MB.',
+            'logo.uploaded' => 'Logo gagal diunggah. Ukuran file mungkin melebihi batas server, coba gambar yang lebih kecil atau kosongkan logo.',
+            'poster.uploaded' => 'Poster gagal diunggah. Ukuran file mungkin melebihi batas server, coba gambar yang lebih kecil.',
         ]);
 
         // Kalau pembina diganti/dilepas, pelatih yang sebelumnya terkait ekskul ini ikut
@@ -145,6 +160,15 @@ class EkskulController extends Controller
         // Logo: sama seperti poster -- ganti kalau ada file baru, hapus kalau dicentang.
         $hapusLogo = ! empty($validated['hapus_logo']);
         unset($validated['hapus_logo']);
+
+        // Logo bersifat OPSIONAL: tidak diisi = logo lama tetap dipakai (atau tetap kosong).
+        if ($request->hasFile('logo') || $hapusLogo) {
+            if (! $this->pastikanKolomLogo()) {
+                return back()->withInput()->withErrors([
+                    'logo' => 'Kolom logo belum ada di database dan gagal dibuat otomatis. Kosongkan logo dulu, atau jalankan migration.',
+                ]);
+            }
+        }
 
         if ($request->hasFile('logo')) {
             $this->hapusFileLogo($ekskul);
@@ -179,6 +203,30 @@ class EkskulController extends Controller
     {
         if ($ekskul->poster && ! str_starts_with($ekskul->poster, 'http')) {
             Storage::disk('public')->delete($ekskul->poster);
+        }
+    }
+
+    /**
+     * Pastikan kolom `logo` ada di tabel ekskuls. Di hosting migration sering belum
+     * dijalankan, sehingga simpan logo gagal dengan "Unknown column 'logo'".
+     * Kalau belum ada, dibuat otomatis (nullable). Return false kalau gagal dibuat.
+     */
+    private function pastikanKolomLogo(): bool
+    {
+        try {
+            if (Schema::hasColumn('ekskuls', 'logo')) {
+                return true;
+            }
+
+            Schema::table('ekskuls', function (Blueprint $table) {
+                $table->string('logo', 255)->nullable()->after('poster');
+            });
+
+            return Schema::hasColumn('ekskuls', 'logo');
+        } catch (\Throwable $e) {
+            report($e);
+
+            return false;
         }
     }
 
