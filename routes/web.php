@@ -298,12 +298,9 @@ Route::post('/absensi-peserta/selesai', [App\Http\Controllers\Ketua\AbsensiPeser
 Route::get('/riwayat-absensi', [RiwayatAbsensiController::class, 'index'])
     ->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])->name('ketua.riwayat-absensi');
 
-// Laporan kegiatan pelatih per bulan (foto + deskripsi + tanggal, diambil dari absensi pelatih).
-Route::get('/laporan-kegiatan', [App\Http\Controllers\Ketua\LaporanKegiatanController::class, 'index'])
-    ->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])->name('ketua.laporan-kegiatan');
-
-Route::get('/laporan-kegiatan/cetak', [App\Http\Controllers\Ketua\LaporanKegiatanController::class, 'cetak'])
-    ->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])->name('ketua.laporan-kegiatan.cetak');
+// Export PDF rekap absensi (peserta + pelatih) per bulan: ?bulan=YYYY-MM
+Route::get('/riwayat-absensi/export-pdf', [RiwayatAbsensiController::class, 'exportPdf'])
+    ->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])->name('ketua.riwayat-absensi.export-pdf');
 
 Route::get('/kelola-anggota', function () {
 
