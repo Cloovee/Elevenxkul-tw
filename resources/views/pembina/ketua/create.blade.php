@@ -148,24 +148,33 @@
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Email <span class="normal-case font-medium text-inksoft/70">(opsional)</span></label>
-                        <input type="email" name="email" x-model="email" :disabled="!(siswaTerpilih && !siswaTerpilih.punya_akun)"
-                               class="w-full px-3.5 py-2.5 rounded-xl border border-[#E7E7F4] text-sm focus:outline-none focus:border-lavender">
+                        <label for="ketua_email" class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Email <span class="text-red-500">*</span></label>
+                        <input type="email" id="ketua_email" name="email" x-model="email" required autocomplete="off" placeholder="nama@sekolah.sch.id" :disabled="!(siswaTerpilih && !siswaTerpilih.punya_akun)"
+                               class="w-full px-3.5 py-2.5 rounded-xl border border-[#E7E7F4] text-sm focus:outline-none focus:border-lavender @error('email') border-red-400 @enderror">
+                        @error('email')<p class="mt-1.5 text-xs font-semibold text-red-500">{{ $message }}</p>@enderror
+                        <p class="mt-1.5 text-xs text-inksoft leading-relaxed">Wajib diisi, format <b>nama@sekolah.sch.id</b>, dan belum dipakai akun lain.</p>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Username <span class="text-red-500">*</span></label>
-                        <input type="text" name="username" value="{{ old('username') }}" :disabled="!(siswaTerpilih && !siswaTerpilih.punya_akun)"
-                               class="w-full px-3.5 py-2.5 rounded-xl border border-[#E7E7F4] text-sm focus:outline-none focus:border-lavender">
+                        <label for="ketua_username" class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Username <span class="text-red-500">*</span></label>
+                        <input type="text" id="ketua_username" name="username" value="{{ old('username') }}" required minlength="3" maxlength="50"
+                               pattern="[A-Za-z0-9_\-]+" title="Hanya huruf, angka, strip (-) dan underscore (_), tanpa spasi, titik, dan tanpa @"
+                               autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="mis. naila_khalisa" :disabled="!(siswaTerpilih && !siswaTerpilih.punya_akun)"
+                               class="w-full px-3.5 py-2.5 rounded-xl border border-[#E7E7F4] text-sm focus:outline-none focus:border-lavender @error('username') border-red-400 @enderror">
+                        @error('username')<p class="mt-1.5 text-xs font-semibold text-red-500">{{ $message }}</p>@enderror
+                        <p class="mt-1.5 text-xs text-inksoft leading-relaxed">Dipakai untuk login. 3-50 karakter, hanya <b>huruf, angka, - atau _</b>. Tanpa spasi, titik, atau @.</p>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Password <span class="text-red-500">*</span></label>
-                        <input type="password" name="password" minlength="8" :disabled="!(siswaTerpilih && !siswaTerpilih.punya_akun)"
-                               class="w-full px-3.5 py-2.5 rounded-xl border border-[#E7E7F4] text-sm focus:outline-none focus:border-lavender">
+                        <label for="ketua_password" class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Password <span class="text-red-500">*</span></label>
+                        <input type="password" id="ketua_password" name="password" required minlength="8" autocomplete="new-password" :disabled="!(siswaTerpilih && !siswaTerpilih.punya_akun)"
+                               class="w-full px-3.5 py-2.5 rounded-xl border border-[#E7E7F4] text-sm focus:outline-none focus:border-lavender @error('password') border-red-400 @enderror">
+                        @error('password')<p class="mt-1.5 text-xs font-semibold text-red-500">{{ $message }}</p>@enderror
+                        <p class="mt-1.5 text-xs text-inksoft leading-relaxed">Minimal <b>8 karakter</b>. Campur huruf dan angka supaya lebih aman.</p>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Konfirmasi Password <span class="text-red-500">*</span></label>
-                        <input type="password" name="password_confirmation" minlength="8" :disabled="!(siswaTerpilih && !siswaTerpilih.punya_akun)"
+                        <label for="ketua_password_confirmation" class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Konfirmasi Password <span class="text-red-500">*</span></label>
+                        <input type="password" id="ketua_password_confirmation" name="password_confirmation" required minlength="8" autocomplete="new-password" :disabled="!(siswaTerpilih && !siswaTerpilih.punya_akun)"
                                class="w-full px-3.5 py-2.5 rounded-xl border border-[#E7E7F4] text-sm focus:outline-none focus:border-lavender">
+                        <p class="mt-1.5 text-xs text-inksoft leading-relaxed">Ketik ulang password di sebelah, harus <b>sama persis</b>.</p>
                     </div>
                 </div>
             </div>

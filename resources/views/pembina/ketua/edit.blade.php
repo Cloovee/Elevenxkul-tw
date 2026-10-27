@@ -105,9 +105,11 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Email <span class="normal-case font-medium text-inksoft/70">(opsional)</span></label>
-                    <input type="email" name="email" value="{{ old('email', $siswa->email) }}"
-                           class="w-full px-3.5 py-2.5 rounded-xl border border-[#E7E7F4] text-sm focus:outline-none focus:border-lavender">
+                    <label class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Email <span class="text-red-500">*</span></label>
+                    <input type="email" name="email" required value="{{ old('email', $siswa->email) }}" autocomplete="off" placeholder="nama@sekolah.sch.id"
+                           class="w-full px-3.5 py-2.5 rounded-xl border border-[#E7E7F4] text-sm focus:outline-none focus:border-lavender @error('email') border-red-400 @enderror">
+                    @error('email')<p class="mt-1.5 text-xs font-semibold text-red-500">{{ $message }}</p>@enderror
+                    <p class="mt-1.5 text-xs text-inksoft leading-relaxed">Wajib diisi, format <b>nama@sekolah.sch.id</b>, dan belum dipakai akun lain.</p>
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">MedSos</label>
@@ -127,19 +129,26 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Username <span class="text-red-500">*</span></label>
-                    <input type="text" name="username" required value="{{ old('username', $siswa->user->username ?? '') }}"
-                           class="w-full px-3.5 py-2.5 rounded-xl border border-[#E7E7F4] text-sm focus:outline-none focus:border-lavender">
+                    <input type="text" name="username" required minlength="3" maxlength="50" value="{{ old('username', $siswa->user->username ?? '') }}"
+                           pattern="[A-Za-z0-9_\-]+" title="Hanya huruf, angka, strip (-) dan underscore (_), tanpa spasi, titik, dan tanpa @"
+                           autocomplete="off" autocapitalize="none" spellcheck="false"
+                           class="w-full px-3.5 py-2.5 rounded-xl border border-[#E7E7F4] text-sm focus:outline-none focus:border-lavender @error('username') border-red-400 @enderror">
+                    @error('username')<p class="mt-1.5 text-xs font-semibold text-red-500">{{ $message }}</p>@enderror
+                    <p class="mt-1.5 text-xs text-inksoft leading-relaxed">Dipakai untuk login. 3-50 karakter, hanya <b>huruf, angka, - atau _</b>. Tanpa spasi, titik, atau @.</p>
                 </div>
                 <div></div>
                 <div>
                     <label class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Password Baru</label>
-                    <input type="password" name="password" minlength="8" placeholder="Kosongkan jika tidak diganti"
-                           class="w-full px-3.5 py-2.5 rounded-xl border border-[#E7E7F4] text-sm focus:outline-none focus:border-lavender">
+                    <input type="password" name="password" minlength="8" placeholder="Kosongkan jika tidak diganti" autocomplete="new-password"
+                           class="w-full px-3.5 py-2.5 rounded-xl border border-[#E7E7F4] text-sm focus:outline-none focus:border-lavender @error('password') border-red-400 @enderror">
+                    @error('password')<p class="mt-1.5 text-xs font-semibold text-red-500">{{ $message }}</p>@enderror
+                    <p class="mt-1.5 text-xs text-inksoft leading-relaxed">Kosongkan kalau tidak ingin mengganti. Kalau diisi, minimal <b>8 karakter</b>.</p>
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Konfirmasi Password Baru</label>
-                    <input type="password" name="password_confirmation" minlength="8"
+                    <input type="password" name="password_confirmation" minlength="8" autocomplete="new-password"
                            class="w-full px-3.5 py-2.5 rounded-xl border border-[#E7E7F4] text-sm focus:outline-none focus:border-lavender">
+                    <p class="mt-1.5 text-xs text-inksoft leading-relaxed">Isi hanya kalau mengganti password, harus <b>sama persis</b>.</p>
                 </div>
             </div>
 

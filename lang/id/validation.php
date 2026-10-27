@@ -1,0 +1,168 @@
+<?php
+
+/*
+| Pesan validasi dalam Bahasa Indonesia. Dipakai otomatis karena APP_LOCALE=id.
+| Pesan sengaja dibuat sebagai PETUNJUK (bukan sekadar "salah"), supaya pengguna
+| langsung tahu apa yang harus diperbaiki, mis. aturan username dan password.
+|
+| Nama kolom yang tampil ke pengguna diatur di bagian "attributes" paling bawah.
+*/
+
+return [
+    'accepted' => ':Attribute harus dicentang/disetujui.',
+    'active_url' => ':Attribute bukan URL yang valid.',
+    'after' => ':Attribute harus berupa tanggal setelah :date.',
+    'after_or_equal' => ':Attribute harus berupa tanggal setelah atau sama dengan :date.',
+    'alpha' => ':Attribute hanya boleh berisi huruf.',
+    'alpha_dash' => ':Attribute hanya boleh berisi huruf, angka, strip (-) dan garis bawah (_). Jangan pakai spasi, titik, atau @.',
+    'alpha_num' => ':Attribute hanya boleh berisi huruf dan angka.',
+    'array' => ':Attribute harus berupa daftar (array).',
+    'before' => ':Attribute harus berupa tanggal sebelum :date.',
+    'before_or_equal' => ':Attribute harus berupa tanggal sebelum atau sama dengan :date.',
+    'between' => [
+        'array' => ':Attribute harus berisi antara :min sampai :max item.',
+        'file' => ':Attribute harus berukuran antara :min sampai :max KB.',
+        'numeric' => ':Attribute harus bernilai antara :min sampai :max.',
+        'string' => ':Attribute harus terdiri dari :min sampai :max karakter.',
+    ],
+    'boolean' => ':Attribute harus bernilai benar atau salah.',
+    'confirmed' => 'Konfirmasi :attribute tidak sama dengan isian di atasnya. Ketik ulang dengan persis sama.',
+    'current_password' => 'Password saat ini salah.',
+    'date' => ':Attribute bukan tanggal yang valid.',
+    'date_equals' => ':Attribute harus berupa tanggal yang sama dengan :date.',
+    'date_format' => ':Attribute tidak cocok dengan format :format.',
+    'different' => ':Attribute dan :other harus berbeda.',
+    'digits' => ':Attribute harus terdiri dari :digits angka.',
+    'digits_between' => ':Attribute harus terdiri dari :min sampai :max angka.',
+    'email' => ':Attribute harus berupa alamat email yang valid, contoh: nama@sekolah.sch.id.',
+    'ends_with' => ':Attribute harus diakhiri salah satu dari: :values.',
+    'exists' => ':Attribute yang dipilih tidak valid atau tidak ditemukan.',
+    'file' => ':Attribute harus berupa file.',
+    'filled' => ':Attribute wajib diisi.',
+    'gt' => [
+        'array' => ':Attribute harus berisi lebih dari :value item.',
+        'file' => ':Attribute harus lebih besar dari :value KB.',
+        'numeric' => ':Attribute harus lebih besar dari :value.',
+        'string' => ':Attribute harus lebih dari :value karakter.',
+    ],
+    'gte' => [
+        'array' => ':Attribute harus berisi minimal :value item.',
+        'file' => ':Attribute harus minimal :value KB.',
+        'numeric' => ':Attribute harus minimal :value.',
+        'string' => ':Attribute harus minimal :value karakter.',
+    ],
+    'image' => ':Attribute harus berupa gambar.',
+    'in' => ':Attribute yang dipilih tidak valid.',
+    'integer' => ':Attribute harus berupa bilangan bulat.',
+    'json' => ':Attribute harus berupa JSON yang valid.',
+    'lowercase' => ':Attribute harus ditulis dengan huruf kecil.',
+    'lt' => [
+        'array' => ':Attribute harus berisi kurang dari :value item.',
+        'file' => ':Attribute harus lebih kecil dari :value KB.',
+        'numeric' => ':Attribute harus lebih kecil dari :value.',
+        'string' => ':Attribute harus kurang dari :value karakter.',
+    ],
+    'lte' => [
+        'array' => ':Attribute tidak boleh lebih dari :value item.',
+        'file' => ':Attribute tidak boleh lebih dari :value KB.',
+        'numeric' => ':Attribute tidak boleh lebih dari :value.',
+        'string' => ':Attribute tidak boleh lebih dari :value karakter.',
+    ],
+    'max' => [
+        'array' => ':Attribute tidak boleh lebih dari :max item.',
+        'file' => ':Attribute tidak boleh lebih dari :max KB.',
+        'numeric' => ':Attribute tidak boleh lebih dari :max.',
+        'string' => ':Attribute tidak boleh lebih dari :max karakter.',
+    ],
+    'mimes' => ':Attribute harus berupa file bertipe: :values.',
+    'mimetypes' => ':Attribute harus berupa file bertipe: :values.',
+    'min' => [
+        'array' => ':Attribute minimal berisi :min item.',
+        'file' => ':Attribute minimal berukuran :min KB.',
+        'numeric' => ':Attribute minimal bernilai :min.',
+        'string' => ':Attribute minimal :min karakter.',
+    ],
+    'not_in' => ':Attribute yang dipilih tidak valid.',
+    'numeric' => ':Attribute harus berupa angka.',
+    'password' => [
+        'letters' => ':Attribute harus mengandung minimal satu huruf.',
+        'mixed' => ':Attribute harus mengandung minimal satu huruf besar dan satu huruf kecil.',
+        'numbers' => ':Attribute harus mengandung minimal satu angka.',
+        'symbols' => ':Attribute harus mengandung minimal satu simbol.',
+        'uncompromised' => ':Attribute ini pernah bocor di internet. Pilih :attribute yang lain.',
+    ],
+    'present' => ':Attribute harus ada.',
+    'regex' => 'Format :attribute tidak valid.',
+    'required' => ':Attribute wajib diisi.',
+    'required_if' => ':Attribute wajib diisi jika :other bernilai :value.',
+    'required_unless' => ':Attribute wajib diisi kecuali :other bernilai :values.',
+    'required_with' => ':Attribute wajib diisi jika :values diisi.',
+    'required_with_all' => ':Attribute wajib diisi jika :values diisi.',
+    'required_without' => ':Attribute wajib diisi jika :values kosong.',
+    'required_without_all' => ':Attribute wajib diisi jika semua :values kosong.',
+    'same' => ':Attribute dan :other harus sama.',
+    'size' => [
+        'array' => ':Attribute harus berisi :size item.',
+        'file' => ':Attribute harus berukuran :size KB.',
+        'numeric' => ':Attribute harus bernilai :size.',
+        'string' => ':Attribute harus terdiri dari :size karakter.',
+    ],
+    'starts_with' => ':Attribute harus diawali salah satu dari: :values.',
+    'string' => ':Attribute harus berupa teks.',
+    'timezone' => ':Attribute harus berupa zona waktu yang valid.',
+    'unique' => ':Attribute ini sudah dipakai. Gunakan :attribute yang lain.',
+    'uploaded' => ':Attribute gagal diunggah. Ukuran file mungkin terlalu besar.',
+    'uppercase' => ':Attribute harus ditulis dengan huruf besar.',
+    'url' => 'Format :attribute tidak valid. Awali dengan http:// atau https://.',
+    'uuid' => ':Attribute harus berupa UUID yang valid.',
+
+    'custom' => [
+        'attribute-name' => [
+            'rule-name' => 'custom-message',
+        ],
+    ],
+
+    /*
+    | Nama kolom -> teks yang tampil di pesan. Tambahkan di sini kalau ada kolom baru.
+    */
+    'attributes' => [
+        'name' => 'nama',
+        'email' => 'email',
+        'username' => 'username',
+        'password' => 'password',
+        'password_confirmation' => 'konfirmasi password',
+        'current_password' => 'password saat ini',
+        'role' => 'role',
+        'remember' => 'ingat saya',
+
+        'NISN' => 'NISN',
+        'NIS' => 'NIS',
+        'nama_siswa' => 'nama siswa',
+        'jk' => 'jenis kelamin',
+        'agama' => 'agama',
+        'nomor_hp' => 'nomor HP',
+        'medsos' => 'medsos',
+        'alamat' => 'alamat',
+        'id_kelas' => 'kelas',
+        'id_siswa' => 'siswa',
+
+        'id_ekskul' => 'ekskul',
+        'nama_ekskul' => 'nama ekskul',
+        'kategori' => 'kategori',
+        'deskripsi' => 'deskripsi',
+        'poster' => 'poster',
+        'logo' => 'logo',
+        'id_pembina' => 'pembina',
+        'id_ketua' => 'ketua',
+        'id_pelatih' => 'pelatih',
+
+        'nama_pembina' => 'nama pembina',
+        'nama_pelatih' => 'nama pelatih',
+        'foto' => 'foto',
+        'nilai' => 'nilai',
+        'semester' => 'semester',
+        'tahun_ajaran' => 'tahun ajaran',
+        'tanggal' => 'tanggal',
+        'file' => 'file',
+    ],
+];
