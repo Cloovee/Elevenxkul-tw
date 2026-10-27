@@ -105,8 +105,8 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Email <span class="text-red-500">*</span></label>
-                    <input type="email" name="email" required value="{{ old('email', $siswa->email) }}"
+                    <label class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Email <span class="normal-case font-medium text-inksoft/70">(opsional)</span></label>
+                    <input type="email" name="email" value="{{ old('email', $siswa->email) }}"
                            class="w-full px-3.5 py-2.5 rounded-xl border border-[#E7E7F4] text-sm focus:outline-none focus:border-lavender">
                 </div>
                 <div>

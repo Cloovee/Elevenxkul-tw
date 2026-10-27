@@ -287,6 +287,10 @@ Route::get('/absensi-peserta', [App\Http\Controllers\Ketua\AbsensiPesertaControl
 Route::post('/absensi-peserta/scan', [App\Http\Controllers\Ketua\AbsensiPesertaController::class, 'scan'])
     ->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])->name('ketua.absensi-peserta.scan');
 
+// Simpan absensi manual kelas 11 & 12 (tabel H / S / I). Catatan hanya disimpan untuk status Izin.
+Route::post('/absensi-peserta/manual', [App\Http\Controllers\Ketua\AbsensiPesertaController::class, 'simpanManual'])
+    ->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])->name('ketua.absensi-peserta.manual');
+
 // Tutup absensi: peserta aktif yang tidak scan dicatat Alpha.
 Route::post('/absensi-peserta/selesai', [App\Http\Controllers\Ketua\AbsensiPesertaController::class, 'selesai'])
     ->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])->name('ketua.absensi-peserta.selesai');

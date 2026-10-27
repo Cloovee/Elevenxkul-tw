@@ -169,7 +169,7 @@ class KetuaController extends Controller
 
         if ($butuhAkun) {
             $validator = Validator::make($request->all(), [
-                'email' => 'required|email|max:100|unique:users,email',
+                'email' => 'nullable|email|max:100|unique:users,email',
                 'username' => 'required|string|max:50|alpha_dash|unique:users,username',
                 'password' => 'required|string|min:8|confirmed',
             ], [
@@ -265,7 +265,7 @@ class KetuaController extends Controller
             'agama' => 'nullable|string|max:20',
             'id_kelas' => 'required|exists:kelas,id_kelas',
             'nomor_hp' => 'nullable|string|max:15',
-            'email' => 'required|email|max:100|unique:users,email,' . optional($user)->id,
+            'email' => 'nullable|email|max:100|unique:users,email,' . optional($user)->id,
             'medsos' => 'nullable|string|max:100',
             'alamat' => 'nullable|string',
             'username' => 'required|string|max:50|alpha_dash|unique:users,username,' . optional($user)->id,
