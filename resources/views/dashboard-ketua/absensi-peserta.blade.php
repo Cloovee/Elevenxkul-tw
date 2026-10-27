@@ -217,11 +217,16 @@
                                 <table class="w-full text-sm">
                                     <thead class="bg-bgsoft text-inksoft text-xs font-bold uppercase tracking-wide">
                                         <tr>
-                                            <th class="px-4 py-3 text-left">NIS</th>
-                                            <th class="px-4 py-3 text-left">Nama</th>
-                                            <th class="px-4 py-3 text-left">Waktu</th>
-                                            <th class="px-4 py-3 text-left">Status Kehadiran</th>
-                                            <th class="px-4 py-3 text-left">Catatan</th>
+                                            <th rowspan="2" class="px-4 py-3 text-left align-middle">NIS</th>
+                                            <th rowspan="2" class="px-4 py-3 text-left align-middle">Nama</th>
+                                            <th rowspan="2" class="px-4 py-3 text-left align-middle">Waktu</th>
+                                            <th colspan="3" class="px-4 py-2 text-center border-b border-ink/10">Status Kehadiran</th>
+                                            <th rowspan="2" x-show="adaIzin" x-cloak class="px-4 py-3 text-left align-middle">Catatan</th>
+                                        </tr>
+                                        <tr>
+                                            <th class="w-14 px-2 py-1.5 text-center">H</th>
+                                            <th class="w-14 px-2 py-1.5 text-center">S</th>
+                                            <th class="w-14 px-2 py-1.5 text-center">I</th>
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y divide-ink/10">
@@ -237,21 +242,24 @@
                                                 </td>
                                                 {{-- Waktu = jam absensi tersimpan (otomatis), "-" kalau belum disimpan --}}
                                                 <td class="px-4 py-2.5 whitespace-nowrap text-inksoft" x-text="r.waktu || '-'"></td>
-                                                <td class="px-4 py-2.5">
-                                                    <select :name="'status[' + r.id + ']'" x-model="r.status"
-                                                            :aria-label="'Status kehadiran: ' + r.nama"
-                                                            class="w-full min-w-[130px] px-3 py-2 rounded-lg border border-ink/15 bg-white focus:outline-none focus:ring-2 focus:ring-periwinkle focus:border-periwinkle transition">
-                                                        <option value="">Pilih status</option>
-                                                        <option value="hadir">Hadir</option>
-                                                        <option value="sakit">Sakit</option>
-                                                        <option value="izin">Izin</option>
-                                                    </select>
+                                                <td class="px-2 py-2.5 text-center">
+                                                    <input type="radio" value="hadir" :name="'status[' + r.id + ']'" x-model="r.status"
+                                                           :aria-label="'Hadir: ' + r.nama" class="w-4 h-4 accent-periwinkle cursor-pointer">
                                                 </td>
-                                                <td class="px-4 py-2.5">
+                                                <td class="px-2 py-2.5 text-center">
+                                                    <input type="radio" value="sakit" :name="'status[' + r.id + ']'" x-model="r.status"
+                                                           :aria-label="'Sakit: ' + r.nama" class="w-4 h-4 accent-periwinkle cursor-pointer">
+                                                </td>
+                                                <td class="px-2 py-2.5 text-center">
+                                                    <input type="radio" value="izin" :name="'status[' + r.id + ']'" x-model="r.status"
+                                                           :aria-label="'Izin: ' + r.nama" class="w-4 h-4 accent-periwinkle cursor-pointer">
+                                                </td>
+                                                {{-- Catatan: kolom hanya ada kalau ada yang Izin, dan kotak isinya hanya di baris yang Izin --}}
+                                                <td x-show="adaIzin" x-cloak class="px-4 py-2.5">
                                                     <input type="text" :name="'catatan[' + r.id + ']'" x-model="r.catatan"
-                                                           :disabled="r.status !== 'izin'"
-                                                           maxlength="255" :placeholder="r.status === 'izin' ? 'Alasan izin' : '-'"
-                                                           class="w-full min-w-[160px] px-3 py-1.5 rounded-lg border border-ink/15 bg-white focus:outline-none focus:ring-2 focus:ring-periwinkle focus:border-periwinkle transition disabled:bg-gray-50 disabled:text-gray-400">
+                                                           x-show="r.status === 'izin'" x-cloak :disabled="r.status !== 'izin'"
+                                                           maxlength="255" placeholder="Alasan izin"
+                                                           class="w-full min-w-[160px] px-3 py-1.5 rounded-lg border border-ink/15 bg-white focus:outline-none focus:ring-2 focus:ring-periwinkle focus:border-periwinkle transition">
                                                 </td>
                                             </tr>
                                         </template>
@@ -259,7 +267,7 @@
                                 </table>
                             </div>
 
-                            <p class="text-xs text-inksoft">Pilih status kehadiran setiap peserta. Waktu terisi otomatis saat absensi disimpan. Catatan diisi jika peserta berstatus Izin.</p>
+                            <p class="text-xs text-inksoft">Status Kehadiran: H = Hadir, S = Sakit, I = Izin. Waktu terisi otomatis saat absensi disimpan. Kolom Catatan muncul kalau ada peserta berstatus Izin.</p>
 
                             <button type="submit" :disabled="terisi === 0" x-show="rowsTampil.length > 0" x-cloak
                                 class="w-full py-3 rounded-xl bg-mint text-ink font-semibold hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed">
