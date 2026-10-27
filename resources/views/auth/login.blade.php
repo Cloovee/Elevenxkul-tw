@@ -92,7 +92,7 @@
                 <x-input-error :messages="$errors->get('password')" class="mt-2" />
             </div>
 
-            <!-- Remember Me + Lupa Password -->
+            <!-- Remember Me -->
             <div class="flex items-center justify-between">
                 <label for="remember_me" class="inline-flex items-center cursor-pointer">
                     <input
@@ -106,15 +106,6 @@
                         Ingat saya
                     </span>
                 </label>
-
-                @if (Route::has('password.request'))
-                    <a
-                        href="{{ route('password.request') }}"
-                        class="text-sm font-medium text-periwinkle hover:text-[#8F92F5] hover:underline"
-                    >
-                        Lupa kata sandi?
-                    </a>
-                @endif
             </div>
 
             <!-- Tombol Masuk -->
@@ -129,10 +120,61 @@
 
     <!-- Kembali ke landing page publik -->
     <a href="{{ route('landing') }}"
-       class="inline-flex items-center gap-1.5 mt-6 text-sm font-medium text-inksoft hover:text-periwinkle transition">
-        &larr; Kembali ke beranda
+       class="group mt-5 flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-periwinkle/30 bg-white px-5 py-3 text-sm font-semibold text-periwinkle shadow-sm transition-all hover:border-periwinkle hover:bg-periwinkle/5 hover:-translate-y-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-periwinkle/60">
+        <svg class="h-5 w-5 transition-transform group-hover:-translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        Kembali ke Beranda
     </a>
 
+
+    {{-- Info lupa kata sandi: pojok kanan bawah layar. Fitur "Lupa kata sandi" dihilangkan karena
+         reset password dilakukan oleh admin. --}}
+    <div id="infoSandi" class="fixed bottom-5 right-5 z-50 flex flex-col items-end gap-3">
+        <div
+            id="infoSandiBox"
+            role="tooltip"
+            class="hidden w-72 max-w-[calc(100vw-2.5rem)] rounded-2xl bg-white p-4 text-sm text-ink shadow-xl shadow-black/20 ring-1 ring-ink/10"
+        >
+            <p class="font-semibold mb-1">Lupa kata sandi?</p>
+            <p class="text-inksoft leading-relaxed">
+                Silakan temui <strong>Admin</strong> untuk mengganti kata sandimu.
+                Kata sandi akan direset langsung oleh Admin.
+            </p>
+        </div>
+
+        <button
+            id="infoSandiBtn"
+            type="button"
+            aria-label="Info lupa kata sandi"
+            aria-expanded="false"
+            aria-controls="infoSandiBox"
+            class="flex h-11 w-11 items-center justify-center rounded-full bg-periwinkle text-white shadow-lg shadow-periwinkle/40 hover:bg-[#5B7FC7] focus:outline-none focus:ring-2 focus:ring-white/80 transition"
+        >
+            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <circle cx="12" cy="12" r="9" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 11v5" />
+                <circle cx="12" cy="7.75" r="0.6" fill="currentColor" />
+            </svg>
+        </button>
+    </div>
+
+    <script>
+        (function () {
+            const wrap = document.getElementById('infoSandi');
+            const btn = document.getElementById('infoSandiBtn');
+            const box = document.getElementById('infoSandiBox');
+
+            function toggle(show) {
+                box.classList.toggle('hidden', !show);
+                btn.setAttribute('aria-expanded', show ? 'true' : 'false');
+            }
+
+            btn.addEventListener('click', () => toggle(box.classList.contains('hidden')));
+            document.addEventListener('click', (e) => { if (!wrap.contains(e.target)) toggle(false); });
+            document.addEventListener('keydown', (e) => { if (e.key === 'Escape') toggle(false); });
+        })();
+    </script>
 
     <script>
         function togglePassword() {
