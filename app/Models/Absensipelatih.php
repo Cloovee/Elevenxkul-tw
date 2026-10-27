@@ -27,6 +27,23 @@ class AbsensiPelatih extends Model
         'tgl_validasi' => 'datetime',
     ];
 
+    /**
+     * URL foto kehadiran (disk "public"), atau null kalau tidak ada foto.
+     * Dipakai di laporan kegiatan bulanan Ketua.
+     */
+    public function getFotoUrlAttribute(): ?string
+    {
+        if (! $this->foto_kehadiran) {
+            return null;
+        }
+
+        if (str_starts_with($this->foto_kehadiran, 'http://') || str_starts_with($this->foto_kehadiran, 'https://')) {
+            return $this->foto_kehadiran;
+        }
+
+        return asset('storage/' . ltrim($this->foto_kehadiran, '/'));
+    }
+
     public function pelatih()
     {
         return $this->belongsTo(Pelatih::class, 'id_pelatih', 'id_pelatih');

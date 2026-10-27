@@ -104,7 +104,7 @@
 
                     <template x-for="(s, i) in hasil" :key="s.grup + '-' + s.id">
                         <div>
-                            <p x-show="s.grup === 'lain' && (i === 0 || hasil[i - 1].grup !== 'lain')"
+                            <p x-show="s.awalLain"
                                class="px-3.5 pt-2 pb-1 text-[11px] font-bold text-inksoft uppercase tracking-wide border-t border-[#F1F1FA]">
                                 Siswa yang belum jadi anggota
                             </p>
@@ -116,9 +116,13 @@
                             </button>
                         </div>
                     </template>
+
+                    <p x-show="total > hasil.length" class="px-3.5 py-2 text-xs text-inksoft border-t border-[#F1F1FA]">
+                        Menampilkan <span x-text="hasil.length"></span> dari <span x-text="total"></span> siswa. Ketik nama/NIS/kelas untuk mempersempit.
+                    </p>
                 </div>
 
-                <p x-show="anggota.length === 0" class="mt-1.5 text-xs text-amber-700">
+                <p x-show="jumlahAnggota === 0" class="mt-1.5 text-xs text-amber-700">
                     Belum ada anggota di ekskul ini. Centang opsi di bawah untuk memilih dari semua siswa.
                 </p>
 
@@ -193,108 +197,140 @@
 
 <script>
     document.addEventListener('alpine:init', () => {
-        Alpine.data('ketuaForm', (init) => ({
-            ekskuls: init.ekskuls,
-            semua: init.siswa,
-            ekskulId: init.ekskulId || '',
-            siswaId: init.siswaId || '',
-            email: init.email || '',
-            tampilLain: false,
+        Alpine.data('ketuaForm', (init) => {
+            // PENTING: daftar siswa (bisa ribuan) disimpan DI LUAR state Alpine. Kalau ditaruh di `this`,
+            // Alpine membungkus tiap objeknya jadi reactive proxy dan semua pencarian jadi sangat lambat.
+            // Teks pencarian (nama/NISN/NIS/kelas, huruf kecil) dihitung sekali di sini, bukan tiap ketikan.
+            const SEMUA = init.siswa.map(s => ({
+                ...s,
+                _cari: [s.nama, s.nisn, s.nis, s.kelas].map(v => String(v ?? '').toLowerCase()),
+            }));
+            // Id anggota per ekskul dalam bentuk Set supaya cek "anggota atau bukan" cepat (O(1)).
+            const ANGGOTA = {};
+            init.ekskuls.forEach(e => { ANGGOTA[e.id] = new Set(e.anggota_ids.map(Number)); });
+            // Daftar hanya menggambar sejumlah ini; sisanya muncul saat pengguna mengetik untuk mempersempit.
+            const BATAS_TAMPIL = 50;
 
-            // --- pencarian dropdown ketua ---
-            cari: '',      // teks di kotak pencarian
-            buka: false,   // daftar hasil terbuka / tertutup
-            sorot: 0,      // baris yang disorot (keyboard / mouse)
+            return {
+                ekskuls: init.ekskuls,
+                ekskulId: init.ekskulId || '',
+                siswaId: init.siswaId || '',
+                email: init.email || '',
+                tampilLain: false,
 
-            get ekskul() { return this.ekskuls.find(e => String(e.id) === String(this.ekskulId)) || null; },
-            get anggota() {
-                if (!this.ekskul) return [];
-                return this.semua.filter(s => this.ekskul.anggota_ids.includes(s.id));
-            },
-            get lain() {
-                if (!this.ekskul) return [];
-                return this.semua.filter(s => !this.ekskul.anggota_ids.includes(s.id));
-            },
-            get siswaTerpilih() { return this.semua.find(s => String(s.id) === String(this.siswaId)) || null; },
+                // --- pencarian dropdown ketua ---
+                cari: '',      // teks di kotak pencarian
+                buka: false,   // daftar hasil terbuka / tertutup
+                sorot: 0,      // baris yang disorot (keyboard / mouse)
 
-            // Teks yang tampil di kotak pencarian setelah siswa dipilih.
-            label(s) { return s.nama + ' — ' + s.kelas; },
+                get ekskul() { return this.ekskuls.find(e => String(e.id) === String(this.ekskulId)) || null; },
+                get siswaTerpilih() { return SEMUA.find(s => String(s.id) === String(this.siswaId)) || null; },
 
-            // Kata kunci efektif: kalau kotak masih berisi label siswa terpilih (belum diketik ulang),
-            // tampilkan semua daftar, bukan hanya siswa itu.
-            get cariAktif() {
-                if (this.siswaTerpilih && this.cari === this.label(this.siswaTerpilih)) return '';
-                return this.cari.trim();
-            },
+                // Jumlah siswa (yang ditawarkan) yang sudah jadi anggota ekskul terpilih.
+                get jumlahAnggota() {
+                    const ids = this.ekskul ? ANGGOTA[this.ekskul.id] : null;
+                    return ids ? SEMUA.reduce((n, s) => n + (ids.has(s.id) ? 1 : 0), 0) : 0;
+                },
 
-            // Cocok kalau SEMUA kata kunci ada di nama / NISN / NIS / kelas (tanpa peduli huruf besar-kecil).
-            cocok(s) {
-                const kata = this.cariAktif.toLowerCase().split(/\s+/).filter(Boolean);
-                if (kata.length === 0) return true;
-                const gudang = [s.nama, s.nisn, s.nis, s.kelas].map(v => String(v ?? '').toLowerCase());
-                return kata.every(k => gudang.some(f => f.includes(k)));
-            },
+                // Teks yang tampil di kotak pencarian setelah siswa dipilih.
+                label(s) { return s.nama + ' — ' + s.kelas; },
 
-            // Daftar akhir: anggota dulu, lalu (kalau dicentang) siswa yang belum jadi anggota.
-            get hasil() {
-                const a = this.anggota.filter(s => this.cocok(s)).map(s => ({ ...s, grup: 'anggota' }));
-                const l = this.tampilLain ? this.lain.filter(s => this.cocok(s)).map(s => ({ ...s, grup: 'lain' })) : [];
-                return a.concat(l);
-            },
+                // Kata kunci efektif: kalau kotak masih berisi label siswa terpilih (belum diketik ulang),
+                // tampilkan semua daftar, bukan hanya siswa itu.
+                get cariAktif() {
+                    const t = this.siswaTerpilih;
+                    if (t && this.cari === this.label(t)) return '';
+                    return this.cari.trim();
+                },
 
-            onKetik() {
-                // Mengetik ulang = membatalkan pilihan sebelumnya, supaya yang terkirim tidak beda dengan yang terlihat.
-                if (this.siswaId) this.siswaId = '';
-                this.buka = true;
-                this.sorot = 0;
-            },
-            pilih(s) {
-                this.siswaId = s.id;
-                this.cari = this.label(s);
-                this.buka = false;
-            },
-            pilihSorotan() {
-                const s = this.hasil[this.sorot];
-                if (s) this.pilih(s);
-            },
-            geser(arah) {
-                if (!this.buka) { this.buka = true; return; }
-                const n = this.hasil.length;
-                if (n === 0) return;
-                this.sorot = (this.sorot + arah + n) % n;
-                this.$nextTick(() => {
-                    const el = this.$refs.daftar.querySelector('[data-idx="' + this.sorot + '"]');
-                    if (el) el.scrollIntoView({ block: 'nearest' });
-                });
-            },
-            kosongkan() {
-                this.siswaId = '';
-                this.cari = '';
-                this.sorot = 0;
-                this.buka = true;
-                this.$refs.cari.focus();
-            },
-            tutup() {
-                this.buka = false;
-                // Kalau belum ada yang dipilih, bersihkan teks setengah jadi; kalau sudah, kembalikan ke label terpilih.
-                this.cari = this.siswaTerpilih ? this.label(this.siswaTerpilih) : '';
-            },
-
-            init() {
-                // Isi otomatis email dari data siswa (boleh diubah) kalau belum diisi manual.
-                this.$watch('siswaId', () => {
-                    if (this.siswaTerpilih && !this.siswaTerpilih.punya_akun) {
-                        this.email = this.siswaTerpilih.email || '';
+                // Seluruh hasil pencarian (belum dipotong): anggota dulu, lalu (kalau dicentang) non-anggota.
+                // Cocok kalau SEMUA kata kunci ada di nama / NISN / NIS / kelas (tanpa peduli huruf besar-kecil).
+                cariSemua() {
+                    const ids = this.ekskul ? ANGGOTA[this.ekskul.id] : null;
+                    if (!ids) return { a: [], l: [] };
+                    const kata = this.cariAktif.toLowerCase().split(/\s+/).filter(Boolean);
+                    const a = [], l = [];
+                    for (const s of SEMUA) {
+                        const anggota = ids.has(s.id);
+                        if (!anggota && !this.tampilLain) continue;
+                        if (kata.length && !kata.every(k => s._cari.some(f => f.includes(k)))) continue;
+                        (anggota ? a : l).push(s);
                     }
-                });
-                // Kalau form balik karena error validasi dengan siswa non-anggota, buka daftar lengkap.
-                if (this.siswaId && this.ekskul && !this.ekskul.anggota_ids.includes(Number(this.siswaId))) {
-                    this.tampilLain = true;
-                }
-                // Kalau form balik karena error validasi, tampilkan lagi siswa yang tadi dipilih di kotak pencarian.
-                if (this.siswaTerpilih) this.cari = this.label(this.siswaTerpilih);
-            },
-        }));
+                    return { a, l };
+                },
+
+                // Daftar yang digambar (maks. BATAS_TAMPIL baris). `awalLain` menandai baris pertama grup
+                // "belum jadi anggota" supaya judul grupnya tampil tanpa menghitung ulang daftar per baris.
+                get hasil() {
+                    const { a, l } = this.cariSemua();
+                    const out = [];
+                    for (const s of a) {
+                        if (out.length >= BATAS_TAMPIL) break;
+                        out.push({ ...s, grup: 'anggota', awalLain: false });
+                    }
+                    for (const s of l) {
+                        if (out.length >= BATAS_TAMPIL) break;
+                        out.push({ ...s, grup: 'lain', awalLain: out.length === 0 || out[out.length - 1].grup !== 'lain' });
+                    }
+                    return out;
+                },
+                get total() { const { a, l } = this.cariSemua(); return a.length + l.length; },
+
+                onKetik() {
+                    // Mengetik ulang = membatalkan pilihan sebelumnya, supaya yang terkirim tidak beda dengan yang terlihat.
+                    if (this.siswaId) this.siswaId = '';
+                    this.buka = true;
+                    this.sorot = 0;
+                },
+                pilih(s) {
+                    this.siswaId = s.id;
+                    this.cari = this.label(s);
+                    this.buka = false;
+                },
+                pilihSorotan() {
+                    const s = this.hasil[this.sorot];
+                    if (s) this.pilih(s);
+                },
+                geser(arah) {
+                    if (!this.buka) { this.buka = true; return; }
+                    const n = this.hasil.length;
+                    if (n === 0) return;
+                    this.sorot = (this.sorot + arah + n) % n;
+                    this.$nextTick(() => {
+                        const el = this.$refs.daftar.querySelector('[data-idx="' + this.sorot + '"]');
+                        if (el) el.scrollIntoView({ block: 'nearest' });
+                    });
+                },
+                kosongkan() {
+                    this.siswaId = '';
+                    this.cari = '';
+                    this.sorot = 0;
+                    this.buka = true;
+                    this.$refs.cari.focus();
+                },
+                tutup() {
+                    this.buka = false;
+                    // Kalau belum ada yang dipilih, bersihkan teks setengah jadi; kalau sudah, kembalikan ke label terpilih.
+                    this.cari = this.siswaTerpilih ? this.label(this.siswaTerpilih) : '';
+                },
+
+                init() {
+                    // Isi otomatis email dari data siswa (boleh diubah) kalau belum diisi manual.
+                    this.$watch('siswaId', () => {
+                        if (this.siswaTerpilih && !this.siswaTerpilih.punya_akun) {
+                            this.email = this.siswaTerpilih.email || '';
+                        }
+                    });
+                    // Kalau form balik karena error validasi dengan siswa non-anggota, buka daftar lengkap.
+                    const ids = this.ekskul ? ANGGOTA[this.ekskul.id] : null;
+                    if (this.siswaId && ids && !ids.has(Number(this.siswaId))) {
+                        this.tampilLain = true;
+                    }
+                    // Kalau form balik karena error validasi, tampilkan lagi siswa yang tadi dipilih di kotak pencarian.
+                    if (this.siswaTerpilih) this.cari = this.label(this.siswaTerpilih);
+                },
+            };
+        });
     });
 </script>
 
