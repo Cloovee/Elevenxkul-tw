@@ -30,14 +30,20 @@
                          deskripsi: @js(old('deskripsi_kegiatan', $deskripsi)),
                          total: {{ $totalPeserta }},
                          log: @js($log),
+                         kelas: @js($kelas),
+                         cara: @js($cara),
+                         rows: @js($baris),
                      })"
-                     x-init="$watch('aktif', v => { if (!v) pesan = null })"
+                     x-init="
+                         $watch('aktif', v => { if (!v) pesan = null });
+                         $watch('modeQr', v => { if (!v && aktif) berhenti() });
+                     "
                 >
 
                     <div>
                         <p class="text-xs text-gray-400 tracking-wide uppercase font-semibold">Ketua</p>
                         <h1 class="text-2xl font-extrabold text-ink">Absensi Peserta</h1>
-                        <p class="text-sm text-gray-500 mt-1">Scan QR pada kartu peserta untuk mencatat kehadiran. Data langsung tampil di halaman Absensi Peserta milik pembina.</p>
+                        <p class="text-sm text-gray-500 mt-1">Pilih kelas dulu. Kelas 10 bisa diabsen lewat scan QR kartu peserta atau tabel manual, kelas 11 dan 12 lewat tabel manual. Data langsung tampil di halaman Absensi Peserta milik pembina.</p>
                     </div>
 
                     @if (session('success'))
@@ -63,6 +69,8 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             {{-- Ganti tanggal = muat ulang halaman, supaya daftar hadir ikut tanggal itu --}}
                             <form method="GET" action="{{ route('ketua.absensi-peserta') }}">
+                                <input type="hidden" name="kelas" :value="kelas">
+                                <input type="hidden" name="cara" :value="cara">
                                 <label class="block text-sm font-medium text-ink mb-1.5">Tanggal Kegiatan</label>
                                 <input type="date" name="tanggal" value="{{ $tanggal }}" max="{{ now()->toDateString() }}"
                                     onchange="this.form.submit()"
@@ -78,6 +86,39 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Pilih kelas, lalu (khusus kelas 10) pilih cara absen -->
+                    <div class="space-y-3">
+                        <div class="flex flex-wrap items-center gap-3">
+                            <span class="text-xs font-bold text-inksoft uppercase tracking-wide">Kelas</span>
+                            <div class="inline-flex flex-wrap gap-1 rounded-2xl bg-white ring-1 ring-black/5 p-1 shadow-sm">
+                                <template x-for="k in daftarKelas" :key="k">
+                                    <button type="button" @click="kelas = k"
+                                        :class="kelas === k ? 'bg-periwinkle text-white shadow' : 'text-inksoft hover:text-ink'"
+                                        class="px-4 py-2 rounded-xl text-sm font-semibold transition">
+                                        <span x-text="labelKelas(k)"></span>
+                                        <span class="ml-1 text-xs opacity-80" x-text="'(' + jumlah(k) + ')'"></span>
+                                    </button>
+                                </template>
+                            </div>
+                        </div>
+
+                        {{-- Kelas 10 punya dua cara absen --}}
+                        <div x-show="kelas === '10'" x-cloak class="flex flex-wrap items-center gap-3">
+                            <span class="text-xs font-bold text-inksoft uppercase tracking-wide">Cara absen</span>
+                            <div class="inline-flex gap-1 rounded-2xl bg-white ring-1 ring-black/5 p-1 shadow-sm">
+                                <button type="button" @click="cara = 'qr'"
+                                    :class="cara === 'qr' ? 'bg-mint text-ink shadow' : 'text-inksoft hover:text-ink'"
+                                    class="px-4 py-2 rounded-xl text-sm font-semibold transition">Scan QR</button>
+                                <button type="button" @click="cara = 'manual'"
+                                    :class="cara === 'manual' ? 'bg-mint text-ink shadow' : 'text-inksoft hover:text-ink'"
+                                    class="px-4 py-2 rounded-xl text-sm font-semibold transition">Tabel Manual</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ===== Kelas 10 + cara Scan QR ===== -->
+                    <div x-show="modeQr" x-cloak class="space-y-6">
 
                     <!-- Scanner -->
                     <div class="bg-white rounded-3xl shadow-xl shadow-periwinkle/10 ring-1 ring-black/5 p-6 space-y-4">
@@ -151,6 +192,83 @@
                         </ul>
                     </div>
 
+                    </div>
+                    <!-- ===== /Scan QR ===== -->
+
+                    <!-- ===== Tabel manual (kelas 10 cara manual, kelas 11, kelas 12) ===== -->
+                    <div x-show="!modeQr" x-cloak>
+                        <form method="POST" action="{{ route('ketua.absensi-peserta.manual') }}"
+                              class="bg-white rounded-3xl shadow-xl shadow-periwinkle/10 ring-1 ring-black/5 p-6 space-y-4">
+                            @csrf
+                            <input type="hidden" name="tanggal_absensi" value="{{ $tanggal }}">
+                            <input type="hidden" name="deskripsi_kegiatan" :value="deskripsi">
+                            <input type="hidden" name="kelas" :value="kelas">
+
+                            <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+                                <h2 class="font-semibold text-ink" x-text="'Absensi Manual · ' + labelKelas(kelas)"></h2>
+                                <span class="text-sm font-semibold text-periwinkle" x-text="terisi + ' / ' + rowsTampil.length + ' terisi'"></span>
+                            </div>
+
+                            <p x-show="rowsTampil.length === 0" class="text-sm text-inksoft border border-dashed border-ink/10 rounded-xl py-6 text-center">
+                                Belum ada anggota aktif <span x-text="labelKelas(kelas).toLowerCase()"></span> di ekskul ini.
+                            </p>
+
+                            <div x-show="rowsTampil.length > 0" x-cloak class="overflow-x-auto rounded-2xl ring-1 ring-ink/10">
+                                <table class="w-full text-sm">
+                                    <thead class="bg-bgsoft text-inksoft text-xs font-bold uppercase tracking-wide">
+                                        <tr>
+                                            <th class="px-4 py-3 text-left">NIS</th>
+                                            <th class="px-4 py-3 text-left">Nama</th>
+                                            <th class="px-4 py-3 text-left">Waktu</th>
+                                            <th class="px-4 py-3 text-left">Status Kehadiran</th>
+                                            <th class="px-4 py-3 text-left">Catatan</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-ink/10">
+                                        <template x-for="r in rowsTampil" :key="r.id">
+                                            <tr class="hover:bg-bgsoft/50">
+                                                <td class="px-4 py-2.5 whitespace-nowrap text-inksoft" x-text="r.nis"></td>
+                                                <td class="px-4 py-2.5">
+                                                    <p class="font-medium text-ink">
+                                                        <span x-text="r.nama"></span>
+                                                        <span x-show="r.status === 'alpha'" x-cloak class="ml-1 text-[11px] font-bold text-red-500 bg-red-50 rounded-full px-2 py-0.5">Alpha</span>
+                                                    </p>
+                                                    <p class="text-xs text-inksoft" x-text="r.kelas"></p>
+                                                </td>
+                                                {{-- Waktu = jam absensi tersimpan (otomatis), "-" kalau belum disimpan --}}
+                                                <td class="px-4 py-2.5 whitespace-nowrap text-inksoft" x-text="r.waktu || '-'"></td>
+                                                <td class="px-4 py-2.5">
+                                                    <select :name="'status[' + r.id + ']'" x-model="r.status"
+                                                            :aria-label="'Status kehadiran: ' + r.nama"
+                                                            class="w-full min-w-[130px] px-3 py-2 rounded-lg border border-ink/15 bg-white focus:outline-none focus:ring-2 focus:ring-periwinkle focus:border-periwinkle transition">
+                                                        <option value="">Pilih status</option>
+                                                        <option value="hadir">Hadir</option>
+                                                        <option value="sakit">Sakit</option>
+                                                        <option value="izin">Izin</option>
+                                                    </select>
+                                                </td>
+                                                <td class="px-4 py-2.5">
+                                                    <input type="text" :name="'catatan[' + r.id + ']'" x-model="r.catatan"
+                                                           :disabled="r.status !== 'izin'"
+                                                           maxlength="255" :placeholder="r.status === 'izin' ? 'Alasan izin' : '-'"
+                                                           class="w-full min-w-[160px] px-3 py-1.5 rounded-lg border border-ink/15 bg-white focus:outline-none focus:ring-2 focus:ring-periwinkle focus:border-periwinkle transition disabled:bg-gray-50 disabled:text-gray-400">
+                                                </td>
+                                            </tr>
+                                        </template>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <p class="text-xs text-inksoft">Pilih status kehadiran setiap peserta. Waktu terisi otomatis saat absensi disimpan. Catatan diisi jika peserta berstatus Izin.</p>
+
+                            <button type="submit" :disabled="terisi === 0" x-show="rowsTampil.length > 0" x-cloak
+                                class="w-full py-3 rounded-xl bg-mint text-ink font-semibold hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed">
+                                Simpan Absensi Manual
+                            </button>
+                        </form>
+                    </div>
+                    <!-- ===== /Tabel manual ===== -->
+
                     <!-- Tutup absensi: yang tidak scan jadi Alpha -->
                     <form method="POST" action="{{ route('ketua.absensi-peserta.selesai') }}"
                           @submit="if (!confirm('Tutup absensi? Peserta yang belum scan akan dicatat Alpha.')) $event.preventDefault()">
@@ -162,7 +280,7 @@
                             class="w-full py-3 rounded-xl bg-periwinkle text-white font-semibold hover:opacity-90 transition shadow-lg shadow-periwinkle/30">
                             Selesai Absen
                         </button>
-                        <p class="text-xs text-inksoft mt-2 text-center">Peserta yang tidak scan otomatis tercatat Alpha. Izin/sakit bisa diubah oleh pembina.</p>
+                        <p class="text-xs text-inksoft mt-2 text-center">Semua peserta aktif (kelas 10, 11, dan 12) yang belum di-scan atau belum dipilih statusnya di tabel manual otomatis tercatat Alpha. Izin/sakit bisa diubah oleh pembina.</p>
                     </form>
 
                 </div>
@@ -184,11 +302,29 @@
                 deskripsi: cfg.deskripsi,
                 total: cfg.total,
                 log: cfg.log,
+                kelas: cfg.kelas,
+                cara: cfg.cara,
+                rows: cfg.rows,
                 aktif: false,
                 busy: false,
                 manualNis: '',
                 pesan: null,
                 errKamera: null,
+
+                // Scan QR hanya untuk kelas 10 yang memilih cara "Scan QR". Selain itu = tabel manual.
+                get modeQr() { return this.kelas === '10' && this.cara === 'qr'; },
+
+                // Pilihan kelas: 10, 11, 12.
+                daftarKelas: ['10', '11', '12'],
+                labelKelas(k) { return 'Kelas ' + k; },
+                jumlah(k) { return this.rows.filter(r => r.tingkat === k).length; },
+
+                // Tabel manual: hanya baris kelas yang dipilih yang tampil (dan terkirim saat disimpan).
+                get rowsTampil() { return this.rows.filter(r => r.tingkat === this.kelas); },
+
+                // Kolom Catatan hanya muncul kalau ada minimal satu peserta (di kelas yang tampil) berstatus Izin.
+                get adaIzin() { return this.rowsTampil.some(r => r.status === 'izin'); },
+                get terisi() { return this.rowsTampil.filter(r => ['hadir', 'sakit', 'izin'].includes(r.status)).length; },
 
                 async mulai() {
                     this.errKamera = null;
