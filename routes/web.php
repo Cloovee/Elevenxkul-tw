@@ -490,11 +490,8 @@ Route::get('/storage/{path}', function (string $path) {
     $file = $base ? realpath($base . DIRECTORY_SEPARATOR . $path) : false;
 
     // Cegah path traversal (../) dan pastikan file benar-benar ada
-    if (! $base) {
-        abort(404, 'FALLBACK AKTIF - folder tidak ada: ' . storage_path('app/public')); // DEBUG sementara
-    }
-    if (! $file || ! str_starts_with($file, $base . DIRECTORY_SEPARATOR) || ! is_file($file)) {
-        abort(404, 'FALLBACK AKTIF - file tidak ada: ' . $path . ' | dicari di: ' . $base); // DEBUG sementara
+    if (! $base || ! $file || ! str_starts_with($file, $base . DIRECTORY_SEPARATOR) || ! is_file($file)) {
+        abort(404);
     }
 
     return response()->file($file, [

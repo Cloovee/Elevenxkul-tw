@@ -41,7 +41,7 @@ class AbsensiPelatih extends Model
             return $this->foto_kehadiran;
         }
 
-        return asset('storage/' . ltrim($this->foto_kehadiran, '/'));
+        return '/storage/' . ltrim($this->foto_kehadiran, '/');
     }
 
     public function pelatih()

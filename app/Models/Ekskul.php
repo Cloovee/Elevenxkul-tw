@@ -74,7 +74,7 @@ class Ekskul extends Model
             return $this->poster;
         }
 
-        return asset('storage/' . ltrim($this->poster, '/'));
+        return '/storage/' . ltrim($this->poster, '/');
     }
 
     /**
@@ -91,7 +91,7 @@ class Ekskul extends Model
             return $this->logo;
         }
 
-        return asset('storage/' . ltrim($this->logo, '/'));
+        return '/storage/' . ltrim($this->logo, '/');
     }
 
     /**

@@ -36,7 +36,7 @@ class Pelatih extends Model
             return $this->foto;
         }
 
-        return asset('storage/' . ltrim($this->foto, '/'));
+        return '/storage/' . ltrim($this->foto, '/');
     }
 
     /**

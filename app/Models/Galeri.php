@@ -29,7 +29,7 @@ class Galeri extends Model
             return $this->foto;
         }
 
-        return asset('storage/' . ltrim($this->foto, '/'));
+        return '/storage/' . ltrim($this->foto, '/');
     }
 
     public function ekskul()
