@@ -294,6 +294,10 @@ Route::post('/absensi-peserta/selesai', [App\Http\Controllers\Ketua\AbsensiPeser
 Route::get('/riwayat-absensi', [RiwayatAbsensiController::class, 'index'])
     ->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])->name('ketua.riwayat-absensi');
 
+// Export PDF rekap absensi (peserta + pelatih) per bulan: ?bulan=YYYY-MM
+Route::get('/riwayat-absensi/export-pdf', [RiwayatAbsensiController::class, 'exportPdf'])
+    ->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])->name('ketua.riwayat-absensi.export-pdf');
+
 Route::get('/kelola-anggota', function () {
 
     $idEkskul = optional(optional(auth()->user()->siswa)->ekskulDipimpin)->id_ekskul;
