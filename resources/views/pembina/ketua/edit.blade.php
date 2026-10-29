@@ -105,8 +105,8 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Email <span class="text-red-500">*</span></label>
-                    <input type="email" name="email" required value="{{ old('email', $siswa->email) }}" autocomplete="off" placeholder="nama@sekolah.sch.id"
+                    <label class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Email <span class="text-inksoft normal-case font-medium">(opsional)</span></label>
+                    <input type="email" name="email" value="{{ old('email', $siswa->email) }}" autocomplete="off" placeholder="nama@sekolah.sch.id"
                            class="w-full px-3.5 py-2.5 rounded-xl border border-[#E7E7F4] text-sm focus:outline-none focus:border-lavender @error('email') border-red-400 @enderror">
                     @error('email')<p class="mt-1.5 text-xs font-semibold text-red-500">{{ $message }}</p>@enderror
                     <p class="mt-1.5 text-xs text-inksoft leading-relaxed">Wajib diisi, format <b>nama@sekolah.sch.id</b>, dan belum dipakai akun lain.</p>
