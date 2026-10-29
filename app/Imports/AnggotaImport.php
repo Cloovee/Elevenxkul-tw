@@ -16,7 +16,8 @@ use PhpOffice\PhpSpreadsheet\Shared\Date as ExcelDate;
  * Beda dengan import Siswa milik Admin: di sini TIDAK membuat siswa baru.
  * Tiap baris dicocokkan ke siswa yang SUDAH ada di Data Siswa lewat NIS
  * (atau NISN kalau NIS kosong), lalu didaftarkan jadi anggota ekskul ini.
- * Kolom lain (Nama, JK, Rombel) hanya informasi dan diabaikan.
+ * Kolom lain (Nama, JK, Rombel) hanya informasi dan diabaikan,
+ * jadi file cukup berisi dua kolom: NIS dan Nama.
  *
  * Kolom opsional: Status (aktif / nonaktif / keluar, default aktif) dan
  * Tanggal Bergabung (default hari ini).
@@ -79,8 +80,13 @@ class AnggotaImport implements OnEachRow, WithHeadingRow
         $nis  = $this->teks($data['nis'] ?? null);
         $nisn = $this->teks($data['nisn'] ?? null);
 
-        // Baris kosong (NIS & NISN sama-sama kosong) dilewati begitu saja.
+        // NIS & NISN sama-sama kosong: kalau barisnya benar-benar kosong, lewati saja.
+        // Kalau ada Nama-nya, laporkan supaya tidak hilang diam-diam.
         if ($nis === '' && $nisn === '') {
+            $nama = $this->teks($data['nama'] ?? null);
+            if ($nama !== '') {
+                $this->gagal($baris, "NIS untuk \"{$nama}\" kosong. Isi NIS-nya supaya siswa bisa dikenali.");
+            }
             return;
         }
 

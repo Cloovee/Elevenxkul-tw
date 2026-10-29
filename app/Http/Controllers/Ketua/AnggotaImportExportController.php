@@ -92,18 +92,16 @@ class AnggotaImportExportController extends Controller
             ->take(2)
             ->get();
 
-        $data = [['NISN', 'NIS', 'Nama', 'JK', 'Rombel', 'Status', 'Tanggal Bergabung']];
+        // Cukup dua kolom: data lain (kelas, JK, dll) diambil otomatis dari Data Siswa.
+        $data = [['NIS', 'Nama']];
 
         if ($contoh->isNotEmpty()) {
             foreach ($contoh as $s) {
-                $data[] = [
-                    (string) $s->NISN, (string) $s->NIS, $s->nama_siswa, $s->jk,
-                    $s->kelas?->kode_rombel ?? '', 'aktif', date('Y-m-d'),
-                ];
+                $data[] = [(string) $s->NIS, $s->nama_siswa];
             }
         } else {
-            $data[] = ['1234567890', '10001', 'Budi Santoso', 'L', '10TJKT1', 'aktif', date('Y-m-d')];
-            $data[] = ['1234567891', '10002', 'Siti Rahayu', 'P', '10TJKT1', 'aktif', date('Y-m-d')];
+            $data[] = ['10001', 'Budi Santoso'];
+            $data[] = ['10002', 'Siti Rahayu'];
         }
 
         return Excel::download(

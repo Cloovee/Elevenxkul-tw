@@ -72,10 +72,11 @@
                             </div>
 
                             <div class="mb-6 p-4 bg-bgsoft rounded-2xl text-sm text-ink">
-                                <p class="font-bold mb-1">Siswa dicocokkan lewat NIS atau NISN</p>
+                                <p class="font-bold mb-1">Cukup isi NIS dan Nama</p>
                                 <ul class="text-xs text-inksoft list-disc pl-5 space-y-1">
+                                    <li>Siswa dicocokkan lewat <span class="font-mono">NIS</span> (atau <span class="font-mono">NISN</span>). Kelas, JK, dan data lain diambil otomatis dari Data Siswa.</li>
                                     <li>Siswa harus <b>sudah ada</b> di Data Siswa (ditambahkan Admin). Import ini tidak membuat siswa baru.</li>
-                                    <li>Kolom yang dibaca: <span class="font-mono">NIS</span> / <span class="font-mono">NISN</span>, serta opsional <span class="font-mono">Status</span> (aktif, nonaktif, keluar) dan <span class="font-mono">Tanggal Bergabung</span> (contoh 2026-10-29). Kolom lain hanya informasi.</li>
+                                    <li>Kolom <span class="font-mono">Nama</span> hanya sebagai pengingat, tidak dipakai untuk mencocokkan. Opsional: <span class="font-mono">Status</span> (aktif, nonaktif, keluar) dan <span class="font-mono">Tanggal Bergabung</span>, kalau kosong otomatis aktif dan hari ini.</li>
                                     <li>Siswa yang sudah jadi anggota dilewati, jadi file hasil Export aman diimport ulang.</li>
                                 </ul>
                             </div>
