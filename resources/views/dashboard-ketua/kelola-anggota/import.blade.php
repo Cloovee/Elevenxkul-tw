@@ -28,7 +28,7 @@
                         <h1 class="text-2xl font-extrabold text-ink">Import Anggota</h1>
                     </div>
 
-                    <div class="bg-white rounded-3xl shadow-xl shadow-periwinkle/10 ring-1 ring-black/5 p-6 max-w-2xl">
+                    <div class="bg-white rounded-3xl shadow-xl shadow-periwinkle/10 ring-1 ring-black/5 p-6 max-w-2xl mx-auto">
                         <h2 class="font-semibold text-ink border-b border-gray-100 pb-3 mb-4">
                             Import ke {{ $ekskul->nama_ekskul }}
                         </h2>
@@ -89,7 +89,7 @@
                                    class="inline-flex items-center gap-2 px-6 py-2.5 bg-bgsoft hover:opacity-80 text-ink rounded-full text-sm font-bold transition">
                                     Download Template
                                 </a>
-                                <a href="{{ route('ketua.kelola-anggota') }}"
+                                <a href="{{ route('ketua.kelola-anggota.tambah') }}"
                                    class="inline-flex items-center gap-2 px-6 py-2.5 bg-bgsoft hover:opacity-80 text-inksoft rounded-full text-sm font-bold transition">
                                     Kembali
                                 </a>
