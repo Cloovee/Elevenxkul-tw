@@ -309,6 +309,13 @@ Route::get('/riwayat-absensi', [RiwayatAbsensiController::class, 'index'])
 Route::get('/riwayat-absensi/export-pdf', [RiwayatAbsensiController::class, 'exportPdf'])
     ->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])->name('ketua.riwayat-absensi.export-pdf');
 
+// Laporan kegiatan pelatih bulanan: pratinjau + halaman cetak (?bulan=YYYY-MM)
+Route::get('/laporan-kegiatan', [LaporanKegiatanController::class, 'index'])
+    ->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])->name('ketua.laporan-kegiatan');
+
+Route::get('/laporan-kegiatan/cetak', [LaporanKegiatanController::class, 'cetak'])
+    ->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])->name('ketua.laporan-kegiatan.cetak');
+
 Route::get('/kelola-anggota', function () {
 
     $idEkskul = optional(optional(auth()->user()->siswa)->ekskulDipimpin)->id_ekskul;
