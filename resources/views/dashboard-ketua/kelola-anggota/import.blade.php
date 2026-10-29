@@ -89,7 +89,7 @@
                                    class="inline-flex items-center gap-2 px-6 py-2.5 bg-bgsoft hover:opacity-80 text-ink rounded-full text-sm font-bold transition">
                                     Download Template
                                 </a>
-                                <a href="{{ route('ketua.kelola-anggota') }}"
+                                <a href="{{ route('ketua.kelola-anggota.tambah') }}"
                                    class="inline-flex items-center gap-2 px-6 py-2.5 bg-bgsoft hover:opacity-80 text-inksoft rounded-full text-sm font-bold transition">
                                     Kembali
                                 </a>
