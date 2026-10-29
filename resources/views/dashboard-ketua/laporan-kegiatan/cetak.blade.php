@@ -101,13 +101,13 @@
         <p class="bulan">BULAN : {{ strtoupper($namaBulan) }}</p>
 
         <table class="info">
-            <tr><td>Nama</td><td>: {{ $pelatih->nama_pelatih ?? '……………………………………………………………' }}</td></tr>
-            <tr><td>Jabatan</td><td>: Pelatih Ekstrakurikuler {{ $ekskul->nama_ekskul }}</td></tr>
+            <tr><td>Nama</td><td>: {{ $penandatangan['nama'] ?: '……………………………………………………………' }}</td></tr>
+            <tr><td>Jabatan</td><td>: {{ $penandatangan['jabatan'] }}</td></tr>
         </table>
 
         <div class="kotak">
             @if ($kegiatan->isEmpty())
-                <p class="kosong">Belum ada kegiatan pelatih pada bulan ini.</p>
+                <p class="kosong">Belum ada kegiatan {{ $pelatih ? 'pelatih ' : '' }}pada bulan ini.</p>
             @else
                 <table class="tabel">
                     <thead>
@@ -142,7 +142,7 @@
             Bandung, {{ now()->locale('id')->translatedFormat('d F Y') }}<br>
             Dibuat Oleh,
             <div class="spasi"></div>
-            <span class="nama">{{ $pelatih->nama_pelatih ?? '' }}</span>
+            <span class="nama">{{ $penandatangan['nama'] ?? '' }}</span>
         </div>
     </div>
 

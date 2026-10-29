@@ -35,7 +35,8 @@
                     @if (! $pelatih)
                         <div class="bg-amber-50 text-amber-700 text-sm font-medium px-4 py-3 rounded-2xl">
                             Ekskul <span class="font-semibold">{{ $ekskul->nama_ekskul }}</span> belum punya pelatih.
-                            Minta pembina menentukan pelatihnya dulu.
+                            Saat dicetak, laporan akan ditandatangani oleh pembina
+                            @if ($pembina) (<span class="font-semibold">{{ $pembina->nama_pembina }}</span>) @endif.
                         </div>
                     @endif
 
@@ -58,7 +59,7 @@
                                     class="px-5 py-2.5 rounded-xl bg-white ring-1 ring-periwinkle/40 text-periwinkle font-semibold text-sm hover:bg-periwinkle/5 transition">
                                     Tampilkan
                                 </button>
-                                @if ($pelatih && $kegiatan->isNotEmpty())
+                                @if (! $pelatih || $kegiatan->isNotEmpty())
                                     <a href="{{ route('ketua.laporan-kegiatan.cetak', ['bulan' => $bulanInput]) }}" target="_blank" rel="noopener"
                                        class="px-5 py-2.5 rounded-xl bg-periwinkle text-white font-semibold text-sm shadow-md shadow-periwinkle/30 hover:opacity-90 transition">
                                         Cetak Laporan

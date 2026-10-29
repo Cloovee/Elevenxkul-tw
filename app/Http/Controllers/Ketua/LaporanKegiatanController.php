@@ -47,7 +47,7 @@ class LaporanKegiatanController extends Controller
     {
         /** @var Ekskul $ekskul */
         $ekskul = $request->attributes->get('ekskul_ketua');
-        $ekskul->loadMissing('pelatih');
+        $ekskul->loadMissing('pelatih', 'pembina');
 
         $request->validate([
             'bulan' => ['nullable', 'date_format:Y-m'],
@@ -81,9 +81,20 @@ class LaporanKegiatanController extends Controller
             );
         }
 
+        // Penanda tangan laporan: pelatih kalau ekskul sudah punya pelatih,
+        // kalau belum maka diganti pembina ekskul tersebut.
+        $pelatih = $ekskul->pelatih;
+        $pembina = $ekskul->pembina;
+
+        $penandatangan = $pelatih
+            ? ['nama' => $pelatih->nama_pelatih, 'jabatan' => 'Pelatih Ekstrakurikuler ' . $ekskul->nama_ekskul]
+            : ['nama' => $pembina->nama_pembina ?? null, 'jabatan' => 'Pembina Ekstrakurikuler ' . $ekskul->nama_ekskul];
+
         return [
             'ekskul'    => $ekskul,
-            'pelatih'   => $ekskul->pelatih,
+            'pelatih'   => $pelatih,
+            'pembina'   => $pembina,
+            'penandatangan' => $penandatangan,
             'bulan'     => $bulan,
             'bulanInput' => $bulan->format('Y-m'),
             'namaBulan' => $bulan->locale('id')->translatedFormat('F Y'),

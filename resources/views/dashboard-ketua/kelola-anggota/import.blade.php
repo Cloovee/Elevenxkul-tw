@@ -66,12 +66,12 @@
                                     Pilih File Excel <span class="text-red-500">*</span>
                                 </label>
                                 <input type="file" name="file" accept=".xlsx,.xls,.csv" required
-                                    class="w-full px-4 py-2.5 bg-bgsoft rounded-xl text-sm text-ink file:mr-4 file:py-1.5 file:px-4 file:rounded-full file:border-0 file:bg-periwinkle file:text-white file:text-xs file:font-bold hover:file:opacity-90 @error('file') ring-2 ring-red-400 @enderror">
+                                    class="w-full px-4 py-2.5 bg-bgsoft ring-1 ring-ink/10 rounded-xl text-sm text-ink file:mr-4 file:py-1.5 file:px-4 file:rounded-full file:border-0 file:bg-periwinkle file:text-white file:text-xs file:font-bold hover:file:opacity-90 @error('file') ring-2 ring-red-400 @enderror">
                                 <p class="text-xs text-inksoft mt-2">Format: .xlsx, .xls, .csv &middot; Maks 5MB</p>
                                 @error('file')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                             </div>
 
-                            <div class="mb-6 p-4 bg-bgsoft rounded-2xl text-sm text-ink">
+                            <div class="mb-6 p-4 bg-bgsoft ring-1 ring-ink/10 rounded-2xl text-sm text-ink">
                                 <p class="font-bold mb-1">Isi tiga kolom: NIS, Nama, Kelas</p>
                                 <ul class="text-xs text-inksoft list-disc pl-5 space-y-1">
                                     <li>Siswa dicocokkan lewat <span class="font-mono">NIS</span>. NISN, JK, dan data lain diambil otomatis dari Data Siswa.</li>
@@ -87,11 +87,11 @@
                                     Import
                                 </button>
                                 <a href="{{ route('ketua.kelola-anggota.template') }}"
-                                   class="inline-flex items-center gap-2 px-6 py-2.5 bg-bgsoft hover:opacity-80 text-ink rounded-full text-sm font-bold transition">
+                                   class="inline-flex items-center gap-2 px-6 py-2.5 bg-white ring-1 ring-periwinkle/40 text-periwinkle hover:bg-periwinkle/5 rounded-full text-sm font-bold transition">
                                     Download Template
                                 </a>
                                 <a href="{{ route('ketua.kelola-anggota.tambah') }}"
-                                   class="inline-flex items-center gap-2 px-6 py-2.5 bg-bgsoft hover:opacity-80 text-inksoft rounded-full text-sm font-bold transition">
+                                   class="inline-flex items-center gap-2 px-6 py-2.5 bg-white ring-1 ring-ink/20 text-inksoft hover:bg-bgsoft rounded-full text-sm font-bold transition">
                                     Kembali
                                 </a>
                             </div>
