@@ -21,6 +21,7 @@ use App\Http\Controllers\Admin\KelasController;
 use App\Http\Controllers\Admin\TahunAjaranController;
 use Illuminate\Support\Facades\Route;
 use App\Models\Peserta;
+use App\Http\Controllers\Ketua\LaporanKegiatanController;
 
 // ===== Landing page PUBLIK (tanpa login) =====
 // Siswa bisa lihat daftar ekskul & detailnya. Admin/Pembina/Ketua masuk lewat tombol Login.
@@ -301,6 +302,13 @@ Route::get('/riwayat-absensi', [RiwayatAbsensiController::class, 'index'])
 // Export PDF rekap absensi (peserta + pelatih) per bulan: ?bulan=YYYY-MM
 Route::get('/riwayat-absensi/export-pdf', [RiwayatAbsensiController::class, 'exportPdf'])
     ->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])->name('ketua.riwayat-absensi.export-pdf');
+
+// Laporan Kegiatan Pelatih (pratinjau + halaman cetak) per bulan: ?bulan=YYYY-MM
+Route::get('/laporan-kegiatan', [LaporanKegiatanController::class, 'index'])
+    ->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])->name('ketua.laporan-kegiatan');
+
+Route::get('/laporan-kegiatan/cetak', [LaporanKegiatanController::class, 'cetak'])
+    ->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])->name('ketua.laporan-kegiatan.cetak');
 
 Route::get('/kelola-anggota', function () {
 
