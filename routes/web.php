@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\LandingController;
+use App\Http\Controllers\Ketua\AnggotaImportExportController;
+use App\Http\Controllers\Ketua\LaporanKegiatanController;
 use App\Http\Controllers\Ketua\RiwayatAbsensiController;
 use App\Http\Controllers\Pembina\AbsensiPelatihController;
 use App\Http\Controllers\Pembina\AbsensiPesertaController;
@@ -21,7 +23,6 @@ use App\Http\Controllers\Admin\KelasController;
 use App\Http\Controllers\Admin\TahunAjaranController;
 use Illuminate\Support\Facades\Route;
 use App\Models\Peserta;
-use App\Http\Controllers\Ketua\LaporanKegiatanController;
 
 // ===== Landing page PUBLIK (tanpa login) =====
 // Siswa bisa lihat daftar ekskul & detailnya. Admin/Pembina/Ketua masuk lewat tombol Login.
@@ -419,6 +420,19 @@ Route::post('/kelola-anggota/tambah', function (\Illuminate\Http\Request $reques
 })->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])
   ->name('ketua.kelola-anggota.store');
 
+
+// Import / Export anggota (HARUS di atas route /kelola-anggota/{id})
+Route::get('/kelola-anggota/import', [AnggotaImportExportController::class, 'showImportForm'])
+    ->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])->name('ketua.kelola-anggota.import.form');
+
+Route::post('/kelola-anggota/import', [AnggotaImportExportController::class, 'import'])
+    ->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])->name('ketua.kelola-anggota.import');
+
+Route::get('/kelola-anggota/export', [AnggotaImportExportController::class, 'export'])
+    ->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])->name('ketua.kelola-anggota.export');
+
+Route::get('/kelola-anggota/template', [AnggotaImportExportController::class, 'downloadTemplate'])
+    ->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])->name('ketua.kelola-anggota.template');
 
 Route::get('/kelola-anggota/{id}', function ($id) {
 

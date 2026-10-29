@@ -23,9 +23,24 @@
                 <!-- Konten -->
                 <div class="flex-1 space-y-6">
 
-                    <div>
-                        <p class="text-xs text-gray-400 tracking-wide uppercase font-semibold">Ketua</p>
-                        <h1 class="text-2xl font-extrabold text-ink">Kelola Anggota</h1>
+                    <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+                        <div>
+                            <p class="text-xs text-gray-400 tracking-wide uppercase font-semibold">Ketua</p>
+                            <h1 class="text-2xl font-extrabold text-ink">Kelola Anggota</h1>
+                        </div>
+
+                        <div class="flex flex-wrap gap-2">
+                            <a href="{{ route('ketua.kelola-anggota.import.form') }}"
+                               class="inline-flex items-center gap-2 px-4 py-2 bg-white ring-1 ring-black/5 shadow-sm hover:shadow-md text-ink rounded-full text-sm font-semibold transition">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M12 4v12m0 0l-4-4m4 4l4-4"/></svg>
+                                Import
+                            </a>
+                            <a href="{{ route('ketua.kelola-anggota.export') }}"
+                               class="inline-flex items-center gap-2 px-4 py-2 bg-white ring-1 ring-black/5 shadow-sm hover:shadow-md text-ink rounded-full text-sm font-semibold transition">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M12 16V4m0 0l-4 4m4-4l4 4"/></svg>
+                                Export
+                            </a>
+                        </div>
                     </div>
 
                     <div class="bg-white rounded-3xl shadow-xl shadow-periwinkle/10 ring-1 ring-black/5 p-6 relative min-h-[420px]">
