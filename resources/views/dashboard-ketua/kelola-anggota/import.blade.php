@@ -65,8 +65,13 @@
                                 <label class="block text-xs font-bold text-inksoft uppercase tracking-wider mb-2">
                                     Pilih File Excel <span class="text-red-500">*</span>
                                 </label>
-                                <input type="file" name="file" accept=".xlsx,.xls,.csv" required
-                                    class="w-full px-4 py-2.5 bg-bgsoft ring-1 ring-ink/10 rounded-xl text-sm text-ink file:mr-4 file:py-1.5 file:px-4 file:rounded-full file:border-0 file:bg-periwinkle file:text-white file:text-xs file:font-bold hover:file:opacity-90 @error('file') ring-2 ring-red-400 @enderror">
+                                <label for="file-anggota"
+                                    class="flex items-center gap-3 w-full px-3 py-2.5 bg-white ring-1 ring-ink/20 rounded-xl text-sm text-ink cursor-pointer hover:ring-periwinkle/60 transition @error('file') ring-2 ring-red-400 @enderror">
+                                    <span class="inline-flex items-center px-4 py-1.5 rounded-full bg-periwinkle text-white text-xs font-bold shrink-0">Pilih File</span>
+                                    <span id="nama-file" class="truncate text-inksoft">Belum ada file dipilih</span>
+                                </label>
+                                <input type="file" id="file-anggota" name="file" accept=".xlsx,.xls,.csv" required class="sr-only"
+                                    onchange="document.getElementById('nama-file').textContent = this.files.length ? this.files[0].name : 'Belum ada file dipilih'">
                                 <p class="text-xs text-inksoft mt-2">Format: .xlsx, .xls, .csv &middot; Maks 5MB</p>
                                 @error('file')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                             </div>

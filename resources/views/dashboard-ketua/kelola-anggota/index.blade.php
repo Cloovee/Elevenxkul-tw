@@ -105,9 +105,9 @@
                             </table>
                         </div>
 
-                        <!-- Tombol tambah, mengambang di kanan bawah -->
+                        <!-- Tombol tambah, melayang tetap di kanan bawah layar (di atas nav bawah pada mobile) -->
                         <a href="{{ route('ketua.kelola-anggota.tambah') }}"
-                           class="absolute bottom-6 right-6 w-14 h-14 rounded-full bg-periwinkle flex items-center justify-center text-white shadow-lg shadow-periwinkle/30 hover:opacity-90 transition"
+                           class="fixed bottom-24 right-5 md:bottom-8 md:right-8 z-40 w-14 h-14 rounded-full bg-periwinkle flex items-center justify-center text-white shadow-xl shadow-periwinkle/40 ring-4 ring-white hover:opacity-90 hover:scale-105 transition"
                            title="Tambah anggota" aria-label="Tambah anggota"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
