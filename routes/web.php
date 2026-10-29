@@ -21,7 +21,6 @@ use App\Http\Controllers\Admin\KelasController;
 use App\Http\Controllers\Admin\TahunAjaranController;
 use Illuminate\Support\Facades\Route;
 use App\Models\Peserta;
-use App\Http\Controllers\Ketua\LaporanKegiatanController;
 
 // ===== Landing page PUBLIK (tanpa login) =====
 // Siswa bisa lihat daftar ekskul & detailnya. Admin/Pembina/Ketua masuk lewat tombol Login.
@@ -117,6 +116,11 @@ Route::prefix('/admin')
     ->group(function () {
 
         Route::get('/dashboard', [DashAdminController::class, 'index'])->name('dashboard');
+
+        // Diagnosa gambar: cek symlink, isi storage, dan data DB yang file fisiknya hilang.
+        Route::get('/cek-gambar', fn () => response(\App\Support\PublicStorage::laporan(), 200, [
+            'Content-Type' => 'text/plain; charset=utf-8',
+        ]))->name('cek-gambar');
 
         Route::prefix('/siswa')->name('siswa.')->group(function () {
             Route::get('/', [SiswaController::class, 'index'])->name('index');
@@ -303,13 +307,6 @@ Route::get('/riwayat-absensi', [RiwayatAbsensiController::class, 'index'])
 Route::get('/riwayat-absensi/export-pdf', [RiwayatAbsensiController::class, 'exportPdf'])
     ->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])->name('ketua.riwayat-absensi.export-pdf');
 
-// Laporan Kegiatan Pelatih (pratinjau + halaman cetak) per bulan: ?bulan=YYYY-MM
-Route::get('/laporan-kegiatan', [LaporanKegiatanController::class, 'index'])
-    ->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])->name('ketua.laporan-kegiatan');
-
-Route::get('/laporan-kegiatan/cetak', [LaporanKegiatanController::class, 'cetak'])
-    ->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])->name('ketua.laporan-kegiatan.cetak');
-
 Route::get('/kelola-anggota', function () {
 
     $idEkskul = optional(optional(auth()->user()->siswa)->ekskulDipimpin)->id_ekskul;
@@ -487,22 +484,26 @@ Route::middleware('auth')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| FALLBACK STORAGE (kalau symlink public/storage tidak ada di hosting)
+| PENYAJI GAMBAR UPLOAD (tahan update, tidak bergantung symlink)
 |--------------------------------------------------------------------------
-| Kalau public/storage sudah ada (hasil storage:link), web server melayani
-| file langsung dan route ini tidak pernah terpakai. Kalau belum ada,
-| route ini yang menyajikan foto dari storage/app/public.
+| /media?p=poster-ekskul/abc.jpg
+|     Jalur utama saat symlink public/storage tidak ada. Sengaja TIDAK memakai
+|     ekstensi di bagian path URL, jadi tidak bisa dicegat nginx/Apache yang
+|     biasanya melayani *.jpg / *.png langsung (dan memberi 404 kalau file
+|     fisiknya tidak ada di document root).
+|
+| /storage/{path}
+|     Cadangan untuk URL lama (bookmark, link yang sudah tersebar). Hanya
+|     terpakai kalau web server meneruskan permintaan ke Laravel.
+|
+| Keduanya dikeluarkan dari grup middleware 'web' (tanpa session / query DB)
+| supaya ringan dan tidak memasang cookie untuk tiap gambar.
 */
-Route::get('/storage/{path}', function (string $path) {
-    $base = realpath(storage_path('app/public'));
-    $file = $base ? realpath($base . DIRECTORY_SEPARATOR . $path) : false;
+Route::get('/media', [\App\Http\Controllers\MediaController::class, 'show'])
+    ->withoutMiddleware('web')
+    ->name('media');
 
-    // Cegah path traversal (../) dan pastikan file benar-benar ada
-    if (! $base || ! $file || ! str_starts_with($file, $base . DIRECTORY_SEPARATOR) || ! is_file($file)) {
-        abort(404);
-    }
-
-    return response()->file($file, [
-        'Cache-Control' => 'public, max-age=86400',
-    ]);
-})->where('path', '.*')->name('storage.fallback');
+Route::get('/storage/{path}', [\App\Http\Controllers\MediaController::class, 'legacy'])
+    ->where('path', '.*')
+    ->withoutMiddleware('web')
+    ->name('storage.fallback');

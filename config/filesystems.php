@@ -73,6 +73,19 @@ return [
     |
     */
 
+    /*
+    |--------------------------------------------------------------------------
+    | Document Root Web Server (opsional)
+    |--------------------------------------------------------------------------
+    |
+    | Biasanya KOSONG (otomatis terdeteksi dari DOCUMENT_ROOT). Isi lewat .env
+    | (PUBLIC_WEB_ROOT=/home/user/domains/situs.com/public_html) hanya kalau
+    | symlink "storage" harus dibuat di folder yang berbeda dari hasil deteksi.
+    |
+    */
+
+    'public_web_root' => env('PUBLIC_WEB_ROOT'),
+
     'links' => [
         public_path('storage') => storage_path('app/public'),
     ],

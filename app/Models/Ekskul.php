@@ -74,7 +74,7 @@ class Ekskul extends Model
             return $this->poster;
         }
 
-        return '/storage/' . ltrim($this->poster, '/');
+        return \App\Support\PublicStorage::url($this->poster);
     }
 
     /**
@@ -91,7 +91,7 @@ class Ekskul extends Model
             return $this->logo;
         }
 
-        return '/storage/' . ltrim($this->logo, '/');
+        return \App\Support\PublicStorage::url($this->logo);
     }
 
     /**

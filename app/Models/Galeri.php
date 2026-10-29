@@ -23,13 +23,13 @@ class Galeri extends Model
     /**
      * URL foto galeri (disimpan admin lewat storage disk "public").
      */
-    public function getFotoUrlAttribute(): string
+    public function getFotoUrlAttribute(): ?string
     {
         if (str_starts_with($this->foto, 'http://') || str_starts_with($this->foto, 'https://')) {
             return $this->foto;
         }
 
-        return '/storage/' . ltrim($this->foto, '/');
+        return \App\Support\PublicStorage::url($this->foto);
     }
 
     public function ekskul()

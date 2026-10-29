@@ -141,7 +141,7 @@
                                 @endphp
                                 <span class="text-[11px] font-bold px-2.5 py-1 rounded-full {{ $kClass }}">{{ $kLabel }}</span>
                                 @if ($v->foto_kehadiran)
-                                    <a href="{{ \Illuminate\Support\Facades\Storage::url($v->foto_kehadiran) }}" target="_blank" class="block text-[10px] text-[#1E6FA8] font-semibold mt-1 hover:underline">Lihat foto</a>
+                                    <a href="{{ $v->foto_url }}" target="_blank" class="block text-[10px] text-[#1E6FA8] font-semibold mt-1 hover:underline">Lihat foto</a>
                                 @endif
                             </td>
                             <td class="py-2.5 px-2">

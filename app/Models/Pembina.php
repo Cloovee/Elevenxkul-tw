@@ -40,7 +40,7 @@ class Pembina extends Model
             return $this->foto;
         }
 
-        return '/storage/' . ltrim($this->foto, '/');
+        return \App\Support\PublicStorage::url($this->foto);
     }
 
     /**

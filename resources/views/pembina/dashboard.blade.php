@@ -75,7 +75,7 @@
                 @php
                     // supports either a full accessor (foto_url) or a raw storage path (foto)
                     $fotoSrc = $pembina->foto_url
-                        ?? (isset($pembina->foto) && $pembina->foto ? '/storage/'.$pembina->foto : null);
+                        ?? (isset($pembina->foto) && $pembina->foto ? \App\Support\PublicStorage::url($pembina->foto) : null);
                 @endphp
                 <a href="{{ route('pembina.profile.index') }}"
                    class="relative block w-[44px] h-[44px] rounded-2xl overflow-hidden shadow-[0_6px_18px_-10px_rgba(46,43,85,0.25)] hover:-translate-y-0.5 transition-transform">

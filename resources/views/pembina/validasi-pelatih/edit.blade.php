@@ -63,8 +63,8 @@
             @if ($absensiPelatih->foto_kehadiran)
                 <div class="pt-2">
                     <span class="text-inksoft text-sm block mb-1.5">Foto bukti</span>
-                    <a href="{{ \Illuminate\Support\Facades\Storage::url($absensiPelatih->foto_kehadiran) }}" target="_blank">
-                        <img src="{{ \Illuminate\Support\Facades\Storage::url($absensiPelatih->foto_kehadiran) }}"
+                    <a href="{{ $absensiPelatih->foto_url }}" target="_blank">
+                        <img src="{{ $absensiPelatih->foto_url }}"
                              class="w-full max-h-48 object-cover rounded-xl" alt="Foto bukti kehadiran">
                     </a>
                 </div>
