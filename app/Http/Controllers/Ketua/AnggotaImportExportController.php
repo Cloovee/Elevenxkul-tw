@@ -61,7 +61,7 @@ class AnggotaImportExportController extends Controller
             }
 
             if ($berhasil === 0 && $sudah === 0) {
-                return back()->with('error', 'Tidak ada baris yang bisa diimport. Pastikan kolom NIS atau NISN terisi dan memakai header dari template.');
+                return back()->with('error', 'Tidak ada baris yang bisa diimport. Pastikan kolom NIS terisi dan memakai header dari template.');
             }
 
             return redirect()->route('ketua.kelola-anggota')->with('success', $pesan);
@@ -92,16 +92,16 @@ class AnggotaImportExportController extends Controller
             ->take(2)
             ->get();
 
-        // Cukup dua kolom: data lain (kelas, JK, dll) diambil otomatis dari Data Siswa.
-        $data = [['NIS', 'Nama']];
+        // Cukup tiga kolom: data lain (NISN, JK, dll) diambil otomatis dari Data Siswa.
+        $data = [['NIS', 'Nama', 'Kelas']];
 
         if ($contoh->isNotEmpty()) {
             foreach ($contoh as $s) {
-                $data[] = [(string) $s->NIS, $s->nama_siswa];
+                $data[] = [(string) $s->NIS, $s->nama_siswa, $s->kelas?->nama_kelas ?? ''];
             }
         } else {
-            $data[] = ['10001', 'Budi Santoso'];
-            $data[] = ['10002', 'Siti Rahayu'];
+            $data[] = ['10001', 'Budi Santoso', '10 TJKT - 1'];
+            $data[] = ['10002', 'Siti Rahayu', '10 TJKT - 1'];
         }
 
         return Excel::download(

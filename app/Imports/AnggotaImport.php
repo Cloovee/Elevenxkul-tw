@@ -14,10 +14,10 @@ use PhpOffice\PhpSpreadsheet\Shared\Date as ExcelDate;
  * Import anggota ke ekskul yang dipimpin Ketua.
  *
  * Beda dengan import Siswa milik Admin: di sini TIDAK membuat siswa baru.
- * Tiap baris dicocokkan ke siswa yang SUDAH ada di Data Siswa lewat NIS
- * (atau NISN kalau NIS kosong), lalu didaftarkan jadi anggota ekskul ini.
- * Kolom lain (Nama, JK, Rombel) hanya informasi dan diabaikan,
- * jadi file cukup berisi dua kolom: NIS dan Nama.
+ * File cukup berisi tiga kolom: NIS, Nama, Kelas.
+ * Siswa dicocokkan HANYA lewat NIS ke Data Siswa yang sudah ada, lalu
+ * didaftarkan jadi anggota ekskul ini. Nama & Kelas hanya pengingat
+ * (data aslinya diambil dari Data Siswa), tidak dipakai untuk mencocokkan.
  *
  * Kolom opsional: Status (aktif / nonaktif / keluar, default aktif) dan
  * Tanggal Bergabung (default hari ini).
@@ -26,9 +26,8 @@ class AnggotaImport implements OnEachRow, WithHeadingRow
 {
     private const STATUS_VALID = ['aktif', 'nonaktif', 'keluar'];
 
-    /** "NIS" => id_siswa, "NISN" => id_siswa (di-load sekali, bukan query per baris) */
+    /** "NIS" => id_siswa (di-load sekali, bukan query per baris) */
     protected array $petaNis = [];
-    protected array $petaNisn = [];
 
     /** id_siswa yang sudah jadi anggota ekskul ini */
     protected array $sudahAnggota = [];
@@ -42,12 +41,9 @@ class AnggotaImport implements OnEachRow, WithHeadingRow
 
     public function __construct(protected int $idEkskul)
     {
-        foreach (Siswa::select('id_siswa', 'NIS', 'NISN')->get() as $s) {
+        foreach (Siswa::select('id_siswa', 'NIS')->get() as $s) {
             if ((string) $s->NIS !== '') {
                 $this->petaNis[(string) $s->NIS] = $s->id_siswa;
-            }
-            if ((string) $s->NISN !== '') {
-                $this->petaNisn[(string) $s->NISN] = $s->id_siswa;
             }
         }
 
@@ -78,24 +74,22 @@ class AnggotaImport implements OnEachRow, WithHeadingRow
         $data  = $row->toArray();
 
         $nis  = $this->teks($data['nis'] ?? null);
-        $nisn = $this->teks($data['nisn'] ?? null);
+        $nama = $this->teks($data['nama'] ?? null);
 
-        // NIS & NISN sama-sama kosong: kalau barisnya benar-benar kosong, lewati saja.
+        // NIS kosong: kalau barisnya benar-benar kosong, lewati saja.
         // Kalau ada Nama-nya, laporkan supaya tidak hilang diam-diam.
-        if ($nis === '' && $nisn === '') {
-            $nama = $this->teks($data['nama'] ?? null);
+        if ($nis === '') {
             if ($nama !== '') {
                 $this->gagal($baris, "NIS untuk \"{$nama}\" kosong. Isi NIS-nya supaya siswa bisa dikenali.");
             }
             return;
         }
 
-        // 1) Cari siswa: NIS dulu, kalau tidak ketemu baru NISN.
-        $idSiswa = ($nis !== '' ? ($this->petaNis[$nis] ?? null) : null)
-            ?? ($nisn !== '' ? ($this->petaNisn[$nisn] ?? null) : null);
+        // 1) Cari siswa lewat NIS.
+        $idSiswa = $this->petaNis[$nis] ?? null;
 
         if (! $idSiswa) {
-            $this->gagal($baris, 'Siswa dengan ' . ($nis !== '' ? "NIS {$nis}" : "NISN {$nisn}") . ' tidak ditemukan di Data Siswa. Minta Admin menambahkannya dulu.');
+            $this->gagal($baris, "Siswa dengan NIS {$nis} tidak ditemukan di Data Siswa. Minta Admin menambahkannya dulu.");
             return;
         }
 
@@ -173,8 +167,8 @@ class AnggotaImport implements OnEachRow, WithHeadingRow
     }
 
     /**
-     * Nilai sel Excel -> string. Angka bulat (NIS/NISN yang kebaca numeric)
-     * ditulis penuh, bukan notasi ilmiah 1.23E+9.
+     * Nilai sel Excel -> string. Angka bulat (NIS yang kebaca numeric)
+     * ditulis penuh, bukan notasi ilmiah.
      */
     protected function teks(mixed $nilai): string
     {

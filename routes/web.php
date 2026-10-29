@@ -325,7 +325,7 @@ Route::get('/kelola-anggota', function () {
             ->with('error', 'Akun kamu belum ditugaskan sebagai ketua ekskul manapun. Hubungi admin untuk menugaskanmu dulu.');
     }
 
-    $anggota = Peserta::with('siswa')
+    $anggota = Peserta::with('siswa.kelas')
         ->where('id_ekskul', $idEkskul)
         ->get();
 

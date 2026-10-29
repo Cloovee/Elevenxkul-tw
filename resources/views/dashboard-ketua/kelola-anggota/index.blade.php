@@ -43,57 +43,72 @@
                             </div>
                         @endif
 
-                        <div class="space-y-2">
-                            @forelse ($anggota as $item)
-                                <div class="flex items-center justify-between gap-4 bg-white rounded-2xl px-4 py-3 shadow-sm ring-1 ring-black/5 hover:shadow-md transition">
-
-                                    <a href="{{ route('ketua.kelola-anggota.detail', $item->id_anggota) }}"
-                                       class="flex items-center gap-3 flex-1 min-w-0"
-                                    >
-                                        <div class="w-10 h-10 rounded-full bg-periwinkle flex items-center justify-center text-white font-semibold text-sm shrink-0">
-                                            {{ strtoupper(substr($item->siswa->nama_siswa, 0, 1)) }}
-                                        </div>
-
-                                        <p class="font-medium text-ink truncate">
-                                            {{ $item->siswa->nama_siswa }}
-                                        </p>
-                                    </a>
-
-                                    <div class="flex items-center gap-2 shrink-0">
-                                        <span class="text-xs font-medium px-3 py-1 rounded-full {{ $item->status === 'aktif' ? 'bg-emerald-50 text-emerald-700' : 'bg-gray-100 text-gray-500' }}">
-                                            {{ ucfirst($item->status) }}
-                                        </span>
-
-                                        <form action="{{ route('ketua.kelola-anggota.destroy', $item->id_anggota) }}"
-                                              method="POST"
-                                              onsubmit="return confirm('Yakin mau hapus {{ addslashes($item->siswa->nama_siswa) }} dari anggota ekskul ini?')"
-                                        >
-                                            @csrf
-                                            @method('DELETE')
-
-                                            <button type="submit"
-                                                title="Hapus anggota"
-                                                class="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 transition"
-                                            >
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                                                </svg>
-                                            </button>
-                                        </form>
-                                    </div>
-
-                                </div>
-                            @empty
-                                <div class="text-center py-10 text-inksoft">
-                                    Belum ada anggota.
-                                </div>
-                            @endforelse
+                        <div class="overflow-x-auto rounded-xl ring-1 ring-black/5">
+                            <table class="min-w-[1050px] w-full text-sm text-left">
+                                <thead class="bg-blue-50 text-ink">
+                                    <tr>
+                                        <th scope="col" class="px-4 py-4 font-semibold">NISN</th>
+                                        <th scope="col" class="px-4 py-4 font-semibold">NIS</th>
+                                        <th scope="col" class="px-4 py-4 font-semibold">Nama</th>
+                                        <th scope="col" class="px-4 py-4 font-semibold">Kelas</th>
+                                        <th scope="col" class="px-4 py-4 font-semibold">JK</th>
+                                        <th scope="col" class="px-4 py-4 font-semibold">Status</th>
+                                        <th scope="col" class="px-4 py-4 font-semibold text-center">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100 bg-white">
+                                    @forelse ($anggota as $item)
+                                        <tr class="hover:bg-blue-50/40 transition">
+                                            <td class="px-4 py-4 whitespace-nowrap">{{ $item->siswa->NISN ?? '-' }}</td>
+                                            <td class="px-4 py-4 whitespace-nowrap">{{ $item->siswa->NIS ?? '-' }}</td>
+                                            <td class="px-4 py-4 font-medium text-ink">{{ $item->siswa->nama_siswa ?? '-' }}</td>
+                                            <td class="px-4 py-4 whitespace-nowrap">{{ $item->siswa->kelas->nama_kelas ?? '-' }}</td>
+                                            <td class="px-4 py-4 whitespace-nowrap">
+                                                @if (($item->siswa->jk ?? '') === 'L')
+                                                    Laki-laki
+                                                @elseif (($item->siswa->jk ?? '') === 'P')
+                                                    Perempuan
+                                                @else
+                                                    -
+                                                @endif
+                                            </td>
+                                            <td class="px-4 py-4 whitespace-nowrap">
+                                                <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium {{ $item->status === 'aktif' ? 'bg-emerald-50 text-emerald-700' : 'bg-gray-100 text-gray-600' }}">
+                                                    {{ $item->status === 'aktif' ? 'Aktif' : 'Tidak Aktif' }}
+                                                </span>
+                                            </td>
+                                            <td class="px-4 py-4">
+                                                <div class="flex items-center justify-center gap-2">
+                                                    <a href="{{ route('ketua.kelola-anggota.detail', $item->id_anggota) }}"
+                                                       class="inline-flex items-center rounded-lg bg-blue-50 px-3 py-2 font-medium text-blue-700 hover:bg-blue-100 transition">
+                                                        Edit
+                                                    </a>
+                                                    <form action="{{ route('ketua.kelola-anggota.destroy', $item->id_anggota) }}"
+                                                          method="POST"
+                                                          onsubmit="return confirm('Yakin ingin menghapus {{ addslashes($item->siswa->nama_siswa ?? 'anggota ini') }} dari daftar anggota?')">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit"
+                                                                class="inline-flex items-center rounded-lg bg-red-50 px-3 py-2 font-medium text-red-600 hover:bg-red-100 transition">
+                                                            Hapus
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="7" class="px-4 py-10 text-center text-inksoft">Belum ada anggota.</td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
                         </div>
 
                         <!-- Tombol tambah, mengambang di kanan bawah -->
                         <a href="{{ route('ketua.kelola-anggota.tambah') }}"
                            class="absolute bottom-6 right-6 w-14 h-14 rounded-full bg-periwinkle flex items-center justify-center text-white shadow-lg shadow-periwinkle/30 hover:opacity-90 transition"
-                           title="Tambah anggota"
+                           title="Tambah anggota" aria-label="Tambah anggota"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />

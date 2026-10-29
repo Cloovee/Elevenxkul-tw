@@ -59,7 +59,7 @@
                                 <div>
                                     <label class="block text-sm font-medium text-inksoft mb-1.5">NIS</label>
                                     <div class="w-full px-4 py-2.5 rounded-xl border border-ink/10 bg-bgsoft text-ink">
-                                        {{ $anggota['nis'] }}
+                                        {{ $anggota->siswa->NIS ?? '-' }}
                                     </div>
                                 </div>
 
