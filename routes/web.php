@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\LandingController;
+use App\Http\Controllers\Ketua\AnggotaImportExportController;
+use App\Http\Controllers\Ketua\LaporanKegiatanController;
 use App\Http\Controllers\Ketua\RiwayatAbsensiController;
 use App\Http\Controllers\Pembina\AbsensiPelatihController;
 use App\Http\Controllers\Pembina\AbsensiPesertaController;
@@ -417,6 +419,19 @@ Route::post('/kelola-anggota/tambah', function (\Illuminate\Http\Request $reques
   ->name('ketua.kelola-anggota.store');
 
 
+// Import / Export anggota (HARUS di atas route /kelola-anggota/{id})
+Route::get('/kelola-anggota/import', [AnggotaImportExportController::class, 'showImportForm'])
+    ->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])->name('ketua.kelola-anggota.import.form');
+
+Route::post('/kelola-anggota/import', [AnggotaImportExportController::class, 'import'])
+    ->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])->name('ketua.kelola-anggota.import');
+
+Route::get('/kelola-anggota/export', [AnggotaImportExportController::class, 'export'])
+    ->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])->name('ketua.kelola-anggota.export');
+
+Route::get('/kelola-anggota/template', [AnggotaImportExportController::class, 'downloadTemplate'])
+    ->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])->name('ketua.kelola-anggota.template');
+
 Route::get('/kelola-anggota/{id}', function ($id) {
 
     $idEkskul = optional(optional(auth()->user()->siswa)->ekskulDipimpin)->id_ekskul;
@@ -486,24 +501,20 @@ Route::middleware('auth')->group(function () {
 |--------------------------------------------------------------------------
 | PENYAJI GAMBAR UPLOAD (tahan update, tidak bergantung symlink)
 |--------------------------------------------------------------------------
-| /media?p=poster-ekskul/abc.jpg
-|     Jalur utama saat symlink public/storage tidak ada. Sengaja TIDAK memakai
-|     ekstensi di bagian path URL, jadi tidak bisa dicegat nginx/Apache yang
-|     biasanya melayani *.jpg / *.png langsung (dan memberi 404 kalau file
-|     fisiknya tidak ada di document root).
-|
-| /storage/{path}
-|     Cadangan untuk URL lama (bookmark, link yang sudah tersebar). Hanya
-|     terpakai kalau web server meneruskan permintaan ke Laravel.
-|
-| Keduanya dikeluarkan dari grup middleware 'web' (tanpa session / query DB)
-| supaya ringan dan tidak memasang cookie untuk tiap gambar.
+| Kalau public/storage sudah ada (hasil storage:link), web server melayani
+| file langsung dan route ini tidak pernah terpakai. Kalau belum ada,
+| route ini yang menyajikan foto dari storage/app/public.
 */
-Route::get('/media', [\App\Http\Controllers\MediaController::class, 'show'])
-    ->withoutMiddleware('web')
-    ->name('media');
+Route::get('/storage/{path}', function (string $path) {
+    $base = realpath(storage_path('app/public'));
+    $file = $base ? realpath($base . DIRECTORY_SEPARATOR . $path) : false;
 
-Route::get('/storage/{path}', [\App\Http\Controllers\MediaController::class, 'legacy'])
-    ->where('path', '.*')
-    ->withoutMiddleware('web')
-    ->name('storage.fallback');
+    // Cegah path traversal (../) dan pastikan file benar-benar ada
+    if (! $base || ! $file || ! str_starts_with($file, $base . DIRECTORY_SEPARATOR) || ! is_file($file)) {
+        abort(404);
+    }
+
+    return response()->file($file, [
+        'Cache-Control' => 'public, max-age=86400',
+    ]);
+})->where('path', '.*')->name('storage.fallback');
