@@ -251,7 +251,7 @@
                                                     {{ optional($absensi->tanggal_absensi)->translatedFormat('d M Y') }}
                                                 </td>
                                                 <td class="py-2.5 px-2 font-medium text-ink">
-                                                    {{ $absensi->pelatih->nama_pelatih ?? '-' }}
+                                                    {{ $absensi->nama_petugas }}
                                                 </td>
                                                 <td class="py-2.5 px-2 text-gray-500">
                                                     {{ $absensi->kegiatan ?: '-' }}

@@ -20,16 +20,14 @@ class BerandaController extends ApiController
         $ekskul = $this->ekskulKetua($request);
         $idEkskul = $ekskul->id_ekskul;
 
-        $pelatih = $ekskul->id_pelatih
-            ? AbsensiPelatih::with('pelatih')
-                ->where('id_pelatih', $ekskul->id_pelatih)
-                ->latest('created_at')->take(5)->get()
-                ->map(fn ($r) => [
-                    'tipe'  => 'absensi_pelatih',
-                    'teks'  => 'Menginput absensi pelatih ' . ($r->pelatih->nama_pelatih ?? '-'),
-                    'waktu' => $r->created_at,
-                ])
-            : collect();
+        $pelatih = AbsensiPelatih::with(['pelatih', 'pembina'])
+            ->untukEkskul($ekskul)
+            ->latest('created_at')->take(5)->get()
+            ->map(fn ($r) => [
+                'tipe'  => 'absensi_pelatih',
+                'teks'  => 'Mengunggah foto kegiatan (' . $r->nama_petugas . ')',
+                'waktu' => $r->created_at,
+            ]);
 
         $peserta = AbsensiPeserta::whereHas('peserta', fn ($q) => $q->where('id_ekskul', $idEkskul))
             ->selectRaw('tanggal_absensi, COUNT(*) as jumlah, MAX(created_at) as waktu')

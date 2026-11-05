@@ -59,10 +59,12 @@ class LaporanKegiatanController extends Controller
         $kegiatan = collect();
         $dikecualikan = collect();
 
-        if ($ekskul->pelatih) {
+        // Ekskul dengan pelatih: foto/absensi pelatih. Ekskul tanpa pelatih: foto/absensi
+        // yang diunggah pembina sebagai pengganti pelatih (scope untukEkskul menangani keduanya).
+        if ($ekskul->pelatih || $ekskul->pembina) {
             // whereDate (bukan whereBetween string) supaya tanggal 31 tidak ikut terpotong
             // kalau kolom tanggal tersimpan lengkap dengan jam ("2026-10-31 00:00:00").
-            $semuaBulanIni = AbsensiPelatih::where('id_pelatih', $ekskul->id_pelatih)
+            $semuaBulanIni = AbsensiPelatih::untukEkskul($ekskul)
                 ->whereDate('tanggal_absensi', '>=', $bulan->copy()->startOfMonth()->toDateString())
                 ->whereDate('tanggal_absensi', '<=', $bulan->copy()->endOfMonth()->toDateString())
                 ->orderBy('tanggal_absensi')

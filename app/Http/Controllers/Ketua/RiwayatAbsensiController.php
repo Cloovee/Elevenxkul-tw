@@ -63,11 +63,12 @@ class RiwayatAbsensiController extends Controller
             ->sortDesc()
             ->mapWithKeys(fn ($b) => [$b => $this->labelBulan($b)]);
 
-        // Satu ekskul dilatih oleh satu pelatih (lihat relasi Ekskul::pelatih()).
-        $idPelatih = Ekskul::where('id_ekskul', $idEkskul)->value('id_pelatih');
+        // Satu ekskul dilatih oleh satu pelatih (lihat relasi Ekskul::pelatih()); bila tidak ada,
+        // baris yang diunggah pembina sebagai pengganti pelatih tetap ditampilkan.
+        $ekskulModel = $request->attributes->get('ekskul_ketua');
 
-        $riwayatPelatih = AbsensiPelatih::with('pelatih')
-            ->where('id_pelatih', $idPelatih)
+        $riwayatPelatih = AbsensiPelatih::with(['pelatih', 'pembina'])
+            ->untukEkskul($ekskulModel)
             ->orderByDesc('tanggal_absensi')
             ->orderByDesc('id_absensi')
             ->get();
@@ -113,12 +114,10 @@ class RiwayatAbsensiController extends Controller
         ]);
 
         // Absensi pelatih pada bulan yang sama (laporan yang ditolak pembina tidak dihitung hadir).
-        $absensiPelatih = $ekskul->id_pelatih
-            ? AbsensiPelatih::where('id_pelatih', $ekskul->id_pelatih)
-                ->whereBetween('tanggal_absensi', [$awal->toDateString(), $akhir->toDateString()])
-                ->get()
-                ->keyBy(fn ($a) => $a->tanggal_absensi->toDateString())
-            : collect();
+        $absensiPelatih = AbsensiPelatih::untukEkskul($ekskul)
+            ->whereBetween('tanggal_absensi', [$awal->toDateString(), $akhir->toDateString()])
+            ->get()
+            ->keyBy(fn ($a) => $a->tanggal_absensi->toDateString());
 
         // Kolom tanggal tabel pelatih = semua tanggal pertemuan (peserta) + tanggal absensi pelatih.
         $tanggalKegiatan = $absensi->toBase()->map(fn ($a) => $a->tanggal_absensi->toDateString())->unique()->sort()->values();

@@ -3,13 +3,18 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Models\AbsensiPelatih;
+use App\Models\Ekskul;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 /**
- * Padanan API dari Ketua\AbsensiPelatihController (web).
- * Pelatih tidak dipilih Ketua: otomatis pelatih milik ekskul (ekskuls.id_pelatih).
- * Status validasi awal selalu "Menunggu" dan divalidasi Pembina di web.
+ * Upload foto kegiatan (sebelumnya "absensi pelatih") dari aplikasi Ketua.
+ *
+ * Petugas tidak dipilih Ketua:
+ *  - ekskul punya pelatih  -> otomatis pelatih ekskul (ekskuls.id_pelatih), menunggu validasi pembina.
+ *  - ekskul tanpa pelatih  -> otomatis pembina ekskul sebagai pengganti pelatih. Karena pembina
+ *    sendiri yang bertanggung jawab, laporannya langsung berstatus "Divalidasi".
+ * Kedua jenis baris ikut ke laporan kegiatan.
  */
 class AbsensiPelatihController extends ApiController
 {
@@ -17,7 +22,8 @@ class AbsensiPelatihController extends ApiController
     {
         return [
             'id_absensi'       => $a->id_absensi,
-            'nama_pelatih'     => $a->pelatih->nama_pelatih ?? '-',
+            'nama_pelatih'     => $a->nama_petugas,
+            'peran'            => $a->oleh_pembina ? 'pembina' : 'pelatih',
             'tanggal'          => $a->tanggal_absensi->toDateString(),
             'kegiatan'         => $a->kegiatan,
             'status'           => $a->status_kehadiran,
@@ -28,17 +34,18 @@ class AbsensiPelatihController extends ApiController
         ];
     }
 
-    /** GET /api/v1/absensi-pelatih - riwayat laporan absensi pelatih ekskul ini. */
+    private function adaPetugas(Ekskul $ekskul): bool
+    {
+        return $ekskul->id_pelatih || $ekskul->id_pembina;
+    }
+
+    /** GET /api/v1/absensi-pelatih - riwayat foto kegiatan ekskul ini. */
     public function index(Request $request): JsonResponse
     {
         $ekskul = $this->ekskulKetua($request);
 
-        if (! $ekskul->id_pelatih) {
-            return response()->json(['data' => []]);
-        }
-
-        $rows = AbsensiPelatih::with('pelatih')
-            ->where('id_pelatih', $ekskul->id_pelatih)
+        $rows = AbsensiPelatih::with(['pelatih', 'pembina'])
+            ->untukEkskul($ekskul)
             ->orderByDesc('tanggal_absensi')
             ->orderByDesc('id_absensi')
             ->get();
@@ -48,23 +55,31 @@ class AbsensiPelatihController extends ApiController
 
     /**
      * POST /api/v1/absensi-pelatih   (multipart/form-data)
-     * field: tanggal_absensi, status_kehadiran, kegiatan?, foto_kehadiran? (gambar maks. 2 MB)
+     * field: tanggal_absensi, status_kehadiran, kegiatan, foto_kehadiran (gambar maks. 2 MB; keduanya wajib)
      */
     public function store(Request $request): JsonResponse
     {
         $ekskul = $this->ekskulKetua($request);
 
-        if (! $ekskul->id_pelatih) {
+        if (! $this->adaPetugas($ekskul)) {
             return response()->json([
-                'message' => 'Ekskul kamu belum punya pelatih. Minta pembina menentukan pelatihnya dulu.',
+                'message' => 'Ekskul kamu belum punya pelatih maupun pembina. Hubungi admin untuk menentukannya dulu.',
             ], 422);
         }
 
+        // Foto dan kegiatan wajib: laporan kosong tidak boleh tersimpan.
         $validated = $request->validate([
             'tanggal_absensi'  => ['required', 'date_format:Y-m-d'],
-            'kegiatan'         => ['nullable', 'string', 'max:100'],
+            'kegiatan'         => ['required', 'string', 'max:100'],
             'status_kehadiran' => ['required', 'in:hadir,izin,sakit,alpha'],
-            'foto_kehadiran'   => ['nullable', 'image', 'max:2048'],
+            'foto_kehadiran'   => ['required', 'image', 'max:2048'],
+        ], [
+            'kegiatan.required'         => 'Kegiatan wajib diisi.',
+            'kegiatan.max'              => 'Kegiatan maksimal 100 karakter.',
+            'foto_kehadiran.required'   => 'Foto kegiatan wajib diunggah.',
+            'foto_kehadiran.image'      => 'File harus berupa gambar (JPG atau PNG).',
+            'foto_kehadiran.max'        => 'Ukuran foto maksimal 2MB.',
+            'foto_kehadiran.uploaded'   => 'Foto gagal diunggah. Coba lagi.',
         ]);
 
         if ($request->hasFile('foto_kehadiran')) {
@@ -72,14 +87,27 @@ class AbsensiPelatihController extends ApiController
                 ->store('absensi-pelatih', 'public');
         }
 
-        $validated['id_pelatih'] = $ekskul->id_pelatih;
-        $validated['status_validasi'] = 'Menunggu';
+        $validated['id_ekskul'] = $ekskul->id_ekskul;
+
+        if ($ekskul->id_pelatih) {
+            $validated['id_pelatih'] = $ekskul->id_pelatih;
+            $validated['status_validasi'] = 'Menunggu';
+            $pesan = 'Foto kegiatan berhasil dikirim, menunggu validasi pembina.';
+        } else {
+            // Tanpa pelatih: pembina menggantikan, jadi tidak perlu menunggu validasi dirinya sendiri.
+            $validated['id_pelatih'] = null;
+            $validated['id_pembina'] = $ekskul->id_pembina;
+            $validated['status_validasi'] = 'Divalidasi';
+            $validated['id_pembina_validasi'] = $ekskul->id_pembina;
+            $validated['tgl_validasi'] = now();
+            $pesan = 'Foto kegiatan berhasil dikirim atas nama pembina (ekskul ini belum punya pelatih).';
+        }
 
         $absensi = AbsensiPelatih::create($validated);
-        $absensi->load('pelatih');
+        $absensi->load(['pelatih', 'pembina']);
 
         return response()->json([
-            'message' => 'Absensi pelatih berhasil dikirim, menunggu validasi pembina.',
+            'message' => $pesan,
             'data'    => $this->json($absensi),
         ], 201);
     }
