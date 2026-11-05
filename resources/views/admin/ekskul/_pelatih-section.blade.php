@@ -26,50 +26,50 @@
 <style>
     .plt-card {
         background: #fff;
-        border: 1px solid #dde8fb;
-        border-radius: 1rem;
-        padding: 1rem 1.25rem;
+        border: 1px solid #DDE8FB;
+        border-radius: 1.25rem;
+        padding: 1.1rem 1.25rem;
         transition: border-color .2s ease;
     }
     .plt-card.is-on { border-color: #0B409C; }
 
-    .plt-head { display: flex; align-items: center; gap: .85rem; flex-wrap: wrap; }
+    .plt-head { display: flex; align-items: center; gap: .9rem; flex-wrap: wrap; }
     .plt-title { flex: 1 1 14rem; min-width: 0; }
     .plt-label { font-size: .75rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: #10316B; }
     .plt-sub { font-size: .8rem; color: #7C8DB5; margin-top: .15rem; font-weight: 500; }
 
-    /* Ikon: kotak datar, hanya ganti warna */
+    /* Ikon: biru solid saat aktif */
     .plt-ico {
-        width: 42px; height: 42px; border-radius: 12px; flex: none;
-        display: grid; place-items: center;
-        color: #0B409C; background: #f4f7fe;
-        transition: background-color .2s ease, color .2s ease;
+        width: 44px; height: 44px; border-radius: .75rem;
+        display: grid; place-items: center; flex: none;
+        color: #0B409C; background: #DDE8FB;
+        transition: background .2s ease, color .2s ease;
     }
-    .plt-ico i { font-size: 1rem; }
+    .plt-ico i { font-size: 1.05rem; }
     .plt-card.is-on .plt-ico { color: #fff; background: #0B409C; }
 
-    /* Saklar: warna solid, tanpa gradasi/glow */
-    .plt-switch { position: relative; display: inline-flex; align-items: center; gap: .65rem; cursor: pointer; user-select: none; }
+    /* Saklar */
+    .plt-switch { position: relative; display: inline-flex; align-items: center; gap: .7rem; cursor: pointer; user-select: none; }
     .plt-switch input[type="checkbox"] { position: absolute; opacity: 0; width: 1px; height: 1px; margin: 0; }
     .plt-track {
-        position: relative; width: 44px; height: 24px; border-radius: 999px; background: #d5dbef; flex: none;
-        transition: background-color .2s ease;
+        position: relative; width: 48px; height: 26px; border-radius: 999px; background: #C9D6EE; flex: none;
+        transition: background .2s ease;
     }
     .plt-knob {
-        position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff;
-        box-shadow: 0 1px 2px rgba(43, 54, 116, .25);
+        position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff;
+        box-shadow: 0 1px 3px rgba(16, 49, 107, .25);
         transition: transform .2s ease;
     }
     .plt-switch input:checked + .plt-track { background: #0B409C; }
-    .plt-switch input:checked + .plt-track .plt-knob { transform: translateX(20px); }
-    .plt-switch input:focus-visible + .plt-track { outline: 2px solid #868dfb; outline-offset: 2px; }
-    .plt-switch-text { font-size: .8rem; font-weight: 700; color: #2b3674; min-width: 6.6rem; }
+    .plt-switch input:checked + .plt-track .plt-knob { transform: translateX(22px); }
+    .plt-switch input:focus-visible + .plt-track { outline: 2px solid rgba(11, 64, 156, .4); outline-offset: 2px; }
+    .plt-switch-text { font-size: .8rem; font-weight: 700; color: #10316B; min-width: 6.6rem; }
 
     /* Catatan kecil di bawah header */
-    .plt-note { margin-top: .85rem; padding: .7rem .9rem; border-radius: .75rem; font-size: .78rem; line-height: 1.45; font-weight: 500; }
+    .plt-note { margin-top: .85rem; padding: .7rem .9rem; border-radius: .9rem; font-size: .78rem; line-height: 1.45; font-weight: 500; }
     .plt-note i { margin-right: .35rem; }
-    .plt-note-info { background: #f4f7fe; color: #5b6e96; }
-    .plt-note-warn { background: #fff7e0; color: #946200; }
+    .plt-note-info { background: #F2F7FF; color: #5B6E96; }
+    .plt-note-warn { background: #FFF7E0; color: #946200; }
 
     /* Panel form: buka/tutup halus (grid 0fr -> 1fr) */
     .plt-collapse {
@@ -78,10 +78,10 @@
     }
     .plt-collapse.open {
         grid-template-rows: 1fr; opacity: 1; visibility: visible;
-        transition: grid-template-rows .3s ease, opacity .25s ease .05s, visibility 0s;
+        transition: grid-template-rows .3s ease, opacity .2s ease, visibility 0s;
     }
     .plt-collapse-inner { overflow: hidden; min-height: 0; }
-    .plt-body { padding: 1.1rem 3px 3px; border-top: 1px solid #eef2fb; margin-top: 1rem; }
+    .plt-body { padding: 1.1rem 3px 3px; border-top: 1px solid #DDE8FB; margin-top: 1rem; }
     .plt-grid { display: grid; grid-template-columns: 1fr; gap: 1.1rem; }
     @media (min-width: 768px) { .plt-grid { grid-template-columns: 1fr 1fr; } }
     .plt-span { grid-column: 1 / -1; }
