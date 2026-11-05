@@ -8,100 +8,68 @@
 
     Variabel: $ekskul (null saat Tambah, model Ekskul saat Edit).
 
-    Gaya & animasi ditulis di blok <style> di bawah (prefix "plt-") supaya langsung
-    berfungsi tanpa perlu build ulang Tailwind (npm run build).
---}}
-@php
-    $ekskul = $ekskul ?? null;
-    $pelatihAda = $ekskul?->pelatih;
-    $punyaAwal = (bool) old('punya_pelatih', $pelatihAda ? 1 : 0);
-    $fotoLama = $pelatihAda?->foto_url;
-
-    $daftarAgama = ['islam' => 'Islam', 'kristen' => 'Kristen', 'katolik' => 'Katolik', 'hindu' => 'Hindu', 'buddha' => 'Buddha', 'konghucu' => 'Konghucu'];
-    $agamaNilai = strtolower((string) old('pelatih_agama', $pelatihAda?->agama));
-
-    $kelasInput = 'w-full px-4 py-3 bg-[#f4f7fe] border %s rounded-xl text-sm text-[#2b3674] placeholder-[#a3aed1] focus:outline-none focus:bg-white focus:border-[#868dfb] focus:ring-2 focus:ring-[#868dfb]/20 transition-all';
-@endphp
-
-<style>
+    Gaya ditulis di blok <style>
     .plt-card {
         background: #fff;
-        border: 1.5px solid #e3e8f8;
-        border-radius: 1.25rem;
-        padding: 1.1rem 1.25rem;
-        transition: border-color .35s ease, box-shadow .35s ease;
+        border: 1px solid #dde8fb;
+        border-radius: 1rem;
+        padding: 1rem 1.25rem;
+        transition: border-color .2s ease;
     }
-    .plt-card.is-on {
-        border-color: rgba(134, 141, 251, .65);
-        box-shadow: 0 14px 34px -18px rgba(67, 24, 255, .45);
-    }
+    .plt-card.is-on { border-color: #0B409C; }
 
-    .plt-head { display: flex; align-items: center; gap: .9rem; flex-wrap: wrap; }
+    .plt-head { display: flex; align-items: center; gap: .85rem; flex-wrap: wrap; }
     .plt-title { flex: 1 1 14rem; min-width: 0; }
     .plt-label { font-size: .75rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: #2b3674; }
     .plt-sub { font-size: .8rem; color: #a3aed1; margin-top: .15rem; font-weight: 500; }
 
-    /* Ikon: ganti warna + goyang kecil saat saklar berubah */
+    /* Ikon: kotak datar, hanya ganti warna */
     .plt-ico {
-        position: relative; width: 46px; height: 46px; border-radius: 14px; overflow: hidden;
-        display: grid; place-items: center; color: #868dfb; background: #e9edfb; flex: none;
-        transition: transform .5s cubic-bezier(.34, 1.56, .64, 1), color .3s ease;
+        width: 42px; height: 42px; border-radius: 12px; flex: none;
+        display: grid; place-items: center;
+        color: #0B409C; background: #f4f7fe;
+        transition: background-color .2s ease, color .2s ease;
     }
-    .plt-ico::before {
-        content: ""; position: absolute; inset: 0; opacity: 0;
-        background: linear-gradient(135deg, #868dfb, #4318FF); transition: opacity .35s ease;
-    }
-    .plt-ico i { position: relative; z-index: 1; font-size: 1.1rem; }
-    .plt-card.is-on .plt-ico { color: #fff; transform: rotate(-7deg) scale(1.08); }
-    .plt-card.is-on .plt-ico::before { opacity: 1; }
+    .plt-ico i { font-size: 1rem; }
+    .plt-card.is-on .plt-ico { color: #fff; background: #0B409C; }
 
-    /* Saklar */
-    .plt-switch { position: relative; display: inline-flex; align-items: center; gap: .7rem; cursor: pointer; user-select: none; }
+    /* Saklar: warna solid, tanpa gradasi/glow */
+    .plt-switch { position: relative; display: inline-flex; align-items: center; gap: .65rem; cursor: pointer; user-select: none; }
     .plt-switch input[type="checkbox"] { position: absolute; opacity: 0; width: 1px; height: 1px; margin: 0; }
     .plt-track {
-        position: relative; width: 54px; height: 30px; border-radius: 999px; background: #d5dbef; flex: none;
-        transition: background .3s ease, box-shadow .3s ease;
+        position: relative; width: 44px; height: 24px; border-radius: 999px; background: #d5dbef; flex: none;
+        transition: background-color .2s ease;
     }
     .plt-knob {
-        position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%; background: #fff;
-        box-shadow: 0 2px 6px rgba(43, 54, 116, .3);
-        transition: transform .4s cubic-bezier(.34, 1.56, .64, 1);
+        position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff;
+        box-shadow: 0 1px 2px rgba(43, 54, 116, .25);
+        transition: transform .2s ease;
     }
-    .plt-switch:active .plt-knob { width: 29px; }
-    .plt-switch input:checked + .plt-track {
-        background: linear-gradient(135deg, #868dfb, #4318FF);
-        box-shadow: 0 8px 18px -8px rgba(67, 24, 255, .65);
-    }
-    .plt-switch input:checked + .plt-track .plt-knob { transform: translateX(24px); }
-    .plt-switch:active input:checked + .plt-track .plt-knob { transform: translateX(19px); }
-    .plt-switch input:focus-visible + .plt-track { outline: 3px solid rgba(134, 141, 251, .5); outline-offset: 3px; }
+    .plt-switch input:checked + .plt-track { background: #0B409C; }
+    .plt-switch input:checked + .plt-track .plt-knob { transform: translateX(20px); }
+    .plt-switch input:focus-visible + .plt-track { outline: 2px solid #868dfb; outline-offset: 2px; }
     .plt-switch-text { font-size: .8rem; font-weight: 700; color: #2b3674; min-width: 6.6rem; }
 
     /* Catatan kecil di bawah header */
-    .plt-note { margin-top: .85rem; padding: .7rem .9rem; border-radius: .9rem; font-size: .78rem; line-height: 1.45; font-weight: 500; }
+    .plt-note { margin-top: .85rem; padding: .7rem .9rem; border-radius: .75rem; font-size: .78rem; line-height: 1.45; font-weight: 500; }
     .plt-note i { margin-right: .35rem; }
-    .plt-note-info { background: #f4f7fe; color: #5b6e96; animation: pltRise .45s ease both; }
-    .plt-note-warn { background: #fff7e0; color: #946200; animation: pltRise .45s ease both; }
+    .plt-note-info { background: #f4f7fe; color: #5b6e96; }
+    .plt-note-warn { background: #fff7e0; color: #946200; }
 
     /* Panel form: terbuka halus dengan trik grid 0fr -> 1fr */
     .plt-collapse {
         display: grid; grid-template-rows: 0fr; opacity: 0; visibility: hidden;
-        transition: grid-template-rows .55s cubic-bezier(.22, 1, .36, 1), opacity .4s ease, visibility 0s linear .55s;
+        transition: grid-template-rows .3s ease, opacity .2s ease, visibility 0s linear .3s;
     }
     .plt-collapse.open {
         grid-template-rows: 1fr; opacity: 1; visibility: visible;
-        transition: grid-template-rows .55s cubic-bezier(.22, 1, .36, 1), opacity .4s ease .05s, visibility 0s;
+        transition: grid-template-rows .3s ease, opacity .25s ease .05s, visibility 0s;
     }
     .plt-collapse-inner { overflow: hidden; min-height: 0; }
-    .plt-body { padding: 1.1rem 3px 3px; border-top: 1px dashed #dfe5f7; margin-top: 1rem; }
+    .plt-body { padding: 1.1rem 3px 3px; border-top: 1px solid #eef2fb; margin-top: 1rem; }
     .plt-grid { display: grid; grid-template-columns: 1fr; gap: 1.1rem; }
     @media (min-width: 768px) { .plt-grid { grid-template-columns: 1fr 1fr; } }
     .plt-span { grid-column: 1 / -1; }
-
-    /* Kolom muncul berurutan setiap panel dibuka */
-    .plt-collapse.open .plt-field { animation: pltRise .55s cubic-bezier(.22, 1, .36, 1) both; animation-delay: calc(var(--i, 0) * 55ms + 120ms); }
-    @keyframes pltRise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
-    @keyframes pltPop { 0% { transform: scale(.6); opacity: 0; } 70% { transform: scale(1.06); opacity: 1; } 100% { transform: scale(1); } }
 
     /* Foto pelatih */
     .plt-foto { display: flex; gap: 1.1rem; align-items: center; flex-wrap: wrap; }
@@ -109,13 +77,12 @@
         width: 88px; height: 88px; border-radius: 50%; overflow: hidden; flex: none; background: #f4f7fe;
         box-shadow: 0 0 0 1px rgba(16, 49, 107, .1); display: grid; place-items: center; color: #a3aed1;
     }
-    .plt-avatar img { width: 100%; height: 100%; object-fit: cover; animation: pltPop .5s cubic-bezier(.34, 1.56, .64, 1) both; }
+    .plt-avatar img { width: 100%; height: 100%; object-fit: cover; }
     .plt-avatar i { font-size: 1.7rem; }
     .plt-foto-input { flex: 1 1 14rem; min-width: 0; }
 
     @media (prefers-reduced-motion: reduce) {
         .plt-card, .plt-ico, .plt-knob, .plt-track, .plt-collapse, .plt-collapse.open { transition: none; }
-        .plt-collapse.open .plt-field, .plt-note, .plt-avatar img { animation: none; }
     }
 </style>
 
