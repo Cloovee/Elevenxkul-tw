@@ -8,7 +8,7 @@
 
     Variabel: $ekskul (null saat Tambah, model Ekskul saat Edit).
 
-    Gaya & animasi ditulis di blok <style> di bawah (prefix "plt-") supaya langsung
+    Gaya ditulis di blok <style> di bawah (prefix "plt-") supaya langsung
     berfungsi tanpa perlu build ulang Tailwind (npm run build).
 --}}
 @php
@@ -20,102 +20,84 @@
     $daftarAgama = ['islam' => 'Islam', 'kristen' => 'Kristen', 'katolik' => 'Katolik', 'hindu' => 'Hindu', 'buddha' => 'Buddha', 'konghucu' => 'Konghucu'];
     $agamaNilai = strtolower((string) old('pelatih_agama', $pelatihAda?->agama));
 
-    $kelasInput = 'w-full px-4 py-3 bg-[#f4f7fe] border %s rounded-xl text-sm text-[#2b3674] placeholder-[#a3aed1] focus:outline-none focus:bg-white focus:border-[#868dfb] focus:ring-2 focus:ring-[#868dfb]/20 transition-all';
+    $kelasInput = 'w-full px-4 py-3 bg-[#F2F7FF] border %s rounded-xl text-sm text-[#10316B] placeholder-[#7C8DB5] focus:outline-none focus:bg-white focus:border-[#0B409C] focus:ring-2 focus:ring-[#0B409C]/20 transition-all';
 @endphp
 
 <style>
     .plt-card {
         background: #fff;
-        border: 1.5px solid #e3e8f8;
+        border: 1px solid #DDE8FB;
         border-radius: 1.25rem;
         padding: 1.1rem 1.25rem;
-        transition: border-color .35s ease, box-shadow .35s ease;
+        transition: border-color .2s ease;
     }
-    .plt-card.is-on {
-        border-color: rgba(134, 141, 251, .65);
-        box-shadow: 0 14px 34px -18px rgba(67, 24, 255, .45);
-    }
+    .plt-card.is-on { border-color: #0B409C; }
 
     .plt-head { display: flex; align-items: center; gap: .9rem; flex-wrap: wrap; }
     .plt-title { flex: 1 1 14rem; min-width: 0; }
-    .plt-label { font-size: .75rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: #2b3674; }
-    .plt-sub { font-size: .8rem; color: #a3aed1; margin-top: .15rem; font-weight: 500; }
+    .plt-label { font-size: .75rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: #10316B; }
+    .plt-sub { font-size: .8rem; color: #7C8DB5; margin-top: .15rem; font-weight: 500; }
 
-    /* Ikon: ganti warna + goyang kecil saat saklar berubah */
+    /* Ikon: biru solid saat aktif */
     .plt-ico {
-        position: relative; width: 46px; height: 46px; border-radius: 14px; overflow: hidden;
-        display: grid; place-items: center; color: #868dfb; background: #e9edfb; flex: none;
-        transition: transform .5s cubic-bezier(.34, 1.56, .64, 1), color .3s ease;
+        width: 44px; height: 44px; border-radius: .75rem;
+        display: grid; place-items: center; flex: none;
+        color: #0B409C; background: #DDE8FB;
+        transition: background .2s ease, color .2s ease;
     }
-    .plt-ico::before {
-        content: ""; position: absolute; inset: 0; opacity: 0;
-        background: linear-gradient(135deg, #868dfb, #4318FF); transition: opacity .35s ease;
-    }
-    .plt-ico i { position: relative; z-index: 1; font-size: 1.1rem; }
-    .plt-card.is-on .plt-ico { color: #fff; transform: rotate(-7deg) scale(1.08); }
-    .plt-card.is-on .plt-ico::before { opacity: 1; }
+    .plt-ico i { font-size: 1.05rem; }
+    .plt-card.is-on .plt-ico { color: #fff; background: #0B409C; }
 
     /* Saklar */
     .plt-switch { position: relative; display: inline-flex; align-items: center; gap: .7rem; cursor: pointer; user-select: none; }
     .plt-switch input[type="checkbox"] { position: absolute; opacity: 0; width: 1px; height: 1px; margin: 0; }
     .plt-track {
-        position: relative; width: 54px; height: 30px; border-radius: 999px; background: #d5dbef; flex: none;
-        transition: background .3s ease, box-shadow .3s ease;
+        position: relative; width: 48px; height: 26px; border-radius: 999px; background: #C9D6EE; flex: none;
+        transition: background .2s ease;
     }
     .plt-knob {
-        position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%; background: #fff;
-        box-shadow: 0 2px 6px rgba(43, 54, 116, .3);
-        transition: transform .4s cubic-bezier(.34, 1.56, .64, 1);
+        position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff;
+        box-shadow: 0 1px 3px rgba(16, 49, 107, .25);
+        transition: transform .2s ease;
     }
-    .plt-switch:active .plt-knob { width: 29px; }
-    .plt-switch input:checked + .plt-track {
-        background: linear-gradient(135deg, #868dfb, #4318FF);
-        box-shadow: 0 8px 18px -8px rgba(67, 24, 255, .65);
-    }
-    .plt-switch input:checked + .plt-track .plt-knob { transform: translateX(24px); }
-    .plt-switch:active input:checked + .plt-track .plt-knob { transform: translateX(19px); }
-    .plt-switch input:focus-visible + .plt-track { outline: 3px solid rgba(134, 141, 251, .5); outline-offset: 3px; }
-    .plt-switch-text { font-size: .8rem; font-weight: 700; color: #2b3674; min-width: 6.6rem; }
+    .plt-switch input:checked + .plt-track { background: #0B409C; }
+    .plt-switch input:checked + .plt-track .plt-knob { transform: translateX(22px); }
+    .plt-switch input:focus-visible + .plt-track { outline: 2px solid rgba(11, 64, 156, .4); outline-offset: 2px; }
+    .plt-switch-text { font-size: .8rem; font-weight: 700; color: #10316B; min-width: 6.6rem; }
 
     /* Catatan kecil di bawah header */
     .plt-note { margin-top: .85rem; padding: .7rem .9rem; border-radius: .9rem; font-size: .78rem; line-height: 1.45; font-weight: 500; }
     .plt-note i { margin-right: .35rem; }
-    .plt-note-info { background: #f4f7fe; color: #5b6e96; animation: pltRise .45s ease both; }
-    .plt-note-warn { background: #fff7e0; color: #946200; animation: pltRise .45s ease both; }
+    .plt-note-info { background: #F2F7FF; color: #5B6E96; }
+    .plt-note-warn { background: #FFF7E0; color: #946200; }
 
-    /* Panel form: terbuka halus dengan trik grid 0fr -> 1fr */
+    /* Panel form: buka/tutup halus (grid 0fr -> 1fr) */
     .plt-collapse {
         display: grid; grid-template-rows: 0fr; opacity: 0; visibility: hidden;
-        transition: grid-template-rows .55s cubic-bezier(.22, 1, .36, 1), opacity .4s ease, visibility 0s linear .55s;
+        transition: grid-template-rows .3s ease, opacity .2s ease, visibility 0s linear .3s;
     }
     .plt-collapse.open {
         grid-template-rows: 1fr; opacity: 1; visibility: visible;
-        transition: grid-template-rows .55s cubic-bezier(.22, 1, .36, 1), opacity .4s ease .05s, visibility 0s;
+        transition: grid-template-rows .3s ease, opacity .2s ease, visibility 0s;
     }
     .plt-collapse-inner { overflow: hidden; min-height: 0; }
-    .plt-body { padding: 1.1rem 3px 3px; border-top: 1px dashed #dfe5f7; margin-top: 1rem; }
+    .plt-body { padding: 1.1rem 3px 3px; border-top: 1px solid #DDE8FB; margin-top: 1rem; }
     .plt-grid { display: grid; grid-template-columns: 1fr; gap: 1.1rem; }
     @media (min-width: 768px) { .plt-grid { grid-template-columns: 1fr 1fr; } }
     .plt-span { grid-column: 1 / -1; }
 
-    /* Kolom muncul berurutan setiap panel dibuka */
-    .plt-collapse.open .plt-field { animation: pltRise .55s cubic-bezier(.22, 1, .36, 1) both; animation-delay: calc(var(--i, 0) * 55ms + 120ms); }
-    @keyframes pltRise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
-    @keyframes pltPop { 0% { transform: scale(.6); opacity: 0; } 70% { transform: scale(1.06); opacity: 1; } 100% { transform: scale(1); } }
-
     /* Foto pelatih */
     .plt-foto { display: flex; gap: 1.1rem; align-items: center; flex-wrap: wrap; }
     .plt-avatar {
-        width: 88px; height: 88px; border-radius: 50%; overflow: hidden; flex: none; background: #f4f7fe;
-        box-shadow: 0 0 0 1px rgba(16, 49, 107, .1); display: grid; place-items: center; color: #a3aed1;
+        width: 88px; height: 88px; border-radius: 50%; overflow: hidden; flex: none; background: #F2F7FF;
+        box-shadow: 0 0 0 1px rgba(16, 49, 107, .1); display: grid; place-items: center; color: #7C8DB5;
     }
-    .plt-avatar img { width: 100%; height: 100%; object-fit: cover; animation: pltPop .5s cubic-bezier(.34, 1.56, .64, 1) both; }
+    .plt-avatar img { width: 100%; height: 100%; object-fit: cover; }
     .plt-avatar i { font-size: 1.7rem; }
     .plt-foto-input { flex: 1 1 14rem; min-width: 0; }
 
     @media (prefers-reduced-motion: reduce) {
         .plt-card, .plt-ico, .plt-knob, .plt-track, .plt-collapse, .plt-collapse.open { transition: none; }
-        .plt-collapse.open .plt-field, .plt-note, .plt-avatar img { animation: none; }
     }
 </style>
 
@@ -172,8 +154,8 @@
                     <div class="plt-grid">
 
                         <!-- Foto -->
-                        <div class="plt-field plt-span" style="--i:0">
-                            <label for="pelatih_foto" class="block text-xs font-bold text-[#2b3674] uppercase tracking-wider mb-2">
+                        <div class="plt-span">
+                            <label for="pelatih_foto" class="block text-xs font-bold text-[#10316B] uppercase tracking-wider mb-2">
                                 Foto Pelatih
                             </label>
                             <div class="plt-foto">
@@ -186,8 +168,8 @@
                                 <div class="plt-foto-input">
                                     <input type="file" name="pelatih_foto" id="pelatih_foto" accept="image/png,image/jpeg,image/webp"
                                         @change="const f = $event.target.files[0]; if (f) { foto = URL.createObjectURL(f); hapusFoto = false }"
-                                        class="block w-full text-sm text-[#2b3674] file:mr-4 file:py-2.5 file:px-5 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-[#0B409C] file:text-white hover:file:opacity-90 file:cursor-pointer bg-[#f4f7fe] rounded-xl @error('pelatih_foto') ring-2 ring-red-500 @enderror">
-                                    <p class="mt-1.5 text-xs text-[#a3aed1]">JPG, PNG, atau WEBP, maksimal 2 MB. Opsional.</p>
+                                        class="block w-full text-sm text-[#10316B] file:mr-4 file:py-2.5 file:px-5 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-[#0B409C] file:text-white hover:file:opacity-90 file:cursor-pointer bg-[#F2F7FF] rounded-xl @error('pelatih_foto') ring-2 ring-red-500 @enderror">
+                                    <p class="mt-1.5 text-xs text-[#7C8DB5]">JPG, PNG, atau WEBP, maksimal 2 MB. Opsional.</p>
                                     @if($pelatihAda?->foto)
                                         <label class="mt-3 inline-flex items-center gap-2 text-xs font-semibold text-red-600 cursor-pointer">
                                             <input type="checkbox" name="hapus_pelatih_foto" value="1" x-model="hapusFoto" class="rounded border-gray-300 text-red-600 focus:ring-red-500">
@@ -204,8 +186,8 @@
                         </div>
 
                         <!-- Nama -->
-                        <div class="plt-field" style="--i:1">
-                            <label for="pelatih_nama" class="block text-xs font-bold text-[#2b3674] uppercase tracking-wider mb-2">
+                        <div>
+                            <label for="pelatih_nama" class="block text-xs font-bold text-[#10316B] uppercase tracking-wider mb-2">
                                 Nama Pelatih <span class="text-red-500">*</span>
                             </label>
                             <input type="text" name="pelatih_nama" id="pelatih_nama" maxlength="100"
@@ -220,8 +202,8 @@
                         </div>
 
                         <!-- Jenis kelamin -->
-                        <div class="plt-field" style="--i:2">
-                            <label for="pelatih_jk" class="block text-xs font-bold text-[#2b3674] uppercase tracking-wider mb-2">
+                        <div>
+                            <label for="pelatih_jk" class="block text-xs font-bold text-[#10316B] uppercase tracking-wider mb-2">
                                 Jenis Kelamin
                             </label>
                             <select name="pelatih_jk" id="pelatih_jk"
@@ -238,8 +220,8 @@
                         </div>
 
                         <!-- Agama -->
-                        <div class="plt-field" style="--i:3">
-                            <label for="pelatih_agama" class="block text-xs font-bold text-[#2b3674] uppercase tracking-wider mb-2">
+                        <div>
+                            <label for="pelatih_agama" class="block text-xs font-bold text-[#10316B] uppercase tracking-wider mb-2">
                                 Agama
                             </label>
                             <select name="pelatih_agama" id="pelatih_agama"
@@ -260,8 +242,8 @@
                         </div>
 
                         <!-- No HP -->
-                        <div class="plt-field" style="--i:4">
-                            <label for="pelatih_nomor_hp" class="block text-xs font-bold text-[#2b3674] uppercase tracking-wider mb-2">
+                        <div>
+                            <label for="pelatih_nomor_hp" class="block text-xs font-bold text-[#10316B] uppercase tracking-wider mb-2">
                                 No. HP
                             </label>
                             <input type="text" name="pelatih_nomor_hp" id="pelatih_nomor_hp" maxlength="15" inputmode="tel"
@@ -276,8 +258,8 @@
                         </div>
 
                         <!-- Email -->
-                        <div class="plt-field" style="--i:5">
-                            <label for="pelatih_email" class="block text-xs font-bold text-[#2b3674] uppercase tracking-wider mb-2">
+                        <div>
+                            <label for="pelatih_email" class="block text-xs font-bold text-[#10316B] uppercase tracking-wider mb-2">
                                 Email
                             </label>
                             <input type="email" name="pelatih_email" id="pelatih_email" maxlength="100"
@@ -292,8 +274,8 @@
                         </div>
 
                         <!-- Media sosial -->
-                        <div class="plt-field" style="--i:6">
-                            <label for="pelatih_medsos" class="block text-xs font-bold text-[#2b3674] uppercase tracking-wider mb-2">
+                        <div>
+                            <label for="pelatih_medsos" class="block text-xs font-bold text-[#10316B] uppercase tracking-wider mb-2">
                                 Media Sosial
                             </label>
                             <input type="text" name="pelatih_medsos" id="pelatih_medsos" maxlength="100"
@@ -308,8 +290,8 @@
                         </div>
 
                         <!-- Alamat -->
-                        <div class="plt-field plt-span" style="--i:7">
-                            <label for="pelatih_alamat" class="block text-xs font-bold text-[#2b3674] uppercase tracking-wider mb-2">
+                        <div class="plt-span">
+                            <label for="pelatih_alamat" class="block text-xs font-bold text-[#10316B] uppercase tracking-wider mb-2">
                                 Alamat
                             </label>
                             <textarea name="pelatih_alamat" id="pelatih_alamat" rows="2"
@@ -322,7 +304,7 @@
                             @enderror
                         </div>
 
-                        <p class="plt-field plt-span text-xs text-[#a3aed1]" style="--i:8">
+                        <p class="plt-span text-xs text-[#7C8DB5]">
                             <i class="fas fa-circle-info"></i>
                             Data pelatih ini juga bisa diperbarui oleh Pembina lewat menu Kelola Pelatih.
                         </p>

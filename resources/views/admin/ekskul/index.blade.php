@@ -63,7 +63,7 @@
                             @if($ekskul->poster_url)
                                 <img src="{{ $ekskul->poster_url }}" alt="Poster {{ $ekskul->nama_ekskul }}" class="w-9 h-12 rounded-lg object-cover ring-2 ring-[#10316B]/10 flex-shrink-0">
                             @else
-                                <div class="w-9 h-9 rounded-full bg-teal-50 text-teal-600 flex items-center justify-center font-display font-bold text-sm ring-2 ring-teal-100 flex-shrink-0">
+                                <div class="w-9 h-9 rounded-full bg-[#DDE8FB] text-[#0B409C] flex items-center justify-center font-display font-bold text-sm ring-2 ring-[#0B409C]/10 flex-shrink-0">
                                     {{ $initial }}
                                 </div>
                             @endif
@@ -74,9 +74,9 @@
                     <td data-label="Kategori" class="px-3 py-3">
                         @php
                             $colors = [
-                                'organisasi' => 'bg-sky/15 text-sky-500',
-                                'ekstrakulikuler' => 'bg-green-50 text-green-500',
-                                'komunitas' => 'bg-periwinkle/10 text-periwinkle',
+                                'organisasi' => 'bg-[#DDE8FB] text-[#0B409C]',
+                                'ekstrakulikuler' => 'bg-green-50 text-green-600',
+                                'komunitas' => 'bg-[#FFF7CC] text-[#7A6200]',
                             ];
                         @endphp
                         <span class="px-2 py-1 rounded-full text-[10px] font-bold {{ $colors[$ekskul->kategori] ?? 'bg-bgsoft text-inksoft' }}">
@@ -102,7 +102,7 @@
 
                     <td data-label="Aksi" class="px-3 py-3">
                         <div class="flex gap-2">
-                            <a href="{{ route('admin.ekskul.show', $ekskul->id_ekskul) }}" class="w-8 h-8 flex items-center justify-center rounded-lg bg-sky/15 text-sky-500 hover:bg-sky-500 hover:text-white transition-colors" title="Detail">
+                            <a href="{{ route('admin.ekskul.show', $ekskul->id_ekskul) }}" class="w-8 h-8 flex items-center justify-center rounded-lg bg-sky-50 text-sky-500 hover:bg-sky-500 hover:text-white transition-colors" title="Detail">
                                 <i class="fas fa-eye text-xs"></i>
                             </a>
                             <a href="{{ route('admin.ekskul.edit', $ekskul->id_ekskul) }}" class="w-8 h-8 flex items-center justify-center rounded-lg bg-amber-50 text-amber-500 hover:bg-amber-500 hover:text-white transition-colors" title="Edit">
