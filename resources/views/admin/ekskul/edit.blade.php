@@ -75,9 +75,6 @@
                     </select>
                     <p class="mt-1.5 text-xs text-[#a3aed1]">
                         Pembina yang dipilih akan bisa mengelola data pelatih untuk ekskul ini.
-                        @if($ekskul->pelatih)
-                            Mengganti pembina akan melepas pelatih ({{ $ekskul->pelatih->nama_pelatih }}) yang saat ini terkait.
-                        @endif
                     </p>
                     @error('id_pembina')
                         <p class="mt-1.5 text-xs text-red-500 font-semibold flex items-center gap-1">
@@ -112,6 +109,9 @@
                         </p>
                     @enderror
                 </div>
+
+                <!-- Pelatih: saklar punya/tanpa pelatih + form data pelatih -->
+                @include('admin.ekskul._pelatih-section', ['ekskul' => $ekskul])
 
                 <!-- Poster (tampil di carousel landing page) -->
                 <div class="md:col-span-2" x-data="{ preview: @js($ekskul->poster_url), hapus: false }">

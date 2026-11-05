@@ -47,14 +47,30 @@ abstract class ApiController extends Controller
     protected function userJson(User $user): array
     {
         $siswa = $user->siswa;
+        $siswa?->loadMissing('kelas');
 
         return [
-            'id'       => $user->id,
-            'name'     => $user->name,
-            'email'    => $user->email,
-            'username' => $user->username,
-            'id_siswa' => $siswa?->id_siswa,
+            'id'        => $user->id,
+            'name'      => $user->name,
+            'email'     => $user->email,
+            'username'  => $user->username,
+            'id_siswa'  => $siswa?->id_siswa,
             'id_ekskul' => $siswa?->ekskulDipimpin?->id_ekskul,
+
+            // Data diri Ketua untuk halaman Profil di aplikasi.
+            'siswa'     => $siswa ? [
+                'nama'     => $siswa->nama_siswa,
+                'nis'      => $siswa->NIS,
+                'nisn'     => $siswa->NISN,
+                'kelas'    => $siswa->kelas ? $siswa->nama_kelas : null,
+                'jk'       => $siswa->jk,
+                'agama'    => $siswa->agama,
+                'nomor_hp' => $siswa->nomor_hp,
+                'email'    => $siswa->email,
+                'medsos'   => $siswa->medsos,
+                'alamat'   => $siswa->alamat,
+                'status'   => $siswa->status,
+            ] : null,
         ];
     }
 
@@ -64,14 +80,22 @@ abstract class ApiController extends Controller
             return null;
         }
 
+        $ekskul->loadMissing(['pelatih', 'pembina']);
+
         $pelatih = $ekskul->pelatih;
+        $pembina = $ekskul->pembina;
 
         return [
-            'id'        => $ekskul->id_ekskul,
-            'nama'      => $ekskul->nama_ekskul,
-            'kategori'  => $ekskul->kategori,
-            'deskripsi' => $ekskul->deskripsi,
-            'pelatih'   => $pelatih ? [
+            'id'             => $ekskul->id_ekskul,
+            'nama'           => $ekskul->nama_ekskul,
+            'kategori'       => $ekskul->kategori,
+            'deskripsi'      => $ekskul->deskripsi,
+            'jumlah_anggota' => $ekskul->peserta()->where('status', 'aktif')->count(),
+            'pembina'        => $pembina ? [
+                'id'   => $pembina->id_pembina,
+                'nama' => $pembina->nama_pembina,
+            ] : null,
+            'pelatih'        => $pelatih ? [
                 'id'       => $pelatih->id_pelatih,
                 'nama'     => $pelatih->nama_pelatih,
                 'foto_url' => $this->urlAbsolut($pelatih->foto_url),

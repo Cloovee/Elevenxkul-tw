@@ -32,7 +32,6 @@ Route::prefix('v1')->group(function () {
         Route::get('/me', [AuthController::class, 'me']);
 
         Route::get('/aktivitas', [BerandaController::class, 'aktivitas']);
-        Route::get('/berita', [BerandaController::class, 'berita']);
         Route::get('/anggota', [AnggotaController::class, 'index']);
 
         Route::prefix('absensi-peserta')->group(function () {

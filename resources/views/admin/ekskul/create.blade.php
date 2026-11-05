@@ -108,6 +108,9 @@
                     @enderror
                 </div>
 
+                <!-- Pelatih: saklar punya/tanpa pelatih + form data pelatih -->
+                @include('admin.ekskul._pelatih-section', ['ekskul' => null])
+
                 <!-- Poster (tampil di carousel landing page) -->
                 <div class="md:col-span-2" x-data="{ preview: @js(null), hapus: false }">
                     <label for="poster" class="block text-xs font-bold text-[#2b3674] uppercase tracking-wider mb-2">

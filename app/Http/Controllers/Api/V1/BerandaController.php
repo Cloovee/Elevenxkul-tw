@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Models\AbsensiPelatih;
 use App\Models\AbsensiPeserta;
-use App\Models\Galeri;
 use App\Models\Peserta;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -60,32 +59,6 @@ class BerandaController extends ApiController
                 'tipe'  => $r['tipe'],
                 'teks'  => $r['teks'],
                 'waktu' => $r['waktu']->toIso8601String(),
-            ])
-            ->values();
-
-        return response()->json(['data' => $data]);
-    }
-
-    /**
-     * GET /api/v1/berita
-     * Web belum punya tabel berita, jadi dipetakan dari galeri_ekskuls milik ekskul ini.
-     */
-    public function berita(Request $request): JsonResponse
-    {
-        $ekskul = $this->ekskulKetua($request);
-
-        $data = Galeri::where('id_ekskul', $ekskul->id_ekskul)
-            ->orderByDesc('created_at')
-            ->orderByDesc('id_galeri')
-            ->limit(50)
-            ->get()
-            ->map(fn (Galeri $g) => [
-                'id'          => $g->id_galeri,
-                'judul'       => $g->judul,
-                'keterangan'  => $g->keterangan,
-                'foto_url'    => $this->urlAbsolut($g->foto_url),
-                'tanggal'     => $g->created_at?->toIso8601String(),
-                'nama_ekskul' => $ekskul->nama_ekskul,
             ])
             ->values();
 
