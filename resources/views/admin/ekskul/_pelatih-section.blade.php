@@ -8,7 +8,22 @@
 
     Variabel: $ekskul (null saat Tambah, model Ekskul saat Edit).
 
-    Gaya ditulis di blok <style>
+    Gaya ditulis di blok <style> di bawah (prefix "plt-") supaya langsung
+    berfungsi tanpa perlu build ulang Tailwind (npm run build).
+--}}
+@php
+    $ekskul = $ekskul ?? null;
+    $pelatihAda = $ekskul?->pelatih;
+    $punyaAwal = (bool) old('punya_pelatih', $pelatihAda ? 1 : 0);
+    $fotoLama = $pelatihAda?->foto_url;
+
+    $daftarAgama = ['islam' => 'Islam', 'kristen' => 'Kristen', 'katolik' => 'Katolik', 'hindu' => 'Hindu', 'buddha' => 'Buddha', 'konghucu' => 'Konghucu'];
+    $agamaNilai = strtolower((string) old('pelatih_agama', $pelatihAda?->agama));
+
+    $kelasInput = 'w-full px-4 py-3 bg-[#f4f7fe] border %s rounded-xl text-sm text-[#2b3674] placeholder-[#a3aed1] focus:outline-none focus:bg-white focus:border-[#868dfb] focus:ring-2 focus:ring-[#868dfb]/20 transition-all';
+@endphp
+
+<style>
     .plt-card {
         background: #fff;
         border: 1px solid #dde8fb;
