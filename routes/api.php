@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\V1\AbsensiPesertaController;
 use App\Http\Controllers\Api\V1\AnggotaController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\BerandaController;
+use App\Http\Controllers\Api\V1\BeritaController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -32,6 +33,10 @@ Route::prefix('v1')->group(function () {
         Route::get('/me', [AuthController::class, 'me']);
 
         Route::get('/aktivitas', [BerandaController::class, 'aktivitas']);
+
+        // Berita dari Pembina (tab Berita + titik notifikasi di navbar)
+        Route::get('/berita', [BeritaController::class, 'index']);
+        Route::post('/berita/dilihat', [BeritaController::class, 'dilihat']);
         Route::get('/anggota', [AnggotaController::class, 'index']);
 
         Route::prefix('absensi-peserta')->group(function () {

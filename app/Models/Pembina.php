@@ -74,6 +74,12 @@ class Pembina extends Model
         return $this->hasMany(Ekskul::class, 'id_pembina', 'id_pembina');
     }
 
+    // Berita yang ditulis pembina ini untuk ketua ekskulnya
+    public function berita()
+    {
+        return $this->hasMany(Berita::class, 'id_pembina', 'id_pembina');
+    }
+
     /**
      * Semua pelatih dari ekskul-ekskul yang dibina oleh pembina ini.
      * Dipakai untuk membatasi data pada halaman validasi absensi pelatih.

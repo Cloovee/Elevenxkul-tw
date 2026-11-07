@@ -5,6 +5,7 @@ use App\Http\Controllers\Ketua\AnggotaImportExportController;
 use App\Http\Controllers\Ketua\LaporanKegiatanController;
 use App\Http\Controllers\Ketua\RiwayatAbsensiController;
 use App\Http\Controllers\Pembina\AbsensiPelatihController;
+use App\Http\Controllers\Pembina\BeritaController as PembinaBeritaController;
 use App\Http\Controllers\Pembina\AbsensiPesertaController;
 use App\Http\Controllers\Pembina\NilaiPesertaController;
 use App\Http\Controllers\Pembina\KetuaController as PembinaKetuaController;
@@ -67,6 +68,18 @@ Route::prefix('pembina')->middleware(['auth', 'role:Pembina'])->name('pembina.')
         Route::get('/{nilaiPeserta}/edit', [NilaiPesertaController::class, 'edit'])->name('edit');
         Route::put('/{nilaiPeserta}', [NilaiPesertaController::class, 'update'])->name('update');
         Route::delete('/{nilaiPeserta}', [NilaiPesertaController::class, 'destroy'])->name('destroy');
+    });
+
+    // ===== CRUD: Berita untuk Ketua =====
+    // Pembina menulis berita/pengumuman -> tampil di aplikasi Ketua ekskul yang dibina
+    // (beranda + tab Berita, dengan titik notifikasi di navbar saat ada berita baru).
+    Route::prefix('berita')->name('berita.')->group(function () {
+        Route::get('/', [PembinaBeritaController::class, 'index'])->name('index');
+        Route::get('/create', [PembinaBeritaController::class, 'create'])->name('create');
+        Route::post('/store', [PembinaBeritaController::class, 'store'])->name('store');
+        Route::get('/{id}/edit', [PembinaBeritaController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [PembinaBeritaController::class, 'update'])->name('update');
+        Route::delete('/{id}', [PembinaBeritaController::class, 'destroy'])->name('destroy');
     });
 
     // ===== CRUD: Kelola Pelatih (untuk ekskul yang dibina) =====
