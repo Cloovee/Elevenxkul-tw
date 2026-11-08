@@ -17,7 +17,6 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Admin\DashAdminController;
 use App\Http\Controllers\Admin\SiswaController;
 use App\Http\Controllers\Admin\UserController;
-use App\Http\Controllers\Admin\PembinaController;
 use App\Http\Controllers\Admin\EkskulController;
 use App\Http\Controllers\Admin\EkskulMonitoringController;
 use App\Http\Controllers\Admin\KelasController;
@@ -158,18 +157,13 @@ Route::prefix('/admin')
 
         Route::prefix('/user')->name('user.')->group(function () {
             Route::get('/', [UserController::class, 'index'])->name('index');
+            Route::get('/create', [UserController::class, 'create'])->name('create');
+            Route::post('/store', [UserController::class, 'store'])->name('store');
+            // Wildcard /{id} ditaruh setelah route statis (/create) biar nggak nyerobot
+            Route::get('/{id}', [UserController::class, 'show'])->name('show');
             Route::get('/{id}/edit', [UserController::class, 'edit'])->name('edit');
             Route::put('/{id}', [UserController::class, 'update'])->name('update');
             Route::delete('/{id}', [UserController::class, 'destroy'])->name('destroy');
-        });
-
-        Route::prefix('/pembina')->name('pembina.')->group(function () {
-            Route::get('/', [PembinaController::class, 'index'])->name('index');
-            Route::get('/create', [PembinaController::class, 'create'])->name('create');
-            Route::post('/store', [PembinaController::class, 'store'])->name('store');
-            Route::get('/{id}/edit', [PembinaController::class, 'edit'])->name('edit');
-            Route::put('/{id}', [PembinaController::class, 'update'])->name('update');
-            Route::delete('/{id}', [PembinaController::class, 'destroy'])->name('destroy');
         });
 
         Route::prefix('/kelas')->name('kelas.')->group(function () {

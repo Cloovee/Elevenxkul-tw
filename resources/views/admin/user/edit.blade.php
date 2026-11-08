@@ -13,13 +13,13 @@
         <h3 class="text-xl font-extrabold text-[#10316B]">Edit Akun User</h3>
     </div>
 
-    <form action="{{ route('admin.user.update', $user->id) }}" method="POST">
+    <form action="{{ route('admin.user.update', $user->id) }}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
-                <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Nama <span class="text-red-500">*</span></label>
+                <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Nama Lengkap <span class="text-red-500">*</span></label>
                 <input type="text" name="name" class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C] @error('name') ring-2 ring-red-400 @enderror" value="{{ old('name', $user->name) }}" required>
                 @error('name')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
@@ -46,11 +46,16 @@
 
             <div class="md:col-span-2">
                 <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Role <span class="text-red-500">*</span></label>
-                <select name="role" id="role-select" class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C] @error('role') ring-2 ring-red-400 @enderror" required>
+                <select name="role" id="role-select" class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C] @error('role') ring-2 ring-red-400 @enderror {{ $user->pembina ? 'opacity-70 cursor-not-allowed' : '' }}" {{ $user->pembina ? 'disabled' : '' }} required>
                     <option value="Admin" {{ old('role', $user->role) == 'Admin' ? 'selected' : '' }}>Admin</option>
                     <option value="Pembina" {{ old('role', $user->role) == 'Pembina' ? 'selected' : '' }}>Pembina</option>
                     <option value="Ketua" {{ old('role', $user->role) == 'Ketua' ? 'selected' : '' }}>Ketua</option>
                 </select>
+                @if($user->pembina)
+                    {{-- select disabled tidak ikut terkirim, jadi role dikirim lewat hidden input --}}
+                    <input type="hidden" name="role" value="Pembina">
+                    <p class="text-xs text-[#7C8DB5] mt-1.5">Role akun Pembina tidak bisa diubah.</p>
+                @endif
                 @error('role')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
 
@@ -67,12 +72,7 @@
                 @error('id_siswa')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
 
-            @if($user->role == 'Pembina')
-                <div class="md:col-span-2 flex items-start gap-2 p-4 bg-sky/15 border-l-4 border-sky-400 rounded-2xl text-sm text-sky-600">
-                    <i class="fas fa-circle-info mt-0.5"></i>
-                    <p>Ganti biodata Pembina (nama, agama, alamat, dll) lewat menu <strong>Kelola Pembina</strong>.</p>
-                </div>
-            @endif
+            @include('admin.user._biodata-pembina', ['pembina' => $user->pembina])
         </div>
 
         <div class="mt-8 flex flex-wrap gap-3">
@@ -89,12 +89,30 @@
 <script>
     const roleSelect = document.getElementById('role-select');
     const siswaField = document.getElementById('siswa-field');
+    const pembinaFields = document.getElementById('pembina-fields');
+    const jkSelect = document.getElementById('jk-select');
 
-    function toggleSiswaField() {
+    function toggleRoleFields() {
         siswaField.style.display = roleSelect.value === 'Ketua' ? 'block' : 'none';
+        const isPembina = roleSelect.value === 'Pembina';
+        pembinaFields.style.display = isPembina ? 'block' : 'none';
+        // Jenis kelamin hanya wajib kalau role = Pembina
+        jkSelect.required = isPembina;
     }
 
-    roleSelect.addEventListener('change', toggleSiswaField);
-    toggleSiswaField();
+    roleSelect.addEventListener('change', toggleRoleFields);
+    toggleRoleFields(); // jalankan sekali pas halaman dibuka (buat kasus old() setelah validasi gagal)
+
+    document.getElementById('foto-input')?.addEventListener('change', function (e) {
+        const file = e.target.files[0];
+        const preview = document.getElementById('foto-preview');
+        if (!file || !preview) return;
+
+        const reader = new FileReader();
+        reader.onload = function (ev) {
+            preview.innerHTML = '<img src="' + ev.target.result + '" class="w-full h-full object-cover" alt="Preview foto">';
+        };
+        reader.readAsDataURL(file);
+    });
 </script>
 @endsection

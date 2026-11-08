@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Tambah Akun User')
+@section('title', 'Tambah Pembina')
 @section('page-title', 'Manajemen Akun')
 
 @section('content')
@@ -8,17 +8,17 @@
 
     <div class="flex items-center gap-3 mb-6">
         <div class="w-11 h-11 bg-[#0B409C] rounded-xl flex items-center justify-center text-white">
-            <i class="fas fa-user-plus"></i>
+            <i class="fas fa-user-tie"></i>
         </div>
-        <h3 class="text-xl font-extrabold text-[#10316B]">Tambah Akun User</h3>
+        <h3 class="text-xl font-extrabold text-[#10316B]">Tambah Pembina</h3>
     </div>
 
-    <form action="{{ route('admin.user.store') }}" method="POST">
+    <form action="{{ route('admin.user.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
-                <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Nama <span class="text-red-500">*</span></label>
+                <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Nama Lengkap <span class="text-red-500">*</span></label>
                 <input type="text" name="name" class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C] @error('name') ring-2 ring-red-400 @enderror" value="{{ old('name') }}" required>
                 @error('name')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
@@ -43,42 +43,9 @@
                 <p class="text-xs text-[#7C8DB5] mt-1.5">Ketik ulang password di atas, harus sama persis.</p>
             </div>
 
-            <div class="md:col-span-2">
-                <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Role <span class="text-red-500">*</span></label>
-                <select name="role" id="role-select" class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C] @error('role') ring-2 ring-red-400 @enderror" required>
-                    <option value="">-- Pilih Role --</option>
-                    <option value="Admin" {{ old('role') == 'Admin' ? 'selected' : '' }}>Admin</option>
-                    <option value="Pembina" {{ old('role') == 'Pembina' ? 'selected' : '' }}>Pembina</option>
-                    <option value="Ketua" {{ old('role') == 'Ketua' ? 'selected' : '' }}>Ketua</option>
-                </select>
-                @error('role')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
-            </div>
+            <input type="hidden" name="role" value="Pembina">
 
-            <!-- Muncul cuma kalau role = Ketua -->
-            <div class="md:col-span-2" id="siswa-field" style="display: none;">
-                <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Pilih Siswa (jadi Ketua) <span class="text-red-500">*</span></label>
-                <select name="id_siswa" class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C] @error('id_siswa') ring-2 ring-red-400 @enderror">
-                    <option value="">-- Pilih Siswa --</option>
-                    @foreach($siswaBelumPunyaAkun as $s)
-                        <option value="{{ $s->id_siswa }}" {{ old('id_siswa') == $s->id_siswa ? 'selected' : '' }}>
-                            {{ $s->nama_siswa }} ({{ $s->NISN }})
-                        </option>
-                    @endforeach
-                </select>
-                @error('id_siswa')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
-                @if($siswaBelumPunyaAkun->isEmpty())
-                    <p class="inline-flex items-center gap-1 text-amber-600 text-xs font-bold bg-amber-50 px-2 py-1 rounded-full mt-2">
-                        <i class="fas fa-triangle-exclamation"></i> Semua siswa sudah punya akun, atau belum ada data siswa.
-                    </p>
-                @endif
-            </div>
-
-            @if(old('role') == 'Pembina')
-                <div class="md:col-span-2 flex items-start gap-2 p-4 bg-sky/15 border-l-4 border-sky-400 rounded-2xl text-sm text-sky-600">
-                    <i class="fas fa-circle-info mt-0.5"></i>
-                    <p>Biodata Pembina (nama, agama, alamat, dll) diisi terpisah nanti di menu <strong>Kelola Pembina</strong>, setelah akun ini dibuat.</p>
-                </div>
-            @endif
+            @include('admin.user._biodata-pembina')
         </div>
 
         <div class="mt-8 flex flex-wrap gap-3">
@@ -93,14 +60,20 @@
 </div>
 
 <script>
-    const roleSelect = document.getElementById('role-select');
-    const siswaField = document.getElementById('siswa-field');
+    // Form ini khusus Pembina, jadi biodata selalu tampil
+    document.getElementById('pembina-fields').style.display = 'block';
+    document.getElementById('jk-select').required = true;
 
-    function toggleSiswaField() {
-        siswaField.style.display = roleSelect.value === 'Ketua' ? 'block' : 'none';
-    }
+    document.getElementById('foto-input')?.addEventListener('change', function (e) {
+        const file = e.target.files[0];
+        const preview = document.getElementById('foto-preview');
+        if (!file || !preview) return;
 
-    roleSelect.addEventListener('change', toggleSiswaField);
-    toggleSiswaField(); // jalankan sekali pas halaman dibuka (buat kasus old() setelah validasi gagal)
+        const reader = new FileReader();
+        reader.onload = function (ev) {
+            preview.innerHTML = '<img src="' + ev.target.result + '" class="w-full h-full object-cover" alt="Preview foto">';
+        };
+        reader.readAsDataURL(file);
+    });
 </script>
 @endsection

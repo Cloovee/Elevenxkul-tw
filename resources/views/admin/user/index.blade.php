@@ -35,7 +35,9 @@
 
     <!-- Info -->
     <div class="flex flex-wrap gap-2 mb-6 pb-6 border-b border-gray-100">
-        <p class="text-xs text-[#7C8DB5]">Akun Pembina dibuat otomatis lewat menu <strong>Kelola Pembina</strong>. Di sini admin hanya bisa mengedit atau menghapus akun.</p>
+        <a href="{{ route('admin.user.create') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-[#0B409C] text-white rounded-full text-sm font-bold shadow-md shadow-[#0B409C]/30 hover:opacity-90 transition-opacity">
+            <i class="fas fa-user-plus"></i> Tambah Pembina
+        </a>
 
         <!-- Ringkasan mini per role, biar keliatan sebaran akunnya -->
         <div class="ml-auto flex flex-wrap gap-2">
@@ -86,8 +88,12 @@
                     <!-- Kolom Akun: avatar inisial + nama + email -->
                     <td data-label="Akun" data-primary class="px-3 py-3">
                         <div class="flex items-center gap-3">
-                            <div class="w-9 h-9 rounded-full {{ $roleStyle['bg'] }} {{ $roleStyle['text'] }} flex items-center justify-center font-display font-bold text-sm ring-2 {{ $roleStyle['ring'] }} flex-shrink-0">
-                                {{ $initial }}
+                            <div class="w-9 h-9 rounded-full {{ $roleStyle['bg'] }} {{ $roleStyle['text'] }} flex items-center justify-center font-display font-bold text-sm ring-2 {{ $roleStyle['ring'] }} flex-shrink-0 overflow-hidden">
+                                @if($u->role == 'Pembina' && $u->pembina && $u->pembina->foto_url)
+                                    <img src="{{ $u->pembina->foto_url }}" class="w-full h-full object-cover" alt="Foto {{ $u->name }}">
+                                @else
+                                    {{ $initial }}
+                                @endif
                             </div>
                             <div>
                                 <p class="text-[#10316B] font-bold leading-tight">{{ $u->name }}</p>
@@ -126,10 +132,13 @@
 
                     <td data-label="Aksi" class="px-3 py-3">
                         <div class="flex gap-2">
+                            <a href="{{ route('admin.user.show', $u->id) }}" class="w-8 h-8 flex items-center justify-center rounded-lg bg-[#F2F7FF] text-[#0B409C] hover:bg-[#0B409C] hover:text-white transition-colors" title="Lihat Detail">
+                                <i class="fas fa-eye text-xs"></i>
+                            </a>
                             <a href="{{ route('admin.user.edit', $u->id) }}" class="w-8 h-8 flex items-center justify-center rounded-lg bg-amber-50 text-amber-500 hover:bg-amber-500 hover:text-white transition-colors" title="Edit">
                                 <i class="fas fa-pen text-xs"></i>
                             </a>
-                            <form action="{{ route('admin.user.destroy', $u->id) }}" method="POST" onsubmit="return confirm('Yakin hapus akun ini? Data terkait (siswa/pembina) tetap tersimpan, cuma akun login-nya yang hilang.')">
+                            <form action="{{ route('admin.user.destroy', $u->id) }}" method="POST" onsubmit="return confirm('Yakin hapus akun ini? Untuk Pembina, biodata dan akun login-nya ikut terhapus dan ekskul yang dibina jadi tanpa pembina. Untuk Ketua, data siswa tetap tersimpan.')">
                                 @csrf @method('DELETE')
                                 <button type="submit" class="w-8 h-8 flex items-center justify-center rounded-lg bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-colors" title="Hapus">
                                     <i class="fas fa-trash text-xs"></i>

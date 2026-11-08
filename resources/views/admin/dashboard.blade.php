@@ -24,7 +24,7 @@
             ['label' => 'Total ekskul',  'value' => $totalEkskul,  'icon' => 'fa-layer-group',   'route' => 'admin.ekskul.index',  'hint' => 'Kelola ekskul'],
             ['label' => 'Total siswa',   'value' => $totalSiswa,   'icon' => 'fa-user-graduate', 'route' => 'admin.siswa.index',   'hint' => 'Kelola siswa'],
             ['label' => 'Total kelas',   'value' => $totalKelas,   'icon' => 'fa-school',        'route' => 'admin.kelas.index',   'hint' => 'Kelola kelas'],
-            ['label' => 'Total pembina', 'value' => $totalPembina, 'icon' => 'fa-user-tie',      'route' => 'admin.pembina.index', 'hint' => 'Kelola pembina'],
+            ['label' => 'Total pembina', 'value' => $totalPembina, 'icon' => 'fa-user-tie',      'route' => 'admin.user.index', 'hint' => 'Kelola user'],
             ['label' => 'Total user',    'value' => $totalUser,    'icon' => 'fa-user-gear',     'route' => 'admin.user.index',    'hint' => 'Kelola user'],
         ];
 
