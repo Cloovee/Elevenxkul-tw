@@ -150,7 +150,7 @@
             <table class="min-w-full text-sm">
                 <thead><tr class="{{ $thead }}">
                     <th class="{{ $th }}">No</th><th class="{{ $th }}">Nama</th><th class="{{ $th }}">Tahun Ajaran</th>
-                    <th class="{{ $th }}">Semester</th><th class="{{ $th }}">Nilai</th><th class="{{ $th }}">Catatan Pembina</th>
+                    <th class="{{ $th }}">Semester</th><th class="{{ $th }}">Kehadiran</th><th class="{{ $th }}">Keaktifan</th><th class="{{ $th }}">Grade Akhir</th><th class="{{ $th }}">Catatan Pembina</th>
                 </tr></thead>
                 <tbody class="divide-y divide-ink/5">
                 @forelse($penilaian as $i => $n)
@@ -159,11 +159,13 @@
                         <td class="{{ $th }} font-semibold text-[#10316B]">{{ $n->peserta->nama ?? '-' }}</td>
                         <td class="{{ $th }}">{{ $n->tahun_ajaran ?: '-' }}</td>
                         <td class="{{ $th }}">{{ $n->semester ?: '-' }}</td>
-                        <td class="{{ $th }}">{{ $n->nilai !== null ? rtrim(rtrim(number_format($n->nilai, 2), '0'), '.') : '-' }}</td>
+                        <td class="{{ $th }}">{{ $n->grade_kehadiran ? $n->grade_kehadiran.' ('.rtrim(rtrim(number_format($n->persen_kehadiran, 2), '0'), '.').'%)' : '-' }}</td>
+                        <td class="{{ $th }}">{{ $n->grade_keaktifan ? $n->grade_keaktifan.' ('.rtrim(rtrim(number_format($n->nilai_keaktifan, 2), '0'), '.').')' : '-' }}</td>
+                        <td class="{{ $th }} font-extrabold text-[#10316B]">{{ $n->grade_akhir ?: '-' }}</td>
                         <td class="{{ $th }}">{{ $n->catatan_pembina ?: '-' }}</td>
                     </tr>
                 @empty
-                    <tr><td colspan="6" class="text-center py-8 text-[#7C8DB5]">Belum ada penilaian.</td></tr>
+                    <tr><td colspan="8" class="text-center py-8 text-[#7C8DB5]">Belum ada penilaian.</td></tr>
                 @endforelse
                 </tbody>
             </table>

@@ -43,7 +43,9 @@ class PembinaDashboardController extends Controller
             ->map(function ($n) {
                 return [
                     'nama' => $n->peserta->nama ?? '-',
-                    'pesan' => 'Anda baru saja memberikan nilai '.($n->nilai ?? '-').' untuk ekstrakulikuler '.($n->peserta->ekskul->nama_ekskul ?? '-').'.',
+                    'pesan' => $n->grade_akhir
+                        ? 'Anda baru saja memberikan grade '.$n->grade_akhir.' (kehadiran '.$n->grade_kehadiran.', keaktifan '.$n->grade_keaktifan.') untuk ekstrakulikuler '.($n->peserta->ekskul->nama_ekskul ?? '-').'.'
+                        : 'Anda baru saja memberikan nilai keaktifan '.($n->nilai_keaktifan ?? $n->nilai ?? '-').' untuk ekstrakulikuler '.($n->peserta->ekskul->nama_ekskul ?? '-').'.',
                     'waktu' => $n->created_at,
                 ];
             });

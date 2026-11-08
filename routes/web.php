@@ -64,6 +64,7 @@ Route::prefix('pembina')->middleware(['auth', 'role:Pembina'])->name('pembina.')
     // ===== CRUD: Memberi Nilai Peserta =====
     Route::prefix('nilai-peserta')->name('nilai.')->group(function () {
         Route::get('/', [NilaiPesertaController::class, 'index'])->name('index');
+        Route::get('/export', [NilaiPesertaController::class, 'export'])->name('export');
         Route::post('/{peserta}', [NilaiPesertaController::class, 'store'])->name('simpan');
         Route::get('/{nilaiPeserta}/edit', [NilaiPesertaController::class, 'edit'])->name('edit');
         Route::put('/{nilaiPeserta}', [NilaiPesertaController::class, 'update'])->name('update');

@@ -141,7 +141,7 @@
         <h2>Penilaian</h2>
         @if($penilaian->count())
             <table>
-                <thead><tr><th style="width:36px">No</th><th>Nama</th><th>Tahun Ajaran</th><th>Semester</th><th>Nilai</th><th>Catatan Pembina</th></tr></thead>
+                <thead><tr><th style="width:36px">No</th><th>Nama</th><th>Tahun Ajaran</th><th>Semester</th><th>Kehadiran</th><th>Keaktifan</th><th>Grade Akhir</th><th>Catatan Pembina</th></tr></thead>
                 <tbody>
                 @foreach($penilaian as $i => $n)
                     <tr>
@@ -149,7 +149,9 @@
                         <td>{{ $n->peserta->nama ?? '-' }}</td>
                         <td>{{ $n->tahun_ajaran ?: '-' }}</td>
                         <td>{{ $n->semester ?: '-' }}</td>
-                        <td>{{ $n->nilai !== null ? rtrim(rtrim(number_format($n->nilai, 2), '0'), '.') : '-' }}</td>
+                        <td>{{ $n->grade_kehadiran ? $n->grade_kehadiran.' ('.rtrim(rtrim(number_format($n->persen_kehadiran, 2), '0'), '.').'%)' : '-' }}</td>
+                        <td>{{ $n->grade_keaktifan ? $n->grade_keaktifan.' ('.rtrim(rtrim(number_format($n->nilai_keaktifan, 2), '0'), '.').')' : '-' }}</td>
+                        <td><b>{{ $n->grade_akhir ?: '-' }}</b></td>
                         <td>{{ $n->catatan_pembina ?: '-' }}</td>
                     </tr>
                 @endforeach
