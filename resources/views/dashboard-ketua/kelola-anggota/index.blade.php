@@ -43,10 +43,43 @@
                             </div>
                         @endif
 
+                        <!-- Filter tingkatan & jurusan -->
+                        <form method="GET" action="{{ route('ketua.kelola-anggota') }}" id="form-filter-anggota"
+                              class="flex flex-col sm:flex-row sm:items-end gap-3 mb-4">
+                            <div>
+                                <label for="filter-tingkat" class="block text-xs font-medium text-inksoft mb-1">Tingkatan</label>
+                                <select name="tingkat" id="filter-tingkat"
+                                        class="w-full sm:w-40 px-4 py-2.5 rounded-xl border border-ink/15 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-periwinkle focus:border-periwinkle transition">
+                                    <option value="">Semua tingkatan</option>
+                                    @foreach ($daftarTingkat as $t)
+                                        <option value="{{ $t }}" {{ (string) $tingkat === (string) $t ? 'selected' : '' }}>Kelas {{ $t }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div>
+                                <label for="filter-jurusan" class="block text-xs font-medium text-inksoft mb-1">Jurusan</label>
+                                <select name="jurusan" id="filter-jurusan"
+                                        class="w-full sm:w-48 px-4 py-2.5 rounded-xl border border-ink/15 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-periwinkle focus:border-periwinkle transition">
+                                    <option value="">Semua jurusan</option>
+                                    @foreach ($daftarJurusan as $j)
+                                        <option value="{{ $j }}" {{ $jurusan === $j ? 'selected' : '' }}>{{ $j }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            @if ($tingkat || $jurusan)
+                                <a href="{{ route('ketua.kelola-anggota') }}"
+                                   class="inline-flex items-center justify-center rounded-xl bg-gray-100 px-4 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-200 transition">
+                                    Reset
+                                </a>
+                            @endif
+                            <p class="sm:ml-auto text-xs text-inksoft self-center">{{ $anggota->count() }} anggota</p>
+                        </form>
+
                         <div class="overflow-x-auto rounded-xl ring-1 ring-black/5">
-                            <table class="min-w-[1050px] w-full text-sm text-left">
+                            <table class="min-w-[1100px] w-full text-sm text-left">
                                 <thead class="bg-blue-50 text-ink">
                                     <tr>
+                                        <th scope="col" class="px-4 py-4 font-semibold w-16">No</th>
                                         <th scope="col" class="px-4 py-4 font-semibold">NISN</th>
                                         <th scope="col" class="px-4 py-4 font-semibold">NIS</th>
                                         <th scope="col" class="px-4 py-4 font-semibold">Nama</th>
@@ -59,6 +92,7 @@
                                 <tbody class="divide-y divide-gray-100 bg-white">
                                     @forelse ($anggota as $item)
                                         <tr class="hover:bg-blue-50/40 transition">
+                                            <td class="px-4 py-4 whitespace-nowrap text-inksoft">{{ $loop->iteration }}</td>
                                             <td class="px-4 py-4 whitespace-nowrap">{{ $item->siswa->NISN ?? '-' }}</td>
                                             <td class="px-4 py-4 whitespace-nowrap">{{ $item->siswa->NIS ?? '-' }}</td>
                                             <td class="px-4 py-4 font-medium text-ink">{{ $item->siswa->nama_siswa ?? '-' }}</td>
@@ -98,7 +132,7 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="7" class="px-4 py-10 text-center text-inksoft">Belum ada anggota.</td>
+                                            <td colspan="8" class="px-4 py-10 text-center text-inksoft">{{ ($tingkat || $jurusan) ? 'Tidak ada anggota yang cocok dengan filter.' : 'Belum ada anggota.' }}</td>
                                         </tr>
                                     @endforelse
                                 </tbody>
@@ -120,6 +154,18 @@
             </div>
         </div>
     </div>
+
+    <script>
+        (function () {
+            const form = document.getElementById('form-filter-anggota');
+            const tingkat = document.getElementById('filter-tingkat');
+            const jurusan = document.getElementById('filter-jurusan');
+            if (!form) return;
+            // Ganti tingkatan -> reset jurusan (daftar jurusan beda per tingkat), lalu kirim
+            tingkat.addEventListener('change', () => { jurusan.value = ''; form.submit(); });
+            jurusan.addEventListener('change', () => form.submit());
+        })();
+    </script>
 
 </body>
 </html>

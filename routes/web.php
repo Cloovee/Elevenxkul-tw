@@ -324,7 +324,7 @@ Route::get('/laporan-kegiatan', [LaporanKegiatanController::class, 'index'])
 Route::get('/laporan-kegiatan/cetak', [LaporanKegiatanController::class, 'cetak'])
     ->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])->name('ketua.laporan-kegiatan.cetak');
 
-Route::get('/kelola-anggota', function () {
+Route::get('/kelola-anggota', function (\Illuminate\Http\Request $request) {
 
     $idEkskul = optional(optional(auth()->user()->siswa)->ekskulDipimpin)->id_ekskul;
 
@@ -333,13 +333,42 @@ Route::get('/kelola-anggota', function () {
             ->with('error', 'Akun kamu belum ditugaskan sebagai ketua ekskul manapun. Hubungi admin untuk menugaskanmu dulu.');
     }
 
+    // Filter: tingkatan (kelas.tingkat) & jurusan (kelas.program_keahlian)
+    $tingkat = $request->query('tingkat');
+    $jurusan = $request->query('jurusan');
+
     $anggota = Peserta::with('siswa.kelas')
         ->where('id_ekskul', $idEkskul)
+        ->when($tingkat || $jurusan, function ($q) use ($tingkat, $jurusan) {
+            $q->whereHas('siswa.kelas', function ($k) use ($tingkat, $jurusan) {
+                if ($tingkat) {
+                    $k->where('tingkat', $tingkat);
+                }
+                if ($jurusan) {
+                    $k->where('program_keahlian', $jurusan);
+                }
+            });
+        })
         ->get();
+
+    // Pilihan dropdown mengikuti kelas yang benar-benar dimiliki anggota ekskul ini
+    $kelasAnggota = \App\Models\Kelas::whereIn('id_kelas', function ($q) use ($idEkskul) {
+            $q->select('siswa.id_kelas')
+                ->from('data_anggota')
+                ->join('siswa', 'siswa.id_siswa', '=', 'data_anggota.id_siswa')
+                ->where('data_anggota.id_ekskul', $idEkskul);
+        })
+        ->get();
+
+    $daftarTingkat = $kelasAnggota->pluck('tingkat')->unique()->sort()->values();
+
+    $daftarJurusan = $kelasAnggota
+        ->when($tingkat, fn ($c) => $c->where('tingkat', $tingkat))
+        ->pluck('program_keahlian')->unique()->sort()->values();
 
     return view(
         'dashboard-ketua.kelola-anggota.index',
-        compact('anggota')
+        compact('anggota', 'daftarTingkat', 'daftarJurusan', 'tingkat', 'jurusan')
     );
 
 })->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])
