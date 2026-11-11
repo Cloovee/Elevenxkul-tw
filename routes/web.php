@@ -337,8 +337,31 @@ Route::get('/kelola-anggota', function (\Illuminate\Http\Request $request) {
     $tingkat = $request->query('tingkat');
     $jurusan = $request->query('jurusan');
 
+    // Pencarian: nama siswa, kelas, jurusan, atau tingkatan.
+    // Beberapa kata = semua kata harus cocok (mis. "budi tjkt" atau "10 tkj").
+    $q = trim((string) $request->query('q', ''));
+    $kataKunci = $q === '' ? [] : preg_split('/\s+/', $q);
+
     $anggota = Peserta::with('siswa.kelas')
         ->where('id_ekskul', $idEkskul)
+        ->when($kataKunci, function ($query) use ($kataKunci) {
+            foreach ($kataKunci as $kata) {
+                $like = '%' . addcslashes($kata, '\\%_') . '%';
+
+                $query->whereHas('siswa', function ($s) use ($like) {
+                    $s->where(function ($w) use ($like) {
+                        $w->where('nama_siswa', 'like', $like)
+                          ->orWhereHas('kelas', function ($k) use ($like) {
+                              $k->where('tingkat', 'like', $like)
+                                ->orWhere('program_keahlian', 'like', $like)
+                                ->orWhere('rombel', 'like', $like)
+                                // kode gabungan, mis. "10TJKT1"
+                                ->orWhereRaw("CONCAT(tingkat, program_keahlian, rombel) like ?", [$like]);
+                          });
+                    });
+                });
+            }
+        })
         ->when($tingkat || $jurusan, function ($q) use ($tingkat, $jurusan) {
             $q->whereHas('siswa.kelas', function ($k) use ($tingkat, $jurusan) {
                 if ($tingkat) {
@@ -368,7 +391,7 @@ Route::get('/kelola-anggota', function (\Illuminate\Http\Request $request) {
 
     return view(
         'dashboard-ketua.kelola-anggota.index',
-        compact('anggota', 'daftarTingkat', 'daftarJurusan', 'tingkat', 'jurusan')
+        compact('anggota', 'daftarTingkat', 'daftarJurusan', 'tingkat', 'jurusan', 'q')
     );
 
 })->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])

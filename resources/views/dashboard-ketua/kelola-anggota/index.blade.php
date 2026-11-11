@@ -66,7 +66,20 @@
                                     @endforeach
                                 </select>
                             </div>
-                            @if ($tingkat || $jurusan)
+                            <div class="w-full sm:flex-1 sm:max-w-sm">
+                                <label for="filter-q" class="block text-xs font-medium text-inksoft mb-1">Cari</label>
+                                <div class="relative">
+                                    <input type="search" name="q" id="filter-q" value="{{ $q }}"
+                                           placeholder="Nama, kelas, jurusan, atau tingkatan"
+                                           autocomplete="off"
+                                           class="w-full pl-4 pr-11 py-2.5 rounded-xl border border-ink/15 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-periwinkle focus:border-periwinkle transition">
+                                    <button type="submit" aria-label="Cari"
+                                            class="absolute inset-y-0 right-0 flex items-center px-3 text-inksoft hover:text-ink transition">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path stroke-linecap="round" d="m20 20-3.5-3.5"/></svg>
+                                    </button>
+                                </div>
+                            </div>
+                            @if ($tingkat || $jurusan || $q !== '')
                                 <a href="{{ route('ketua.kelola-anggota') }}"
                                    class="inline-flex items-center justify-center rounded-xl bg-gray-100 px-4 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-200 transition">
                                     Reset
@@ -132,7 +145,7 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="8" class="px-4 py-10 text-center text-inksoft">{{ ($tingkat || $jurusan) ? 'Tidak ada anggota yang cocok dengan filter.' : 'Belum ada anggota.' }}</td>
+                                            <td colspan="8" class="px-4 py-10 text-center text-inksoft">{{ ($tingkat || $jurusan || $q !== '') ? 'Tidak ada anggota yang cocok dengan filter atau pencarian.' : 'Belum ada anggota.' }}</td>
                                         </tr>
                                     @endforelse
                                 </tbody>
