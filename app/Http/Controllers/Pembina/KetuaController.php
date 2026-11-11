@@ -40,7 +40,7 @@ class KetuaController extends Controller
      */
     private function pembinaOrFail(): Pembina
     {
-        $pembina = Auth::user()->pembina;
+        $pembina = Pembina::untukUser(Auth::user());
 
         abort_if(
             !$pembina,
@@ -169,11 +169,12 @@ class KetuaController extends Controller
 
         if ($butuhAkun) {
             $validator = Validator::make($request->all(), [
-                'email' => 'nullable|email|max:100|unique:users,email',
+                'email' => 'nullable|email:rfc,dns|max:100|unique:users,email',
                 'username' => 'required|string|max:50|alpha_dash|unique:users,username',
                 'password' => 'required|string|min:8|confirmed',
             ], [
-                'email.unique' => 'Email ini sudah dipakai akun lain.',
+                'email.email' => 'Email tidak valid atau domainnya tidak ditemukan. Pakai email asli atau kosongkan saja.',
+            'email.unique' => 'Email ini sudah dipakai akun lain.',
                 'username.unique' => 'Username ini sudah dipakai akun lain.',
             ]);
 
@@ -265,7 +266,7 @@ class KetuaController extends Controller
             'agama' => 'nullable|string|max:20',
             'id_kelas' => 'required|exists:kelas,id_kelas',
             'nomor_hp' => 'nullable|string|max:15',
-            'email' => 'nullable|email|max:100|unique:users,email,' . optional($user)->id,
+            'email' => 'nullable|email:rfc,dns|max:100|unique:users,email,' . optional($user)->id,
             'medsos' => 'nullable|string|max:100',
             'alamat' => 'nullable|string',
             'username' => 'required|string|max:50|alpha_dash|unique:users,username,' . optional($user)->id,
@@ -275,6 +276,7 @@ class KetuaController extends Controller
             'id_ekskul.in' => 'Ekskul tersebut bukan ekskul yang kamu bina.',
             'NISN.unique' => 'NISN ini sudah terdaftar.',
             'NIS.unique' => 'NIS ini sudah terdaftar.',
+            'email.email' => 'Email tidak valid atau domainnya tidak ditemukan. Pakai email asli atau kosongkan saja.',
             'email.unique' => 'Email ini sudah dipakai akun lain.',
             'username.unique' => 'Username ini sudah dipakai akun lain.',
         ]);

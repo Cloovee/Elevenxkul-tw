@@ -62,6 +62,24 @@ class Pembina extends Model
             ->implode('');
     }
 
+    /**
+     * Pembina yang dipakai halaman role Pembina.
+     * - Pembina : biodata miliknya (bisa null kalau belum dibuat Admin).
+     * - Admin   : "pembina virtual" yang melihat SEMUA ekskul (lihat AdminPembina).
+     */
+    public static function untukUser(?User $user): ?self
+    {
+        if (! $user) {
+            return null;
+        }
+
+        if ($user->role === 'Admin') {
+            return AdminPembina::untuk($user);
+        }
+
+        return static::where('id_user', $user->id)->first();
+    }
+
     // Akun login milik pembina ini
     public function user()
     {

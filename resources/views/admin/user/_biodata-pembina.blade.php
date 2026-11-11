@@ -62,11 +62,6 @@
                 @error('nomor_hp')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
             <div>
-                <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Email <span class="text-xs normal-case font-normal text-[#7C8DB5]">(opsional, hanya kontak)</span></label>
-                <input type="email" name="email" class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C] @error('email') ring-2 ring-red-400 @enderror" value="{{ old('email', $pembina->email ?? '') }}">
-                @error('email')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
-            </div>
-            <div>
                 <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Media Sosial</label>
                 <input type="text" name="medsos" class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C] @error('medsos') ring-2 ring-red-400 @enderror" value="{{ old('medsos', $pembina->medsos ?? '') }}">
                 @error('medsos')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror

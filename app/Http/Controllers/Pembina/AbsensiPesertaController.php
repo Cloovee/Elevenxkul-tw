@@ -16,7 +16,7 @@ class AbsensiPesertaController extends Controller
 {
     private function pembinaAktif(): ?Pembina
     {
-        return Pembina::where('id_user', Auth::id())->first();
+        return Pembina::untukUser(Auth::user());
     }
 
     /**
@@ -46,7 +46,7 @@ class AbsensiPesertaController extends Controller
             return $this->belumTerhubung();
         }
 
-        $ekskuls = Ekskul::where('id_pembina', $pembina->id_pembina)->get();
+        $ekskuls = $pembina->ekskuls()->get();
         $ekskulIds = $ekskuls->pluck('id_ekskul');
 
         $anggotaIds = Peserta::whereIn('id_ekskul', $ekskulIds)->pluck('id_anggota');

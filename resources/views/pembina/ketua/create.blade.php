@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tambah Ketua - ElevenXkul</title>
+    <title>Tambah Ketua - Xkul11</title>
     @include('partials.favicon')
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -156,7 +156,7 @@
                         <input type="email" id="ketua_email" name="email" x-model="email" autocomplete="off" placeholder="nama@sekolah.sch.id" :disabled="!(siswaTerpilih && !siswaTerpilih.punya_akun)"
                                class="w-full px-3.5 py-2.5 rounded-xl border border-[#E7E7F4] text-sm focus:outline-none focus:border-lavender @error('email') border-red-400 @enderror">
                         @error('email')<p class="mt-1.5 text-xs font-semibold text-red-500">{{ $message }}</p>@enderror
-                        <p class="mt-1.5 text-xs text-inksoft leading-relaxed">Wajib diisi, format <b>nama@sekolah.sch.id</b>, dan belum dipakai akun lain.</p>
+                        <p class="mt-1.5 text-xs text-inksoft leading-relaxed">Boleh dikosongkan. Kalau diisi harus email asli, format <b>nama@sekolah.sch.id</b>, dan belum dipakai akun lain.</p>
                     </div>
                     <div>
                         <label for="ketua_username" class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Username <span class="text-red-500">*</span></label>

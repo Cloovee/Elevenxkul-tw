@@ -55,6 +55,7 @@ class UserController extends Controller
         $validator = Validator::make($request->all(), array_merge([
             'name' => 'required|string|max:100',
             'username' => 'required|string|min:3|max:50|alpha_dash:ascii|unique:users,username',
+            'email' => 'nullable|email:rfc,dns|max:100|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
         ], $this->aturanBiodataPembina()), $this->pesan());
 
@@ -70,6 +71,7 @@ class UserController extends Controller
             $user = User::create([
                 'name' => $request->name,
                 'username' => $request->username,
+                'email' => $request->filled('email') ? $request->email : null,
                 'password' => Hash::make($request->password),
                 'role' => 'Pembina',
             ]);
@@ -126,6 +128,7 @@ class UserController extends Controller
         $validator = Validator::make($request->all(), array_merge([
             'name' => 'required|string|max:100',
             'username' => ['required', 'string', 'min:3', 'max:50', 'alpha_dash:ascii', Rule::unique('users', 'username')->ignore($user->id)],
+            'email' => ['nullable', 'email:rfc,dns', 'max:100', Rule::unique('users', 'email')->ignore($user->id)],
             'password' => 'nullable|string|min:8|confirmed',
             'role' => 'required|in:Admin,Pembina,Ketua',
             'id_siswa' => 'required_if:role,Ketua|nullable|exists:siswa,id_siswa',
@@ -161,6 +164,7 @@ class UserController extends Controller
             $userData = [
                 'name' => $request->name,
                 'username' => $request->username,
+                'email' => $request->filled('email') ? $request->email : null,
                 'role' => $request->role,
             ];
 
@@ -247,7 +251,6 @@ class UserController extends Controller
             'jk' => [$wajibPembina, 'nullable', 'in:L,P'],
             'agama' => 'nullable|string|max:20',
             'nomor_hp' => 'nullable|string|max:15',
-            'email' => 'nullable|email|max:100',
             'medsos' => 'nullable|string|max:100',
             'alamat' => 'nullable|string',
             'ekskul_ids' => 'nullable|array',
@@ -296,6 +299,8 @@ class UserController extends Controller
             'username.min' => 'Username minimal 3 karakter.',
             'username.unique' => 'Username ini sudah dipakai akun lain.',
             'username.alpha_dash' => 'Username hanya boleh huruf, angka, strip (-) dan underscore (_), tanpa spasi dan tanpa @.',
+            'email.email' => 'Email tidak valid atau domainnya tidak ditemukan. Pakai email asli atau kosongkan saja.',
+            'email.unique' => 'Email ini sudah dipakai akun lain.',
             'password.required' => 'Password wajib diisi.',
             'password.min' => 'Password minimal 8 karakter.',
         ];

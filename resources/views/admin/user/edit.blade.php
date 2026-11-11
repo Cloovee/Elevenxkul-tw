@@ -32,6 +32,13 @@
             </div>
 
             <div>
+                <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Email <span class="text-xs normal-case font-normal text-[#7C8DB5]">(opsional)</span></label>
+                <input type="email" name="email" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="nama@sekolah.sch.id" class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C] @error('email') ring-2 ring-red-400 @enderror" value="{{ old('email', $user->email ?: ($user->pembina->email ?? '')) }}">
+                @error('email')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                <p class="text-xs text-[#7C8DB5] mt-1.5">Boleh dikosongkan. Kalau diisi harus email asli yang aktif, dan bisa dipakai login selain username.</p>
+            </div>
+
+            <div>
                 <label class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Password Baru</label>
                 <input type="password" name="password" minlength="8" autocomplete="new-password" placeholder="Kosongkan kalau tidak ingin ganti" class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] placeholder-[#7C8DB5] focus:ring-2 focus:ring-[#0B409C] @error('password') ring-2 ring-red-400 @enderror">
                 @error('password')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror

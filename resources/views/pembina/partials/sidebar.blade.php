@@ -1,3 +1,7 @@
+{{-- Admin membuka halaman Pembina -> pakai sidebar admin 3 kolom (Admin | Pembina | Ketua). --}}
+@if(auth()->user()?->role === 'Admin')
+    @include('partials.sidebar-admin', ['insetY' => '1.25rem', 'insetX' => '1.25rem'])
+@else
 {{--
     Sidebar rail role PEMBINA — format disamakan dengan sidebar ketua.
     Gunakan: @include('pembina.partials.sidebar', ['active' => 'dashboard'])
@@ -248,3 +252,4 @@
         if (a) rail.scrollLeft = a.offsetLeft - (rail.clientWidth - a.offsetWidth) / 2;
     })();
 </script>
+@endif

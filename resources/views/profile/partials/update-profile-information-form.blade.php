@@ -16,11 +16,23 @@
         </div>
 
         <div>
-            <label for="email" class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Email</label>
+            <label for="username" class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Username <span class="text-red-500">*</span></label>
+            <input id="username" name="username" type="text" minlength="3" maxlength="50" pattern="[A-Za-z0-9_\-]+"
+                title="Hanya huruf, angka, strip (-) dan underscore (_), tanpa spasi dan tanpa @"
+                autocomplete="username" autocapitalize="none" spellcheck="false"
+                class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C] @error('username') ring-2 ring-red-400 @enderror"
+                value="{{ old('username', $user->username ?: \Illuminate\Support\Str::of($user->email ?? '')->before('@')->replaceMatches('/[^A-Za-z0-9_-]/', '')) }}" required>
+            @error('username')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+            <p class="text-xs text-[#7C8DB5] mt-1.5">Dipakai untuk login. Cukup huruf, angka, - atau _ (tanpa @ dan .com).</p>
+        </div>
+
+        <div>
+            <label for="email" class="block text-xs font-bold text-[#7C8DB5] uppercase tracking-wider mb-2">Email <span class="text-xs normal-case font-normal text-[#7C8DB5]">(opsional)</span></label>
             <input id="email" name="email" type="email"
                 class="w-full px-4 py-2.5 bg-[#F2F7FF] border-none rounded-xl text-sm text-[#10316B] focus:ring-2 focus:ring-[#0B409C] @error('email') ring-2 ring-red-400 @enderror"
-                value="{{ old('email', $user->email) }}" required autocomplete="username">
+                value="{{ old('email', $user->email) }}" autocomplete="email" placeholder="nama@sekolah.sch.id">
             @error('email')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+            <p class="text-xs text-[#7C8DB5] mt-1.5">Boleh dikosongkan. Kalau diisi harus email asli, dan bisa dipakai login selain username.</p>
 
             @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! $user->hasVerifiedEmail())
                 <p class="mt-2 inline-flex items-center gap-1.5 text-amber-600 text-xs font-bold bg-amber-50 px-3 py-1.5 rounded-full">

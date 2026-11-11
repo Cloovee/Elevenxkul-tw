@@ -16,6 +16,12 @@ class PembinaProfileController extends Controller
     public function index()
     {
         $user = Auth::user();
+
+        // Admin punya halaman profil sendiri (bukan biodata pembina).
+        if ($user->role === 'Admin') {
+            return redirect()->route('profile.edit');
+        }
+
         $pembina = Pembina::where('id_user', $user->id)->first();
 
         // Ekskul yang dibina (ditentukan admin saat membuat/mengedit pembina).

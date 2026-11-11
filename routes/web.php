@@ -32,7 +32,7 @@ Route::get('/ekskul/{ekskul}', [LandingController::class, 'show'])->name('landin
 require __DIR__.'/auth.php';
 
 // 3. Grup route khusus Pembina (wajib login)
-Route::prefix('pembina')->middleware(['auth', 'role:Pembina'])->name('pembina.')->group(function () {
+Route::prefix('pembina')->middleware(['auth', 'role:Pembina,Admin'])->name('pembina.')->group(function () {
     Route::get('/dashboard', [PembinaDashboardController::class, 'index'])->name('dashboard');
 
     // ===== Profil Pembina (halaman khusus, terpisah dari /profile umum) =====
@@ -132,6 +132,14 @@ Route::prefix('/admin')
 
         Route::get('/dashboard', [DashAdminController::class, 'index'])->name('dashboard');
 
+        // Ekskul yang sedang dikelola Admin di halaman role Ketua (dipilih dari sidebar).
+        Route::post('/ekskul-aktif', function (\Illuminate\Http\Request $request) {
+            $data = $request->validate(['id_ekskul' => ['required', 'integer', 'exists:ekskuls,id_ekskul']]);
+            session([\App\Support\EkskulAktif::SESSION_KEY => (int) $data['id_ekskul']]);
+
+            return redirect()->back();
+        })->name('ekskul-aktif');
+
         // Diagnosa gambar: cek symlink, isi storage, dan data DB yang file fisiknya hilang.
         Route::get('/cek-gambar', fn () => response(\App\Support\PublicStorage::laporan(), 200, [
             'Content-Type' => 'text/plain; charset=utf-8',
@@ -218,7 +226,7 @@ Route::prefix('/admin')
 |--------------------------------------------------------------------------
 */
 Route::prefix('/ketua')
-    ->middleware(['auth', 'verified', 'role:Ketua'])
+    ->middleware(['auth', 'verified', 'role:Ketua,Admin'])
     ->name('ketua.')
     ->group(function () {
         Route::get('/dashboard', function () {
@@ -230,7 +238,7 @@ Route::prefix('/ketua')
 Route::get('/dashboard-ketua', function () {
     // Ekskul diambil dari akun Ketua yang login (siswa -> ekskulDipimpin), BUKAN hardcode.
     // Kalau akun belum ditugaskan, dashboard tetap terbuka (supaya tidak loop) dan menampilkan peringatan.
-    $idEkskul = optional(optional(auth()->user()->siswa)->ekskulDipimpin)->id_ekskul;
+    $idEkskul = \App\Support\EkskulAktif::id(auth()->user());
     $idPelatih = $idEkskul ? \App\Models\Ekskul::where('id_ekskul', $idEkskul)->value('id_pelatih') : null;
     $jumlahPeserta = App\Models\Peserta::where('id_ekskul', $idEkskul)->count();
 
@@ -286,47 +294,47 @@ Route::get('/dashboard-ketua', function () {
         'riwayat' => $riwayat,
         'belumDitugaskan' => ! $idEkskul,
     ]);
-})->middleware(['auth', 'verified', 'role:Ketua'])->name('dashboard.ketua');
+})->middleware(['auth', 'verified', 'role:Ketua,Admin'])->name('dashboard.ketua');
 
 
 Route::get('/absensi-pelatih', [App\Http\Controllers\Ketua\AbsensiPelatihController::class, 'index'])
-    ->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])->name('ketua.absensi-pelatih');
+    ->middleware(['auth', 'verified', 'role:Ketua,Admin', 'ketua.ekskul'])->name('ketua.absensi-pelatih');
 
 Route::post('/absensi-pelatih', [App\Http\Controllers\Ketua\AbsensiPelatihController::class, 'store'])
-    ->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])->name('ketua.absensi-pelatih.store');
+    ->middleware(['auth', 'verified', 'role:Ketua,Admin', 'ketua.ekskul'])->name('ketua.absensi-pelatih.store');
 
 Route::get('/absensi-peserta', [App\Http\Controllers\Ketua\AbsensiPesertaController::class, 'index'])
-    ->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])->name('ketua.absensi-peserta');
+    ->middleware(['auth', 'verified', 'role:Ketua,Admin', 'ketua.ekskul'])->name('ketua.absensi-peserta');
 
 // Scan QR kartu peserta (isi QR = NIS). Dipanggil lewat fetch/JSON dari halaman absensi peserta.
 Route::post('/absensi-peserta/scan', [App\Http\Controllers\Ketua\AbsensiPesertaController::class, 'scan'])
-    ->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])->name('ketua.absensi-peserta.scan');
+    ->middleware(['auth', 'verified', 'role:Ketua,Admin', 'ketua.ekskul'])->name('ketua.absensi-peserta.scan');
 
 // Simpan absensi manual kelas 11 & 12 (tabel H / S / I). Catatan hanya disimpan untuk status Izin.
 Route::post('/absensi-peserta/manual', [App\Http\Controllers\Ketua\AbsensiPesertaController::class, 'simpanManual'])
-    ->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])->name('ketua.absensi-peserta.manual');
+    ->middleware(['auth', 'verified', 'role:Ketua,Admin', 'ketua.ekskul'])->name('ketua.absensi-peserta.manual');
 
 // Tutup absensi: peserta aktif yang tidak scan dicatat Alpha.
 Route::post('/absensi-peserta/selesai', [App\Http\Controllers\Ketua\AbsensiPesertaController::class, 'selesai'])
-    ->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])->name('ketua.absensi-peserta.selesai');
+    ->middleware(['auth', 'verified', 'role:Ketua,Admin', 'ketua.ekskul'])->name('ketua.absensi-peserta.selesai');
 
 Route::get('/riwayat-absensi', [RiwayatAbsensiController::class, 'index'])
-    ->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])->name('ketua.riwayat-absensi');
+    ->middleware(['auth', 'verified', 'role:Ketua,Admin', 'ketua.ekskul'])->name('ketua.riwayat-absensi');
 
 // Export PDF rekap absensi (peserta + pelatih) per bulan: ?bulan=YYYY-MM
 Route::get('/riwayat-absensi/export-pdf', [RiwayatAbsensiController::class, 'exportPdf'])
-    ->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])->name('ketua.riwayat-absensi.export-pdf');
+    ->middleware(['auth', 'verified', 'role:Ketua,Admin', 'ketua.ekskul'])->name('ketua.riwayat-absensi.export-pdf');
 
 // Laporan kegiatan pelatih bulanan: pratinjau + halaman cetak (?bulan=YYYY-MM)
 Route::get('/laporan-kegiatan', [LaporanKegiatanController::class, 'index'])
-    ->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])->name('ketua.laporan-kegiatan');
+    ->middleware(['auth', 'verified', 'role:Ketua,Admin', 'ketua.ekskul'])->name('ketua.laporan-kegiatan');
 
 Route::get('/laporan-kegiatan/cetak', [LaporanKegiatanController::class, 'cetak'])
-    ->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])->name('ketua.laporan-kegiatan.cetak');
+    ->middleware(['auth', 'verified', 'role:Ketua,Admin', 'ketua.ekskul'])->name('ketua.laporan-kegiatan.cetak');
 
 Route::get('/kelola-anggota', function (\Illuminate\Http\Request $request) {
 
-    $idEkskul = optional(optional(auth()->user()->siswa)->ekskulDipimpin)->id_ekskul;
+    $idEkskul = \App\Support\EkskulAktif::id(auth()->user());
 
     if (! $idEkskul) {
         return redirect()->route('dashboard.ketua')
@@ -337,8 +345,31 @@ Route::get('/kelola-anggota', function (\Illuminate\Http\Request $request) {
     $tingkat = $request->query('tingkat');
     $jurusan = $request->query('jurusan');
 
+    // Pencarian: nama siswa, kelas, jurusan, atau tingkatan.
+    // Beberapa kata = semua kata harus cocok (mis. "budi tjkt" atau "10 tkj").
+    $q = trim((string) $request->query('q', ''));
+    $kataKunci = $q === '' ? [] : preg_split('/\s+/', $q);
+
     $anggota = Peserta::with('siswa.kelas')
         ->where('id_ekskul', $idEkskul)
+        ->when($kataKunci, function ($query) use ($kataKunci) {
+            foreach ($kataKunci as $kata) {
+                $like = '%' . addcslashes($kata, '\\%_') . '%';
+
+                $query->whereHas('siswa', function ($s) use ($like) {
+                    $s->where(function ($w) use ($like) {
+                        $w->where('nama_siswa', 'like', $like)
+                          ->orWhereHas('kelas', function ($k) use ($like) {
+                              $k->where('tingkat', 'like', $like)
+                                ->orWhere('program_keahlian', 'like', $like)
+                                ->orWhere('rombel', 'like', $like)
+                                // kode gabungan, mis. "10TJKT1"
+                                ->orWhereRaw("CONCAT(tingkat, program_keahlian, rombel) like ?", [$like]);
+                          });
+                    });
+                });
+            }
+        })
         ->when($tingkat || $jurusan, function ($q) use ($tingkat, $jurusan) {
             $q->whereHas('siswa.kelas', function ($k) use ($tingkat, $jurusan) {
                 if ($tingkat) {
@@ -368,16 +399,16 @@ Route::get('/kelola-anggota', function (\Illuminate\Http\Request $request) {
 
     return view(
         'dashboard-ketua.kelola-anggota.index',
-        compact('anggota', 'daftarTingkat', 'daftarJurusan', 'tingkat', 'jurusan')
+        compact('anggota', 'daftarTingkat', 'daftarJurusan', 'tingkat', 'jurusan', 'q')
     );
 
-})->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])
+})->middleware(['auth', 'verified', 'role:Ketua,Admin', 'ketua.ekskul'])
   ->name('ketua.kelola-anggota');
 
 
 Route::get('/kelola-anggota/tambah', function () {
 
-    $idEkskul = optional(optional(auth()->user()->siswa)->ekskulDipimpin)->id_ekskul;
+    $idEkskul = \App\Support\EkskulAktif::id(auth()->user());
 
     // Siswa yang sudah jadi anggota ekskul ini gak usah muncul lagi di pilihan
     $idSiswaSudahAnggota = $idEkskul
@@ -398,7 +429,7 @@ Route::get('/kelola-anggota/tambah', function () {
     $daftarKelas = \App\Models\Kelas::orderBy('tingkat')->orderBy('program_keahlian')->orderBy('rombel')->get();
 
     return view('dashboard-ketua.kelola-anggota.tambah', compact('daftarSiswa', 'daftarKelas'));
-})->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])
+})->middleware(['auth', 'verified', 'role:Ketua,Admin', 'ketua.ekskul'])
   ->name('ketua.kelola-anggota.tambah');
 
 
@@ -411,7 +442,7 @@ Route::post('/kelola-anggota/tambah', function (\Illuminate\Http\Request $reques
         'id_siswa.required' => 'Pilih minimal 1 siswa dulu.',
     ]);
 
-    $idEkskul = optional(optional(auth()->user()->siswa)->ekskulDipimpin)->id_ekskul;
+    $idEkskul = \App\Support\EkskulAktif::id(auth()->user());
 
     if (! $idEkskul) {
         return redirect()->route('dashboard.ketua')
@@ -459,26 +490,26 @@ Route::post('/kelola-anggota/tambah', function (\Illuminate\Http\Request $reques
         ->route('ketua.kelola-anggota')
         ->with('success', $pesan);
 
-})->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])
+})->middleware(['auth', 'verified', 'role:Ketua,Admin', 'ketua.ekskul'])
   ->name('ketua.kelola-anggota.store');
 
 
 // Import / Export anggota (HARUS di atas route /kelola-anggota/{id})
 Route::get('/kelola-anggota/import', [AnggotaImportExportController::class, 'showImportForm'])
-    ->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])->name('ketua.kelola-anggota.import.form');
+    ->middleware(['auth', 'verified', 'role:Ketua,Admin', 'ketua.ekskul'])->name('ketua.kelola-anggota.import.form');
 
 Route::post('/kelola-anggota/import', [AnggotaImportExportController::class, 'import'])
-    ->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])->name('ketua.kelola-anggota.import');
+    ->middleware(['auth', 'verified', 'role:Ketua,Admin', 'ketua.ekskul'])->name('ketua.kelola-anggota.import');
 
 Route::get('/kelola-anggota/export', [AnggotaImportExportController::class, 'export'])
-    ->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])->name('ketua.kelola-anggota.export');
+    ->middleware(['auth', 'verified', 'role:Ketua,Admin', 'ketua.ekskul'])->name('ketua.kelola-anggota.export');
 
 Route::get('/kelola-anggota/template', [AnggotaImportExportController::class, 'downloadTemplate'])
-    ->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])->name('ketua.kelola-anggota.template');
+    ->middleware(['auth', 'verified', 'role:Ketua,Admin', 'ketua.ekskul'])->name('ketua.kelola-anggota.template');
 
 Route::get('/kelola-anggota/{id}', function ($id) {
 
-    $idEkskul = optional(optional(auth()->user()->siswa)->ekskulDipimpin)->id_ekskul;
+    $idEkskul = \App\Support\EkskulAktif::id(auth()->user());
 
     if (! $idEkskul) {
         return redirect()->route('dashboard.ketua')
@@ -495,12 +526,12 @@ Route::get('/kelola-anggota/{id}', function ($id) {
         compact('anggota')
     );
 
-})->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])
+})->middleware(['auth', 'verified', 'role:Ketua,Admin', 'ketua.ekskul'])
   ->name('ketua.kelola-anggota.detail');
 
 Route::delete('/kelola-anggota/{id}', function ($id) {
 
-    $idEkskul = optional(optional(auth()->user()->siswa)->ekskulDipimpin)->id_ekskul;
+    $idEkskul = \App\Support\EkskulAktif::id(auth()->user());
 
     if (! $idEkskul) {
         return redirect()->route('dashboard.ketua')
@@ -526,7 +557,7 @@ Route::delete('/kelola-anggota/{id}', function ($id) {
         ->route('ketua.kelola-anggota')
         ->with('success', "{$namaSiswa} berhasil dihapus dari anggota.");
 
-})->middleware(['auth', 'verified', 'role:Ketua', 'ketua.ekskul'])
+})->middleware(['auth', 'verified', 'role:Ketua,Admin', 'ketua.ekskul'])
   ->name('ketua.kelola-anggota.destroy');
 
 /*

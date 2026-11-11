@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Pembina - ElevenXkul</title>
+    <title>Dashboard Pembina - Xkul11</title>
     @include('partials.favicon')
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
@@ -114,7 +114,7 @@
                 <div class="max-w-sm">
                     <p class="text-inksoft text-xs font-semibold uppercase tracking-[0.14em]">{{ now()->translatedFormat('l, d F Y') }}</p>
                     <h2 class="font-display text-2xl md:text-3xl font-bold mt-2 leading-snug text-ink">
-                        Program Pembinaan Elevenxkul
+                        Program Pembinaan Xkull11
                     </h2>
                     <p class="text-inksoft text-sm mt-2 leading-relaxed">
                         Pantau kehadiran, validasi laporan pelatih, dan beri nilai peserta — semua dari satu layar.
