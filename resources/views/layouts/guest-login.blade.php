@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
-        <title>{{ $attributes->get('title', 'Masuk') }} - ElevenXkul</title>
+        <title>{{ $attributes->get('title', 'Masuk') }} - Xkul11</title>
     @include('partials.favicon')
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />
@@ -39,7 +39,7 @@
                     />
 
                     <h1 class="font-display font-bold text-white text-2xl mt-6">
-                        ElevenXkul
+                        Xkull11
                     </h1>
                     <p class="text-white font-semibold text-sm mt-1">
                         Ekskul Management
@@ -66,7 +66,7 @@
                     <div class="lg:hidden mb-8 flex items-center gap-3">
                         <img src="{{ asset('images/smkn11logo.png') }}" alt="Logo SMKN 11" class="w-11 h-11 object-contain shrink-0 drop-shadow-[0_4px_12px_rgba(0,0,0,0.35)]" />
                         <div class="leading-tight">
-                            <p class="font-display font-bold text-white text-sm">ElevenXkul</p>
+                            <p class="font-display font-bold text-white text-sm">Xkull11</p>
                             <p class="text-white/80 text-xs">Ekskul Management</p>
                         </div>
                     </div>
