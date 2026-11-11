@@ -22,7 +22,9 @@
                         </div>
                         <h1 class="text-xl font-extrabold text-ink mb-2">Akun kamu belum ditugaskan</h1>
                         <p class="text-sm text-inksoft mb-5">
-                            @if($punyaBiodata)
+                            @if(!empty($adminTanpaEkskul))
+                                Belum ada ekskul yang bisa dikelola. Tambahkan ekskul dulu lewat menu <b>Kelola Ekskul</b>.
+                            @elseif($punyaBiodata)
                                 Akun ini belum ditetapkan sebagai ketua ekskul/organisasi manapun, jadi menu ini belum bisa dipakai.
                                 Minta Pembina memilihmu sebagai ketua lewat menu <b>Kelola Ketua</b>.
                             @else

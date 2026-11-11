@@ -40,7 +40,7 @@ class KetuaController extends Controller
      */
     private function pembinaOrFail(): Pembina
     {
-        $pembina = Auth::user()->pembina;
+        $pembina = Pembina::untukUser(Auth::user());
 
         abort_if(
             !$pembina,

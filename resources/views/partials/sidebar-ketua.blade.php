@@ -1,3 +1,7 @@
+{{-- Admin membuka halaman Ketua -> pakai sidebar admin 3 kolom (Admin | Pembina | Ketua). --}}
+@if(auth()->user()?->role === 'Admin')
+    @include('partials.sidebar-admin')
+@else
 {{--
     Sidebar rail role KETUA (dipakai juga oleh halaman profil).
 
@@ -225,3 +229,4 @@
         if (a) rail.scrollLeft = a.offsetLeft - (rail.clientWidth - a.offsetWidth) / 2;
     })();
 </script>
+@endif

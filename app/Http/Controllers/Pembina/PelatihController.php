@@ -21,7 +21,7 @@ class PelatihController extends Controller
      */
     private function pembinaOrFail(): Pembina
     {
-        $pembina = Auth::user()->pembina;
+        $pembina = Pembina::untukUser(Auth::user());
 
         abort_if(
             !$pembina,
@@ -120,7 +120,7 @@ class PelatihController extends Controller
 
         // Kaitkan pelatih baru ke ekskul milik pembina ini (menggantikan pelatih lama kalau ada).
         Ekskul::where('id_ekskul', $request->id_ekskul)
-            ->where('id_pembina', $pembina->id_pembina)
+            ->whereIn('id_ekskul', $ekskulIds)
             ->update(['id_pelatih' => $pelatih->id_pelatih]);
 
         return redirect()->route('pembina.pelatih.index')
@@ -200,7 +200,7 @@ class PelatihController extends Controller
 
         // Pasang ke ekskul pilihan (gantikan pelatih lama ekskul itu kalau ada).
         Ekskul::where('id_ekskul', $request->id_ekskul)
-            ->where('id_pembina', $pembina->id_pembina)
+            ->whereIn('id_ekskul', $ekskulIds)
             ->update(['id_pelatih' => $pelatih->id_pelatih]);
 
         return redirect()->route('pembina.pelatih.index')

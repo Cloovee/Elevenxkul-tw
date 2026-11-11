@@ -17,8 +17,7 @@ class AbsensiPelatihController extends Controller
      */
     private function idEkskulAktif(): ?int
     {
-        $siswa = Auth::user()->siswa;
-        return optional(optional($siswa)->ekskulDipimpin)->id_ekskul;
+        return \App\Support\EkskulAktif::id(Auth::user());
     }
 
     /**

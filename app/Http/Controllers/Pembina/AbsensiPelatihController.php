@@ -32,7 +32,7 @@ class AbsensiPelatihController extends Controller
      */
     public function index(Request $request)
     {
-        $pembina = Pembina::where('id_user', Auth::id())->first();
+        $pembina = Pembina::untukUser(Auth::user());
 
         if (! $pembina) {
             return $this->belumTerhubung();
@@ -110,7 +110,7 @@ class AbsensiPelatihController extends Controller
             'catatan_validasi' => ['nullable', 'string', 'max:500'],
         ]);
 
-        $pembina = Pembina::where('id_user', Auth::id())->first();
+        $pembina = Pembina::untukUser(Auth::user());
 
         $absensiPelatih->update($validated + [
             'id_pembina_validasi' => $pembina->id_pembina ?? $absensiPelatih->id_pembina_validasi,
@@ -139,7 +139,7 @@ class AbsensiPelatihController extends Controller
      */
     public function setujui(AbsensiPelatih $absensiPelatih)
     {
-        $pembina = Pembina::where('id_user', Auth::id())->first();
+        $pembina = Pembina::untukUser(Auth::user());
 
         $absensiPelatih->update([
             'status_validasi' => 'Divalidasi',
@@ -157,7 +157,7 @@ class AbsensiPelatihController extends Controller
      */
     public function tolak(AbsensiPelatih $absensiPelatih)
     {
-        $pembina = Pembina::where('id_user', Auth::id())->first();
+        $pembina = Pembina::untukUser(Auth::user());
 
         $absensiPelatih->update([
             'status_validasi' => 'Ditolak',

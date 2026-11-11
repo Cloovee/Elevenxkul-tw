@@ -19,12 +19,15 @@ class EnsureKetuaHasEkskul
 {
     public function handle(Request $request, Closure $next): Response
     {
-        $siswa = $request->user()?->siswa;
-        $ekskul = $siswa?->ekskulDipimpin;
+        $user = $request->user();
+        $siswa = $user?->siswa;
+        // Ketua: ekskul yang dipimpin. Admin: ekskul yang dipilih di sidebar (tanpa batasan).
+        $ekskul = \App\Support\EkskulAktif::untuk($user);
 
         if (! $ekskul) {
             return response()->view('dashboard-ketua.belum-ditugaskan', [
                 'punyaBiodata' => (bool) $siswa,
+                'adminTanpaEkskul' => $user?->role === 'Admin',
             ], 403);
         }
 

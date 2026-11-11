@@ -23,7 +23,7 @@ class PembinaDashboardController extends Controller
      */
     public function index(Request $request)
     {
-        $pembina = Pembina::where('id_user', Auth::id())->first();
+        $pembina = Pembina::untukUser(Auth::user());
         $ekskulIds = $pembina ? $pembina->ekskuls()->pluck('id_ekskul') : collect();
         $pelatihIds = $pembina ? $pembina->ekskuls()->whereNotNull('id_pelatih')->pluck('id_pelatih') : collect();
         $anggotaIds = Peserta::whereIn('id_ekskul', $ekskulIds)->pluck('id_anggota');

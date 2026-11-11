@@ -40,7 +40,7 @@ class NilaiPesertaController extends Controller
 
     private function pembina(): ?Pembina
     {
-        return Pembina::where('id_user', Auth::id())->first();
+        return Pembina::untukUser(Auth::user());
     }
 
     /** id ekskul yang dibina pembina yang login (kosong bila bukan pembina). */
