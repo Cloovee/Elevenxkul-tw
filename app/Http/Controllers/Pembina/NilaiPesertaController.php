@@ -21,13 +21,17 @@ use Maatwebsite\Excel\Facades\Excel;
  * Penilaian peserta oleh pembina, berbentuk grade A/B/C.
  *
  *   Grade kehadiran : otomatis dari absensi peserta pada semester tsb.
- *   Grade keaktifan : pembina mengisi angka (min. 70), sistem mengubahnya jadi grade.
+ *   Grade keaktifan : pembina mengisi angka 0-100, sistem mengubahnya jadi grade.
  *   Grade akhir     : gabungan keduanya (aturan di config/penilaian.php).
  *
+ * Peserta yang tidak pernah hadir sama sekali pada semester itu TIDAK diberi nilai/grade.
  * Pembina hanya bisa menilai dan meng-export peserta ekskul yang ia bina.
  */
 class NilaiPesertaController extends Controller
 {
+    /** Jumlah peserta per halaman di tabel "Beri Nilai". */
+    private const PESERTA_PER_HALAMAN = 20;
+
     /**
      * Redirect ramah (bukan 404) ketika akun yang login belum
      * terhubung ke data pembina manapun.
@@ -83,8 +87,9 @@ class NilaiPesertaController extends Controller
     }
 
     /**
-     * Halaman beri nilai: pilih ekskul + semester, lihat kehadiran tiap peserta,
-     * isi keaktifan, grade terhitung otomatis.
+     * Halaman beri nilai: pilih ekskul + semester, cari peserta, saring per jurusan,
+     * lihat kehadiran tiap peserta (20 peserta per halaman), isi keaktifan, grade
+     * terhitung otomatis.
      */
     public function index(Request $request)
     {
@@ -101,17 +106,31 @@ class NilaiPesertaController extends Controller
         [$tahunAjaran, $semester] = $this->periodeDariRequest($request);
         [$mulai, $selesai] = Penilaian::periode($tahunAjaran, $semester);
 
-        $daftarPeserta = Peserta::with(['siswa.kelas', 'ekskul'])
-            ->whereIn('id_ekskul', $ekskulIds)
-            ->where('status', 'aktif')
-            ->get()
-            ->sortBy('nama')
-            ->values();
+        // Pilihan jurusan = program keahlian siswa yang benar-benar ada di ekskul yang dilihat.
+        $opsiJurusan = $this->opsiJurusan($ekskulIds);
+        $filterJurusan = (string) $request->query('jurusan');
+        $filterJurusan = $opsiJurusan->contains($filterJurusan) ? $filterJurusan : '';
 
-        $kehadiran = Penilaian::kehadiran($daftarPeserta->pluck('id_anggota'), $mulai, $selesai);
+        $cari = trim((string) $request->query('search'));
+
+        $daftarPeserta = $this->queryPeserta($ekskulIds, $cari, $filterJurusan)
+            ->paginate(self::PESERTA_PER_HALAMAN, ['data_anggota.*'], 'page')
+            ->onEachSide(1)
+            ->withQueryString()
+            ->fragment('beri-nilai');
+
+        // Alamat halaman yang sudah tidak ada (mis. link lama setelah data berkurang) -> halaman terakhir.
+        if ($daftarPeserta->isEmpty() && $daftarPeserta->currentPage() > $daftarPeserta->lastPage()) {
+            return redirect()->to($daftarPeserta->url($daftarPeserta->lastPage()));
+        }
+
+        // Kehadiran & nilai hanya dihitung untuk peserta di halaman ini.
+        $idHalamanIni = $daftarPeserta->getCollection()->pluck('id_anggota');
+
+        $kehadiran = Penilaian::kehadiran($idHalamanIni, $mulai, $selesai);
 
         // Nilai yang sudah tersimpan pada semester ini (satu per peserta).
-        $nilaiSemester = NilaiPeserta::whereIn('id_anggota', $daftarPeserta->pluck('id_anggota'))
+        $nilaiSemester = NilaiPeserta::whereIn('id_anggota', $idHalamanIni)
             ->where('tahun_ajaran', $tahunAjaran)
             ->where('semester', (string) $semester)
             ->latest('id_nilai')
@@ -121,11 +140,14 @@ class NilaiPesertaController extends Controller
 
         $anggotaIds = Peserta::whereIn('id_ekskul', $ekskulIds)->pluck('id_anggota');
 
+        // Riwayat punya nomor halaman sendiri (riwayat_page) supaya tidak bentrok dengan tabel peserta.
         $riwayatNilai = NilaiPeserta::with(['peserta.siswa', 'peserta.ekskul'])
             ->whereIn('id_anggota', $anggotaIds)
             ->latest('id_nilai')
-            ->paginate(10)
-            ->withQueryString();
+            ->paginate(10, ['*'], 'riwayat_page')
+            ->onEachSide(1)
+            ->withQueryString()
+            ->fragment('riwayat');
 
         return view('pembina.nilai-peserta.index', [
             'daftarPeserta' => $daftarPeserta,
@@ -134,9 +156,16 @@ class NilaiPesertaController extends Controller
             'riwayatNilai' => $riwayatNilai,
             'ekskulList' => $ekskulList,
             'filterEkskul' => $filterEkskul,
+            'opsiJurusan' => $opsiJurusan,
+            'filterJurusan' => $filterJurusan,
+            'cari' => $cari,
             'tahunAjaran' => $tahunAjaran,
             'semester' => $semester,
             'opsiTahunAjaran' => Penilaian::opsiTahunAjaran(),
+            // Tahun ajaran yang dipilih lebih baru dari yang aktif -> beri notifikasi,
+            // daftar peserta tetap menampilkan anggota tahun ajaran aktif.
+            'anggotaBelumTersedia' => Penilaian::anggotaBelumTersedia($tahunAjaran),
+            'tahunAjaranAnggota' => Penilaian::tahunAjaranAnggota(),
         ]);
     }
 
@@ -165,7 +194,11 @@ class NilaiPesertaController extends Controller
                 'ekskul' => $request->input('ekskul'),
                 'tahun_ajaran' => $data['tahun_ajaran'],
                 'semester' => $data['semester'],
-            ]))
+                // Tetap di pencarian, jurusan, dan halaman yang sedang dibuka.
+                'search' => $request->input('search'),
+                'jurusan' => $request->input('jurusan'),
+                'page' => $request->input('page'),
+            ], fn ($v) => $v !== null && $v !== ''))
             ->with('success', $this->pesanHasil($peserta, $nilai, $baru));
     }
 
@@ -282,6 +315,55 @@ class NilaiPesertaController extends Controller
     // Helper
     // ------------------------------------------------------------------
 
+    /**
+     * Query peserta aktif untuk tabel penilaian: bisa dicari (nama / NIS / NISN) dan
+     * disaring per jurusan (program keahlian kelas siswa). Diurutkan menurut nama siswa.
+     */
+    private function queryPeserta(Collection $ekskulIds, string $cari, string $jurusan)
+    {
+        $query = Peserta::query()
+            ->select('data_anggota.*')
+            ->leftJoin('siswa', 'siswa.id_siswa', '=', 'data_anggota.id_siswa')
+            ->leftJoin('kelas', 'kelas.id_kelas', '=', 'siswa.id_kelas')
+            ->with(['siswa.kelas', 'ekskul'])
+            ->whereIn('data_anggota.id_ekskul', $ekskulIds)
+            ->where('data_anggota.status', 'aktif');
+
+        if ($cari !== '') {
+            // Karakter khusus LIKE (% _ \) dianggap huruf biasa.
+            $like = '%' . addcslashes($cari, '%_\\') . '%';
+
+            $query->where(function ($w) use ($like) {
+                $w->where('siswa.nama_siswa', 'like', $like)
+                    ->orWhere('siswa.NIS', 'like', $like)
+                    ->orWhere('siswa.NISN', 'like', $like);
+            });
+        }
+
+        if ($jurusan !== '') {
+            $query->where('kelas.program_keahlian', $jurusan);
+        }
+
+        return $query
+            ->orderBy('siswa.nama_siswa')
+            ->orderBy('data_anggota.id_anggota');
+    }
+
+    /** Daftar jurusan (program keahlian) peserta aktif di ekskul yang sedang dilihat. */
+    private function opsiJurusan(Collection $ekskulIds): Collection
+    {
+        return Peserta::query()
+            ->join('siswa', 'siswa.id_siswa', '=', 'data_anggota.id_siswa')
+            ->join('kelas', 'kelas.id_kelas', '=', 'siswa.id_kelas')
+            ->whereIn('data_anggota.id_ekskul', $ekskulIds)
+            ->where('data_anggota.status', 'aktif')
+            ->whereNotNull('kelas.program_keahlian')
+            ->where('kelas.program_keahlian', '!=', '')
+            ->distinct()
+            ->orderBy('kelas.program_keahlian')
+            ->pluck('kelas.program_keahlian');
+    }
+
     private function validasi(Request $request): array
     {
         $minimum = Penilaian::nilaiMinimum();
@@ -298,15 +380,16 @@ class NilaiPesertaController extends Controller
         ], [
             'nilai_keaktifan.required' => 'Nilai keaktifan wajib diisi.',
             'nilai_keaktifan.numeric' => 'Nilai keaktifan harus berupa angka.',
-            'nilai_keaktifan.min' => "Nilai keaktifan minimal {$minimum}.",
-            'nilai_keaktifan.max' => 'Nilai keaktifan maksimal 100.',
+            'nilai_keaktifan.min' => "Nilai keaktifan minimal {$minimum} (rentang nilai {$minimum}-100).",
+            'nilai_keaktifan.max' => "Nilai keaktifan maksimal 100 (rentang nilai {$minimum}-100).",
         ]);
     }
 
     /**
      * Hitung grade (kehadiran dari absensi, keaktifan dari angka, lalu gabungan)
-     * dan simpan. Ditolak bila peserta belum punya absensi pada semester tsb,
-     * karena grade kehadirannya tidak bisa dihitung.
+     * dan simpan. Ditolak bila:
+     *   - peserta belum punya absensi pada semester tsb (grade kehadiran tidak bisa dihitung), atau
+     *   - peserta tidak pernah hadir sama sekali pada semester tsb (tanpa nilai/grade).
      */
     private function isiNilai(NilaiPeserta $nilai, Peserta $peserta, array $data): void
     {
@@ -316,6 +399,12 @@ class NilaiPesertaController extends Controller
         if ($hadir['total'] === 0) {
             throw ValidationException::withMessages([
                 'nilai_keaktifan' => "Belum ada data absensi {$peserta->nama} pada Semester {$data['semester']} {$data['tahun_ajaran']}, sehingga grade kehadirannya belum bisa dihitung.",
+            ]);
+        }
+
+        if (! Penilaian::pernahHadir($hadir)) {
+            throw ValidationException::withMessages([
+                'nilai_keaktifan' => "{$peserta->nama} tidak pernah hadir pada Semester {$data['semester']} {$data['tahun_ajaran']}, sehingga tidak diberi nilai maupun grade.",
             ]);
         }
 

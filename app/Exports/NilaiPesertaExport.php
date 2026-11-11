@@ -12,7 +12,8 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 /**
  * Export grade peserta ekskul untuk satu semester (hasil App\Support\Penilaian::rekap).
- * Peserta yang belum dinilai tetap muncul dengan keterangan "Belum dinilai".
+ * Peserta yang belum dinilai tetap muncul dengan keterangan "Belum dinilai"; yang tidak pernah
+ * hadir sama sekali muncul tanpa grade dengan keterangan "Tidak pernah hadir (tanpa grade)".
  */
 class NilaiPesertaExport implements FromArray, WithHeadings, WithStyles, WithTitle, ShouldAutoSize
 {
@@ -51,7 +52,9 @@ class NilaiPesertaExport implements FromArray, WithHeadings, WithStyles, WithTit
                 $b['grade_kehadiran'] ?? '',
                 $b['nilai_keaktifan'] !== null ? $b['nilai_keaktifan'] : '',
                 $b['grade_keaktifan'] ?? '',
-                $dinilai ? $b['grade_akhir'] : 'Belum dinilai',
+                $dinilai
+                    ? $b['grade_akhir']
+                    : (($b['status'] ?? '') === 'tanpa_hadir' ? 'Tidak pernah hadir (tanpa grade)' : 'Belum dinilai'),
                 $b['catatan'],
             ];
         })->all();

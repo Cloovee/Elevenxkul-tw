@@ -33,10 +33,24 @@ class Penilaian
         return array_key_last($batas);
     }
 
-    /** Nilai keaktifan terendah yang boleh diinput (= batas grade terendah). */
+    /** Nilai keaktifan terendah yang boleh diinput (= batas grade terendah, saat ini 0). */
     public static function nilaiMinimum(): int
     {
         return (int) min(config('penilaian.batas'));
+    }
+
+    /**
+     * Apakah peserta pernah hadir pada semester tsb? (hasil dari kehadiran()).
+     *
+     * Peserta yang tidak pernah hadir sama sekali (kehadiran 0%) TIDAK diberi nilai
+     * maupun grade. Pakai persentase (bukan sekadar jumlah "hadir") supaya ikut aturan
+     * bobot_status di config: kalau sekolah menghitung izin/sakit sebagai hadir, peserta
+     * yang hanya izin tetap dianggap pernah hadir. Dengan setelan default, ini sama
+     * dengan "jumlah hadir > 0".
+     */
+    public static function pernahHadir(array $kehadiran): bool
+    {
+        return ($kehadiran['persen'] ?? 0) > 0;
     }
 
     /** Gabungkan grade kehadiran + keaktifan menjadi grade akhir. */
@@ -71,6 +85,24 @@ class Penilaian
         $mulai = $t->month >= 7 ? $t->year : $t->year - 1;
 
         return $mulai . '/' . ($mulai + 1);
+    }
+
+    /**
+     * Tahun ajaran yang datanya (anggota/peserta) saat ini tersedia = Tahun Ajaran
+     * AKTIF di modul Tahun Ajaran (diganti Admin lewat "Ganti Tahun Ajaran").
+     * Bila belum ada yang aktif, jatuh ke tahun ajaran berjalan menurut tanggal.
+     */
+    public static function tahunAjaranAnggota(): string
+    {
+        $aktif = \App\Models\TahunAjaran::aktif()->orderByDesc('tahun_ajaran')->value('tahun_ajaran');
+
+        return $aktif && self::tahunAjaranValid($aktif) ? $aktif : self::tahunAjaranSaatIni();
+    }
+
+    /** True bila $tahunAjaran lebih baru dari tahun ajaran yang anggotanya sudah tersedia. */
+    public static function anggotaBelumTersedia(string $tahunAjaran): bool
+    {
+        return (int) substr($tahunAjaran, 0, 4) > (int) substr(self::tahunAjaranAnggota(), 0, 4);
     }
 
     /** Format "2026/2027" (tahun kedua = tahun pertama + 1). */
@@ -197,23 +229,40 @@ class Penilaian
             ->unique('id_anggota')
             ->keyBy('id_anggota');
 
-        return $peserta->map(function (Peserta $p) use ($nilai) {
+        // Kehadiran semester tsb, untuk menandai peserta yang tidak pernah hadir (tanpa grade).
+        [$mulai, $selesai] = self::periode($tahunAjaran, $semester);
+        $kehadiran = self::kehadiran($peserta->pluck('id_anggota'), $mulai, $selesai);
+
+        return $peserta->map(function (Peserta $p) use ($nilai, $kehadiran) {
             $n = $nilai->get($p->id_anggota);
+            $k = $kehadiran[$p->id_anggota] ?? [];
+            $pernahHadir = self::pernahHadir($k);
+            $tanpaHadir = ! $pernahHadir && ($k['total'] ?? 0) > 0; // ada absensi, tapi tidak pernah hadir
+            $dinilai = $pernahHadir && $n !== null && $n->grade_akhir !== null;
+
+            // Hanya baris yang benar-benar dinilai yang menampilkan grade/nilai tersimpan.
+            // Peserta yang tidak pernah hadir selalu tanpa grade (walau ada data lama).
+            $nilaiTampil = $dinilai ? $n : null;
 
             return [
                 'ekskul'          => $p->ekskul->nama_ekskul ?? '-',
                 'nis'             => (string) ($p->siswa->NIS ?? ''),
                 'nama'            => $p->nama,
                 'kelas'           => $p->kelas ?? '',
-                'hadir'           => $n?->jumlah_hadir,
-                'pertemuan'       => $n?->jumlah_pertemuan,
-                'persen'          => $n?->persen_kehadiran !== null ? (float) $n->persen_kehadiran : null,
-                'grade_kehadiran' => $n?->grade_kehadiran,
-                'nilai_keaktifan' => $n?->nilai_keaktifan !== null ? (float) $n->nilai_keaktifan : null,
-                'grade_keaktifan' => $n?->grade_keaktifan,
-                'grade_akhir'     => $n?->grade_akhir,
-                'catatan'         => $n?->catatan_pembina ?? '',
-                'dinilai'         => $n !== null && $n->grade_akhir !== null,
+                // Tanpa grade tetap menampilkan data kehadirannya sebagai informasi.
+                'hadir'           => $nilaiTampil?->jumlah_hadir ?? ($tanpaHadir ? $k['hadir'] : null),
+                'pertemuan'       => $nilaiTampil?->jumlah_pertemuan ?? ($tanpaHadir ? $k['total'] : null),
+                'persen'          => $nilaiTampil?->persen_kehadiran !== null
+                    ? (float) $nilaiTampil->persen_kehadiran
+                    : ($tanpaHadir ? (float) $k['persen'] : null),
+                'grade_kehadiran' => $nilaiTampil?->grade_kehadiran,
+                'nilai_keaktifan' => $nilaiTampil?->nilai_keaktifan !== null ? (float) $nilaiTampil->nilai_keaktifan : null,
+                'grade_keaktifan' => $nilaiTampil?->grade_keaktifan,
+                'grade_akhir'     => $nilaiTampil?->grade_akhir,
+                'catatan'         => $nilaiTampil?->catatan_pembina ?? '',
+                'dinilai'         => $dinilai,
+                // 'dinilai' | 'belum' (belum dinilai / belum ada absensi) | 'tanpa_hadir' (tidak pernah hadir)
+                'status'          => $tanpaHadir ? 'tanpa_hadir' : ($dinilai ? 'dinilai' : 'belum'),
             ];
         });
     }
