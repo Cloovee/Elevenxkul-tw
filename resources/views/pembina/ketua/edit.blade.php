@@ -109,7 +109,7 @@
                     <input type="email" name="email" value="{{ old('email', $siswa->email) }}" autocomplete="off" placeholder="nama@sekolah.sch.id"
                            class="w-full px-3.5 py-2.5 rounded-xl border border-[#E7E7F4] text-sm focus:outline-none focus:border-lavender @error('email') border-red-400 @enderror">
                     @error('email')<p class="mt-1.5 text-xs font-semibold text-red-500">{{ $message }}</p>@enderror
-                    <p class="mt-1.5 text-xs text-inksoft leading-relaxed">Wajib diisi, format <b>nama@sekolah.sch.id</b>, dan belum dipakai akun lain.</p>
+                    <p class="mt-1.5 text-xs text-inksoft leading-relaxed">Boleh dikosongkan. Kalau diisi harus email asli, format <b>nama@sekolah.sch.id</b>, dan belum dipakai akun lain.</p>
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">MedSos</label>

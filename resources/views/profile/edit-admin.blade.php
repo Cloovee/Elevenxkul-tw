@@ -13,7 +13,7 @@
             </div>
             <div>
                 <h3 class="text-xl font-extrabold text-[#10316B]">Informasi Profil</h3>
-                <p class="text-xs text-[#7C8DB5]">Update nama dan alamat email akunmu.</p>
+                <p class="text-xs text-[#7C8DB5]">Update nama, username, dan email akunmu.</p>
             </div>
         </div>
         @include('profile.partials.update-profile-information-form')
