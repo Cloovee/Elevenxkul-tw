@@ -81,7 +81,8 @@ class AbsensiPesertaController extends Controller
             return \App\Support\EkskulAktif::halamanPilih(
                 'Absensi Peserta',
                 'Pilih ekskul dulu, lalu catat kehadiran peserta ekskul tersebut.',
-                'ketua.absensi-peserta'
+                'ketua.absensi-peserta',
+                true
             );
         }
 

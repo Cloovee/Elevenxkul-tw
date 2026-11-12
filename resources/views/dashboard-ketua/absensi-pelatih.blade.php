@@ -29,7 +29,7 @@
                         <p class="text-sm text-gray-500 mt-1">Catat apakah pelatih ekskulmu hadir/melatih. Laporan akan divalidasi oleh pembina ekskul terkait.</p>
                     </div>
 
-                    @include('dashboard-ketua.partials.filter-ekskul', ['mode' => 'pilih'])
+                    @include('dashboard-ketua.partials.ekskul-terpilih', ['routeName' => 'ketua.absensi-pelatih'])
 
                     @if (session('success'))
                         <div class="bg-emerald-50 text-emerald-700 text-sm font-semibold px-4 py-3 rounded-2xl">

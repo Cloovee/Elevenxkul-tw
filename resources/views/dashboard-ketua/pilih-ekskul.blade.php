@@ -29,12 +29,46 @@
                         <p class="text-sm text-gray-500 mt-1">{{ $deskripsi }}</p>
                     </div>
 
-                    @include('dashboard-ketua.partials.filter-ekskul', ['mode' => 'pilih'])
+                    @unless (! empty($daftar))
+                        @include('dashboard-ketua.partials.filter-ekskul', ['mode' => 'pilih'])
+                    @endunless
 
                     @if (session('error'))
                         <div class="bg-red-50 text-red-500 text-sm font-semibold px-4 py-3 rounded-2xl">{{ session('error') }}</div>
                     @endif
 
+                    @if (! empty($daftar))
+                        {{-- Daftar seluruh ekskul: klik satu ekskul untuk masuk ke halaman absensinya --}}
+                        @if ($daftarEkskul->isEmpty())
+                            <div class="bg-white rounded-3xl shadow-xl shadow-periwinkle/10 ring-1 ring-black/5 p-10 text-center">
+                                <p class="font-semibold text-ink">Belum ada ekskul</p>
+                                <p class="text-sm text-inksoft mt-1">Tambahkan ekskul dulu lewat menu Ekskul di dashboard admin.</p>
+                            </div>
+                        @else
+                            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+                                @foreach ($daftarEkskul as $e)
+                                    @php
+                                        $inisial = collect(explode(' ', $e->nama_ekskul ?? '-'))->map(fn ($s) => mb_substr($s, 0, 1))->take(2)->implode('');
+                                    @endphp
+                                    <a href="{{ route($routeName, ['ekskul' => $e->id_ekskul]) }}"
+                                       class="group flex items-center gap-4 bg-white rounded-2xl p-4 shadow-sm ring-1 ring-black/5 hover:ring-periwinkle hover:shadow-lg hover:shadow-periwinkle/10 transition">
+                                        <div class="w-12 h-12 rounded-xl bg-periwinkle/10 text-periwinkle font-bold flex items-center justify-center shrink-0 uppercase">
+                                            {{ $inisial }}
+                                        </div>
+                                        <div class="min-w-0 flex-1">
+                                            <p class="font-semibold text-ink truncate">{{ $e->nama_ekskul }}</p>
+                                            <p class="text-xs text-inksoft truncate">
+                                                {{ $e->peserta_count }} peserta &middot; {{ optional($e->pelatih)->nama_pelatih ?? 'Belum ada pelatih' }}
+                                            </p>
+                                        </div>
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-300 group-hover:text-periwinkle transition shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                                        </svg>
+                                    </a>
+                                @endforeach
+                            </div>
+                        @endif
+                    @else
                     <div class="bg-white rounded-3xl shadow-xl shadow-periwinkle/10 ring-1 ring-black/5 p-10 text-center">
                         <div class="w-14 h-14 rounded-2xl bg-periwinkle/10 text-periwinkle flex items-center justify-center mx-auto mb-4">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -46,6 +80,7 @@
                             Halaman ini bekerja per ekskul. Pilih ekskul di atas, setelah itu kamu bisa melanjutkan.
                         </p>
                     </div>
+                    @endif
 
                 </div>
             </div>

@@ -46,7 +46,7 @@
                         <p class="text-sm text-gray-500 mt-1">Pilih kelas dulu. Kelas 10 bisa diabsen lewat scan QR kartu peserta atau tabel manual, kelas 11 dan 12 lewat tabel manual. Data langsung tampil di halaman Absensi Peserta milik pembina.</p>
                     </div>
 
-                    @include('dashboard-ketua.partials.filter-ekskul', ['mode' => 'pilih'])
+                    @include('dashboard-ketua.partials.ekskul-terpilih', ['routeName' => 'ketua.absensi-peserta'])
 
                     @if (session('success'))
                         <div class="bg-emerald-50 text-emerald-700 text-sm font-semibold px-4 py-3 rounded-2xl">

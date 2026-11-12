@@ -102,12 +102,15 @@ class EkskulAktif
     }
 
     /** Halaman "pilih ekskul dulu" untuk Admin yang membuka halaman yang butuh satu ekskul. */
-    public static function halamanPilih(string $judul, string $deskripsi, string $routeName)
+    public static function halamanPilih(string $judul, string $deskripsi, string $routeName, bool $daftar = false)
     {
         return view('dashboard-ketua.pilih-ekskul', [
             'judul' => $judul,
             'deskripsi' => $deskripsi,
             'routeName' => $routeName,
+            // true -> tampilkan daftar kartu seluruh ekskul (klik satu untuk masuk), bukan dropdown.
+            'daftar' => $daftar,
+            'daftarEkskul' => $daftar ? Ekskul::with('pelatih')->withCount('peserta')->orderBy('nama_ekskul')->get() : collect(),
         ]);
     }
 }
