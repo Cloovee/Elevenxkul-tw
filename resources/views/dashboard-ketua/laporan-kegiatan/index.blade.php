@@ -32,7 +32,7 @@
                         </p>
                     </div>
 
-                    @include('dashboard-ketua.partials.filter-ekskul', ['mode' => 'pilih'])
+                    @include('dashboard-ketua.partials.ekskul-terpilih', ['routeName' => 'ketua.laporan-kegiatan'])
 
                     @if (! $pelatih)
                         <div class="bg-amber-50 text-amber-700 text-sm font-medium px-4 py-3 rounded-2xl">

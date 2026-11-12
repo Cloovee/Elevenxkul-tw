@@ -22,7 +22,8 @@ class LaporanKegiatanController extends Controller
             return \App\Support\EkskulAktif::halamanPilih(
                 'Laporan Kegiatan',
                 'Pilih ekskul dulu untuk melihat dan mencetak laporan kegiatan pelatihnya.',
-                'ketua.laporan-kegiatan'
+                'ketua.laporan-kegiatan',
+                true
             );
         }
 
