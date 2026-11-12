@@ -38,6 +38,19 @@ class AppServiceProvider extends ServiceProvider
             Vite::useHotFile(storage_path('framework/vite.hot'));
         }
 
+        // FOTO UPLOAD: di production (request web), simpan langsung di <document root>/uploads
+        // supaya foto tampil sebagai file statis dan TIDAK ikut tertimpa saat project di-upload ulang.
+        // Tidak dipakai kalau PUBLIC_UPLOAD_PATH diisi manual di .env. Lokal tidak berubah.
+        // Sengaja dilakukan saat runtime (bukan di config) agar kebal terhadap config:cache.
+        if (! $this->app->runningInConsole() && $this->app->isProduction()) {
+            $bawaan = rtrim(str_replace('\\', '/', storage_path('app/public')), '/');
+            $aktif  = rtrim(str_replace('\\', '/', (string) config('filesystems.disks.public.root')), '/');
+
+            if ($aktif === $bawaan && ($folder = PublicStorage::folderUnggahOtomatis()) !== null) {
+                config(['filesystems.disks.public.root' => $folder]);
+            }
+        }
+
         // Symlink public/storage hilang tiap kali folder public diganti saat update.
         // Cek singkat tiap request web, dan buat ulang otomatis kalau hilang/rusak.
         // (Tidak jalan di artisan/queue/test.)

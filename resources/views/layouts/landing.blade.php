@@ -510,7 +510,9 @@
                 @foreach($pembina as $p)
                     <div class="person">
                         @if($p->foto_url)
-                            <img class="avatar" src="{{ $p->foto_url }}" alt="Foto {{ $p->nama_pembina }}" loading="lazy">
+                            <img class="avatar" src="{{ $p->foto_url }}" alt="Foto {{ $p->nama_pembina }}" loading="lazy"
+                                 data-inisial="{{ $p->inisial }}"
+                                 onerror="var d=document.createElement('div');d.className='avatar';d.setAttribute('aria-hidden','true');d.textContent=this.dataset.inisial;this.replaceWith(d);">
                         @else
                             <div class="avatar" aria-hidden="true">{{ $p->inisial }}</div>
                         @endif

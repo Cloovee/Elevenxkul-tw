@@ -8,6 +8,61 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
+/*
+|--------------------------------------------------------------------------
+| ANTI-CACHE-BASI (otomatis setelah update/upload ulang)
+|--------------------------------------------------------------------------
+| Kalau di hosting pernah dijalankan `php artisan optimize` / `route:cache` /
+| `config:cache`, Laravel memakai route & config LAMA dan mengabaikan file baru
+| yang kamu upload (akibatnya route baru seperti /media tidak dikenal -> foto rusak).
+|
+| Blok ini dijalankan SEBELUM Laravel memuat cache: ia membandingkan "sidik jari"
+| isi file routes/, config/, dan .env dengan yang tercatat terakhir kali. Kalau
+| berbeda (artinya ada update), file cache route/config dihapus otomatis sehingga
+| request ini langsung memakai file terbaru. Tanpa update = hampir tanpa beban
+| (hanya cek ada/tidaknya file cache). Tidak pernah melempar error.
+*/
+(static function (): void {
+    try {
+        $cacheDir = __DIR__ . '/cache';
+        $files = array_merge(
+            glob($cacheDir . '/routes-*.php') ?: [],
+            glob($cacheDir . '/config.php') ?: [],
+            glob($cacheDir . '/events.php') ?: []
+        );
+
+        if ($files === []) {
+            return; // tidak ada cache -> tidak ada yang perlu dibersihkan
+        }
+
+        $base = dirname(__DIR__);
+        $sumber = array_merge(
+            glob($base . '/routes/*.php') ?: [],
+            glob($base . '/config/*.php') ?: [],
+            [$base . '/.env']
+        );
+        sort($sumber);
+
+        $hash = '';
+        foreach ($sumber as $f) {
+            $hash .= basename($f) . ':' . (is_file($f) ? md5_file($f) : '-') . ';';
+        }
+        $sidikJari = md5($hash);
+
+        $catatan = $base . '/storage/framework/cache-fingerprint.txt';
+        $lama = is_file($catatan) ? trim((string) @file_get_contents($catatan)) : '';
+
+        if ($lama !== $sidikJari) {
+            foreach ($files as $f) {
+                @unlink($f);
+            }
+            @file_put_contents($catatan, $sidikJari);
+        }
+    } catch (\Throwable) {
+        // abaikan: lebih baik tetap jalan daripada website error
+    }
+})();
+
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',

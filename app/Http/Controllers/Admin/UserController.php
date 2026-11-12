@@ -150,6 +150,9 @@ class UserController extends Controller
         $pembina = $user->pembina;
         $fotoBaru = null;
         $hapusFotoLama = false;
+        // Simpan path foto LAMA sekarang. Setelah $pembina->update() nanti, atribut foto pada
+        // model sudah berisi foto BARU, sehingga kalau dibaca belakangan foto baru ikut terhapus.
+        $fotoLama = $pembina?->foto;
 
         if ($request->role === 'Pembina') {
             if ($request->hasFile('foto')) {
@@ -204,8 +207,10 @@ class UserController extends Controller
         });
 
         // File foto lama dihapus setelah transaksi sukses
-        if ($hapusFotoLama && $pembina && $pembina->foto && Storage::disk('public')->exists($pembina->foto)) {
-            Storage::disk('public')->delete($pembina->foto);
+        if ($hapusFotoLama && $fotoLama && $fotoLama !== $fotoBaru
+            && ! preg_match('#^https?://#i', $fotoLama)
+            && Storage::disk('public')->exists($fotoLama)) {
+            Storage::disk('public')->delete($fotoLama);
         }
 
         return redirect()->route('admin.user.index')

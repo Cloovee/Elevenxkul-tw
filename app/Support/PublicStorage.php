@@ -81,13 +81,80 @@ class PublicStorage
 
         $path = ltrim(str_replace('\\', '/', $path), '/');
 
-        // Jalur cepat: file memang tersedia di document root lewat /storage/...
-        if (self::bisaDilayaniLangsung($path)) {
+        // Jalur utama: file ada di <document root>/uploads -> dilayani langsung oleh web server
+        // sebagai file statis (tanpa PHP, tanpa symlink, tanpa route, tidak kena cache).
+        $langsung = self::urlLangsung($path);
+        if ($langsung !== null) {
+            return $langsung;
+        }
+
+        // Jalur lama (opsional): lewat symlink /storage, hanya kalau PUBLIC_STORAGE_DIRECT=true.
+        if (config('filesystems.public_storage_direct') && self::bisaDilayaniLangsung($path)) {
             return '/storage/' . $path;
         }
 
         // Jalur aman: lewat PHP. Tidak ada ekstensi di bagian path, jadi web server tidak mencegat.
         return '/media?p=' . str_replace('%2F', '/', rawurlencode($path));
+    }
+
+    /** Folder <document root>/uploads, atau null kalau belum ada. */
+    private static function folderUploadWeb(): ?string
+    {
+        try {
+            $real = @realpath(self::webRoot() . DIRECTORY_SEPARATOR . 'uploads');
+
+            return $real !== false ? $real : null;
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
+    /**
+     * Kalau file fisiknya berada di <document root>/uploads, kembalikan URL statisnya
+     * (/uploads/...). Selain itu null.
+     */
+    private static function urlLangsung(string $path): ?string
+    {
+        try {
+            $uploads = self::folderUploadWeb();
+            $dasar   = @realpath(self::sumber());
+
+            if ($uploads === null || $dasar === false || $dasar !== $uploads) {
+                return null;
+            }
+
+            if (! @is_file($dasar . DIRECTORY_SEPARATOR . $path)) {
+                return null;
+            }
+
+            return '/uploads/' . str_replace('%2F', '/', rawurlencode($path));
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
+    /**
+     * Lokasi upload otomatis untuk production: <document root>/uploads.
+     * Dipakai AppServiceProvider supaya foto langsung tampil sebagai file statis dan
+     * tidak ikut terhapus saat folder project di-upload ulang. Null kalau tidak bisa dipakai.
+     */
+    public static function folderUnggahOtomatis(): ?string
+    {
+        try {
+            $web = self::webRoot();
+            if (! is_dir($web)) {
+                return null;
+            }
+
+            $dir = $web . DIRECTORY_SEPARATOR . 'uploads';
+            if (! is_dir($dir) && ! @mkdir($dir, 0755, true) && ! is_dir($dir)) {
+                return null;
+            }
+
+            return is_writable($dir) ? $dir : null;
+        } catch (\Throwable) {
+            return null;
+        }
     }
 
     private static function bisaDilayaniLangsung(string $path): bool
@@ -122,15 +189,23 @@ class PublicStorage
             return null;
         }
 
-        $dasar = realpath(self::sumber());
-        $file  = $dasar ? realpath($dasar . DIRECTORY_SEPARATOR . $path) : false;
+        // Cari di folder upload aktif, lalu di lokasi lama storage/app/public (file lama tetap ketemu).
+        $kandidat = array_unique(array_filter([
+            self::sumber(),
+            storage_path('app/public'),
+        ]));
 
-        // Wajib berada di dalam folder sumber (cegah ../)
-        if (! $dasar || ! $file || ! str_starts_with($file, $dasar . DIRECTORY_SEPARATOR) || ! is_file($file)) {
-            return null;
+        foreach ($kandidat as $folder) {
+            $dasar = realpath($folder);
+            $file  = $dasar ? realpath($dasar . DIRECTORY_SEPARATOR . $path) : false;
+
+            // Wajib berada di dalam folder sumber (cegah ../)
+            if ($dasar && $file && str_starts_with($file, $dasar . DIRECTORY_SEPARATOR) && is_file($file)) {
+                return $file;
+            }
         }
 
-        return $file;
+        return null;
     }
 
     /**

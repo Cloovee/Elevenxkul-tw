@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\LandingController;
+use App\Http\Controllers\MediaController;
 use App\Http\Controllers\Ketua\AnggotaImportExportController;
 use App\Http\Controllers\Ketua\LaporanKegiatanController;
 use App\Http\Controllers\Ketua\RiwayatAbsensiController;
@@ -565,20 +566,13 @@ Route::middleware('auth')->group(function () {
 |--------------------------------------------------------------------------
 | PENYAJI GAMBAR UPLOAD (tahan update, tidak bergantung symlink)
 |--------------------------------------------------------------------------
-| Kalau public/storage sudah ada (hasil storage:link), web server melayani
-| file langsung dan route ini tidak pernah terpakai. Kalau belum ada,
-| route ini yang menyajikan foto dari storage/app/public.
+| Semua foto upload (pembina, poster/banner, logo, galeri, pelatih) disajikan
+| lewat PHP dari storage/app/public, jadi tetap muncul walau symlink
+| public/storage tidak ada / diblokir hosting.
+|   - /media?p=folder/file.jpg  : URL yang dihasilkan PublicStorage::url()
+|   - /storage/{path}           : cadangan untuk URL lama yang sudah tersimpan
 */
-Route::get('/storage/{path}', function (string $path) {
-    $base = realpath(storage_path('app/public'));
-    $file = $base ? realpath($base . DIRECTORY_SEPARATOR . $path) : false;
-
-    // Cegah path traversal (../) dan pastikan file benar-benar ada
-    if (! $base || ! $file || ! str_starts_with($file, $base . DIRECTORY_SEPARATOR) || ! is_file($file)) {
-        abort(404);
-    }
-
-    return response()->file($file, [
-        'Cache-Control' => 'public, max-age=86400',
-    ]);
-})->where('path', '.*')->name('storage.fallback');
+Route::get('/media', [MediaController::class, 'show'])->name('media');
+Route::get('/storage/{path}', [MediaController::class, 'legacy'])
+    ->where('path', '.*')
+    ->name('storage.fallback');

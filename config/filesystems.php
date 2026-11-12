@@ -40,7 +40,11 @@ return [
 
         'public' => [
             'driver' => 'local',
-            'root' => storage_path('app/public'),
+            // Foto upload (pembina, poster, logo, galeri, absensi). Isi PUBLIC_UPLOAD_PATH di .env
+            // dengan folder DI LUAR folder project (mis. /home/user/domains/situs.com/uploads)
+            // supaya foto TIDAK ikut tertimpa/terhapus saat project di-upload ulang.
+            // Kalau kosong -> storage/app/public (perilaku lama, cocok untuk lokal).
+            'root' => env('PUBLIC_UPLOAD_PATH') ?: storage_path('app/public'),
             'url' => '/storage',
             'visibility' => 'public',
             'throw' => false,
@@ -85,6 +89,9 @@ return [
     */
 
     'public_web_root' => env('PUBLIC_WEB_ROOT'),
+
+    // true = pakai /storage/... langsung (butuh symlink yang diizinkan web server). Default false = lewat /media.
+    'public_storage_direct' => env('PUBLIC_STORAGE_DIRECT', false),
 
     'links' => [
         public_path('storage') => storage_path('app/public'),
