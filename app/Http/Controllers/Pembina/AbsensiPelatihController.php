@@ -38,7 +38,18 @@ class AbsensiPelatihController extends Controller
             return $this->belumTerhubung();
         }
 
-        $pelatihIds = $pembina->ekskuls()->whereNotNull('id_pelatih')->pluck('id_pelatih');
+        // Filter ekskul: hanya diterima kalau memang termasuk ekskul yang boleh dilihat
+        // (pembina: ekskul binaannya, admin: semua ekskul).
+        $ekskulList = $pembina->ekskuls()->orderBy('nama_ekskul')->get();
+        $filterEkskul = (int) $request->query('ekskul');
+        if (! $ekskulList->contains('id_ekskul', $filterEkskul)) {
+            $filterEkskul = null;
+        }
+
+        $pelatihIds = $pembina->ekskuls()
+            ->whereNotNull('id_pelatih')
+            ->when($filterEkskul, fn ($q) => $q->where('id_ekskul', $filterEkskul))
+            ->pluck('id_pelatih');
 
         // Filter status_validasi lewat query string (?status=Menunggu|Divalidasi|Ditolak),
         // default: tampilkan semua tapi laporan "Menunggu" selalu di atas.
@@ -83,6 +94,8 @@ class AbsensiPelatihController extends Controller
             'ditolakCount' => $ditolakCount,
             'kehadiranSummary' => $kehadiranSummary,
             'statusAktif' => $status,
+            'ekskulList' => $ekskulList,
+            'filterEkskul' => $filterEkskul,
         ]);
     }
 

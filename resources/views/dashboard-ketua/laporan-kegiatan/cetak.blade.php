@@ -75,7 +75,7 @@
 <body>
 
     <div class="toolbar">
-        <a href="{{ route('ketua.laporan-kegiatan', ['bulan' => $bulanInput]) }}" class="btn-back">&larr; Kembali</a>
+        <a href="{{ \App\Support\EkskulAktif::route('ketua.laporan-kegiatan', ['bulan' => $bulanInput]) }}" class="btn-back">&larr; Kembali</a>
         <button type="button" class="btn-print" onclick="window.print()">Cetak Laporan</button>
     </div>
 

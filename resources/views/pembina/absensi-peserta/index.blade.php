@@ -57,7 +57,20 @@
 
         {{-- DAFTAR EKSKUL — kartu per ekskul, dropdown riwayat tanggal, dropdown detail per tanggal --}}
         <div class="animate-fade-in-up animate-delay-2 bg-white rounded-3xl p-6 shadow-[0_10px_30px_-18px_rgba(46,43,85,0.35)]">
-            <h3 class="font-bold text-base mb-4">Data Absensi per Ekskul</h3>
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                <h3 class="font-bold text-base">Data Absensi per Ekskul</h3>
+
+                {{-- Filter ekskul (admin / pembina yang membina lebih dari satu ekskul) --}}
+                @if ($ekskulList->count() > 1 || auth()->user()->role === 'Admin')
+                    <form method="GET" class="flex items-center gap-2">
+                        @include('pembina.partials.filter-ekskul')
+                        @if ($filterEkskul)
+                            <a href="{{ route('pembina.absensi.index') }}"
+                               class="px-4 py-2 bg-bgsoft hover:bg-[#e9edfb] text-inksoft rounded-full text-sm font-bold transition-colors">Reset</a>
+                        @endif
+                    </form>
+                @endif
+            </div>
 
             @if ($riwayatPerEkskul->isEmpty())
                 <div class="flex flex-col items-center justify-center text-center gap-2 py-12">

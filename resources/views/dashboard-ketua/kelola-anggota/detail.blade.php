@@ -24,7 +24,7 @@
                 <div class="flex-1 space-y-6">
 
                     <div class="flex items-center gap-3">
-                        <a href="{{ route('ketua.kelola-anggota') }}" class="w-9 h-9 rounded-xl bg-white shadow-sm flex items-center justify-center text-inksoft hover:text-periwinkle transition">
+                        <a href="{{ \App\Support\EkskulAktif::route('ketua.kelola-anggota') }}" class="w-9 h-9 rounded-xl bg-white shadow-sm flex items-center justify-center text-inksoft hover:text-periwinkle transition">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
                             </svg>
@@ -90,7 +90,7 @@
 
                         <!-- Hapus anggota -->
                         <div class="mt-8 pt-6 border-t border-gray-100 flex justify-end">
-                            <form action="{{ route('ketua.kelola-anggota.destroy', $anggota->id_anggota) }}"
+                            <form action="{{ \App\Support\EkskulAktif::route('ketua.kelola-anggota.destroy', [$anggota->id_anggota]) }}"
                                   method="POST"
                                   onsubmit="return confirm('Yakin mau hapus {{ addslashes($anggota->nama) }} dari anggota ekskul ini? Tindakan ini tidak bisa dibatalkan.')"
                             >

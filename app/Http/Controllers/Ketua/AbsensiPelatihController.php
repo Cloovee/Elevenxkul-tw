@@ -30,6 +30,15 @@ class AbsensiPelatihController extends Controller
     {
         $idEkskul = $this->idEkskulAktif();
 
+        // Admin: wajib pilih ekskul dulu sebelum bisa mengabsen pelatih.
+        if (! $idEkskul && \App\Support\EkskulAktif::admin()) {
+            return \App\Support\EkskulAktif::halamanPilih(
+                'Absensi Pelatih',
+                'Pilih ekskul dulu, lalu catat kehadiran pelatih ekskul tersebut.',
+                'ketua.absensi-pelatih'
+            );
+        }
+
         if (! $idEkskul) {
             return redirect()->route('dashboard.ketua')
                 ->with('error', 'Akun kamu belum ditugaskan sebagai ketua ekskul manapun. Hubungi admin untuk menugaskanmu dulu.');
@@ -54,6 +63,11 @@ class AbsensiPelatihController extends Controller
     {
         $idEkskul = $this->idEkskulAktif();
 
+        if (! $idEkskul && \App\Support\EkskulAktif::admin()) {
+            return redirect()->route('ketua.absensi-pelatih')
+                ->with('error', 'Pilih ekskul dulu sebelum mengirim absensi pelatih.');
+        }
+
         if (! $idEkskul) {
             return redirect()->route('dashboard.ketua')
                 ->with('error', 'Akun kamu belum ditugaskan sebagai ketua ekskul manapun. Hubungi admin untuk menugaskanmu dulu.');
@@ -62,7 +76,7 @@ class AbsensiPelatihController extends Controller
         $pelatih = optional(Ekskul::with('pelatih')->find($idEkskul))->pelatih;
 
         if (! $pelatih) {
-            return redirect()->route('ketua.absensi-pelatih')
+            return redirect(\App\Support\EkskulAktif::route('ketua.absensi-pelatih'))
                 ->with('error', 'Ekskul kamu belum punya pelatih. Minta pembina menentukan pelatihnya dulu.');
         }
 
@@ -83,8 +97,7 @@ class AbsensiPelatihController extends Controller
 
         AbsensiPelatih::create($validated);
 
-        return redirect()
-            ->route('ketua.absensi-pelatih')
+        return redirect(\App\Support\EkskulAktif::route('ketua.absensi-pelatih'))
             ->with('success', 'Absensi pelatih berhasil dikirim, menunggu validasi pembina.');
     }
 }

@@ -43,9 +43,21 @@
                             </div>
                         @endif
 
-                        <!-- Filter tingkatan & jurusan -->
+                        <!-- Filter ekskul (Admin), tingkatan, jurusan, pencarian -->
                         <form method="GET" action="{{ route('ketua.kelola-anggota') }}" id="form-filter-anggota"
                               class="flex flex-col sm:flex-row sm:items-end gap-3 mb-4">
+                            @if (\App\Support\EkskulAktif::admin())
+                                <div>
+                                    <label for="filter-ekskul" class="block text-xs font-medium text-inksoft mb-1">Ekskul</label>
+                                    <select name="ekskul" id="filter-ekskul"
+                                            class="w-full sm:w-48 px-4 py-2.5 rounded-xl border border-ink/15 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-periwinkle focus:border-periwinkle transition">
+                                        <option value="">Semua ekskul</option>
+                                        @foreach (\App\Support\EkskulAktif::pilihan() as $e)
+                                            <option value="{{ $e->id_ekskul }}" {{ (int) request('ekskul') === (int) $e->id_ekskul ? 'selected' : '' }}>{{ $e->nama_ekskul }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            @endif
                             <div>
                                 <label for="filter-tingkat" class="block text-xs font-medium text-inksoft mb-1">Tingkatan</label>
                                 <select name="tingkat" id="filter-tingkat"
@@ -80,7 +92,7 @@
                                 </div>
                             </div>
                             @if ($tingkat || $jurusan || $q !== '')
-                                <a href="{{ route('ketua.kelola-anggota') }}"
+                                <a href="{{ \App\Support\EkskulAktif::route('ketua.kelola-anggota') }}"
                                    class="inline-flex items-center justify-center rounded-xl bg-gray-100 px-4 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-200 transition">
                                     Reset
                                 </a>
@@ -96,6 +108,9 @@
                                         <th scope="col" class="px-4 py-4 font-semibold">NISN</th>
                                         <th scope="col" class="px-4 py-4 font-semibold">NIS</th>
                                         <th scope="col" class="px-4 py-4 font-semibold">Nama</th>
+                                        @if ($tampilEkskul)
+                                            <th scope="col" class="px-4 py-4 font-semibold">Ekskul</th>
+                                        @endif
                                         <th scope="col" class="px-4 py-4 font-semibold">Kelas</th>
                                         <th scope="col" class="px-4 py-4 font-semibold">JK</th>
                                         <th scope="col" class="px-4 py-4 font-semibold">Status</th>
@@ -109,6 +124,11 @@
                                             <td class="px-4 py-4 whitespace-nowrap">{{ $item->siswa->NISN ?? '-' }}</td>
                                             <td class="px-4 py-4 whitespace-nowrap">{{ $item->siswa->NIS ?? '-' }}</td>
                                             <td class="px-4 py-4 font-medium text-ink">{{ $item->siswa->nama_siswa ?? '-' }}</td>
+                                            @if ($tampilEkskul)
+                                                <td class="px-4 py-4 whitespace-nowrap">
+                                                    <span class="inline-block px-2.5 py-1 rounded-full bg-periwinkle/10 text-periwinkle text-xs font-semibold">{{ $item->ekskul->nama_ekskul ?? '-' }}</span>
+                                                </td>
+                                            @endif
                                             <td class="px-4 py-4 whitespace-nowrap">{{ $item->siswa->kelas->nama_kelas ?? '-' }}</td>
                                             <td class="px-4 py-4 whitespace-nowrap">
                                                 @if (($item->siswa->jk ?? '') === 'L')
@@ -126,11 +146,11 @@
                                             </td>
                                             <td class="px-4 py-4">
                                                 <div class="flex items-center justify-center gap-2">
-                                                    <a href="{{ route('ketua.kelola-anggota.detail', $item->id_anggota) }}"
+                                                    <a href="{{ \App\Support\EkskulAktif::route('ketua.kelola-anggota.detail', [$item->id_anggota, 'ekskul' => $item->id_ekskul]) }}"
                                                        class="inline-flex items-center rounded-lg bg-blue-50 px-3 py-2 font-medium text-blue-700 hover:bg-blue-100 transition">
                                                         Edit
                                                     </a>
-                                                    <form action="{{ route('ketua.kelola-anggota.destroy', $item->id_anggota) }}"
+                                                    <form action="{{ \App\Support\EkskulAktif::route('ketua.kelola-anggota.destroy', [$item->id_anggota, 'ekskul' => $item->id_ekskul]) }}"
                                                           method="POST"
                                                           onsubmit="return confirm('Yakin ingin menghapus {{ addslashes($item->siswa->nama_siswa ?? 'anggota ini') }} dari daftar anggota?')">
                                                         @csrf
@@ -145,7 +165,7 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="8" class="px-4 py-10 text-center text-inksoft">{{ ($tingkat || $jurusan || $q !== '') ? 'Tidak ada anggota yang cocok dengan filter atau pencarian.' : 'Belum ada anggota.' }}</td>
+                                            <td colspan="{{ $tampilEkskul ? 9 : 8 }}" class="px-4 py-10 text-center text-inksoft">{{ ($tingkat || $jurusan || $q !== '') ? 'Tidak ada anggota yang cocok dengan filter atau pencarian.' : 'Belum ada anggota.' }}</td>
                                         </tr>
                                     @endforelse
                                 </tbody>
@@ -153,7 +173,7 @@
                         </div>
 
                         <!-- Tombol tambah, melayang tetap di kanan bawah layar (di atas nav bawah pada mobile) -->
-                        <a href="{{ route('ketua.kelola-anggota.tambah') }}"
+                        <a href="{{ \App\Support\EkskulAktif::route('ketua.kelola-anggota.tambah') }}"
                            class="fixed bottom-24 right-5 md:bottom-8 md:right-8 z-40 w-14 h-14 rounded-full bg-periwinkle flex items-center justify-center text-white shadow-xl shadow-periwinkle/40 ring-4 ring-white hover:opacity-90 hover:scale-105 transition"
                            title="Tambah anggota" aria-label="Tambah anggota"
                         >
@@ -173,7 +193,10 @@
             const form = document.getElementById('form-filter-anggota');
             const tingkat = document.getElementById('filter-tingkat');
             const jurusan = document.getElementById('filter-jurusan');
+            const ekskul = document.getElementById('filter-ekskul');
             if (!form) return;
+            // Admin: ganti ekskul -> pilihan tingkatan & jurusan ikut berubah, jadi direset
+            if (ekskul) ekskul.addEventListener('change', () => { tingkat.value = ''; jurusan.value = ''; form.submit(); });
             // Ganti tingkatan -> reset jurusan (daftar jurusan beda per tingkat), lalu kirim
             tingkat.addEventListener('change', () => { jurusan.value = ''; form.submit(); });
             jurusan.addEventListener('change', () => form.submit());

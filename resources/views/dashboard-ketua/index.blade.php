@@ -45,6 +45,8 @@
                         </div>
                     </div>
 
+                    @include('dashboard-ketua.partials.filter-ekskul', ['mode' => 'semua'])
+
                     @if (session('success'))
                         <div class="bg-mint text-[#1F7A3D] text-sm font-semibold px-4 py-3 rounded-2xl">{{ session('success') }}</div>
                     @endif
@@ -127,7 +129,7 @@
                     <div class="bg-white rounded-3xl shadow-sm ring-1 ring-black/5 p-6">
                         <h2 class="font-semibold text-ink mb-4">Akses Cepat</h2>
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                            <a href="{{ route('ketua.absensi-pelatih') }}" class="flex items-center gap-3 p-4 rounded-2xl bg-periwinkle/10 hover:bg-periwinkle/20 transition">
+                            <a href="{{ \App\Support\EkskulAktif::route('ketua.absensi-pelatih') }}" class="flex items-center gap-3 p-4 rounded-2xl bg-periwinkle/10 hover:bg-periwinkle/20 transition">
                                 <div class="w-10 h-10 rounded-xl bg-periwinkle flex items-center justify-center shrink-0">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -139,7 +141,7 @@
                                 </div>
                             </a>
 
-                            <a href="{{ route('ketua.absensi-peserta') }}" class="flex items-center gap-3 p-4 rounded-2xl bg-mint/50 hover:bg-mint/70 transition">
+                            <a href="{{ \App\Support\EkskulAktif::route('ketua.absensi-peserta') }}" class="flex items-center gap-3 p-4 rounded-2xl bg-mint/50 hover:bg-mint/70 transition">
                                 <div class="w-10 h-10 rounded-xl bg-sky flex items-center justify-center shrink-0">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-2.13a4 4 0 10-4-4 4 4 0 004 4zm6 0a4 4 0 10-4-4" />
@@ -151,7 +153,7 @@
                                 </div>
                             </a>
 
-                            <a href="{{ route('ketua.kelola-anggota') }}" class="flex items-center gap-3 p-4 rounded-2xl bg-periwinkle/10 hover:bg-periwinkle/20 transition">
+                            <a href="{{ \App\Support\EkskulAktif::route('ketua.kelola-anggota') }}" class="flex items-center gap-3 p-4 rounded-2xl bg-periwinkle/10 hover:bg-periwinkle/20 transition">
                                 <div class="w-10 h-10 rounded-xl bg-navy flex items-center justify-center shrink-0">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />

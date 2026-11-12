@@ -58,7 +58,7 @@
                             </div>
                         @endif
 
-                        <form action="{{ route('ketua.kelola-anggota.import') }}" method="POST" enctype="multipart/form-data">
+                        <form action="{{ \App\Support\EkskulAktif::route('ketua.kelola-anggota.import') }}" method="POST" enctype="multipart/form-data">
                             @csrf
 
                             <div class="mb-5">
@@ -91,11 +91,11 @@
                                     class="inline-flex items-center gap-2 px-6 py-2.5 bg-periwinkle text-white rounded-full text-sm font-bold shadow-md shadow-periwinkle/30 hover:opacity-90 transition">
                                     Import
                                 </button>
-                                <a href="{{ route('ketua.kelola-anggota.template') }}"
+                                <a href="{{ \App\Support\EkskulAktif::route('ketua.kelola-anggota.template') }}"
                                    class="inline-flex items-center gap-2 px-6 py-2.5 bg-white ring-1 ring-periwinkle/40 text-periwinkle hover:bg-periwinkle/5 rounded-full text-sm font-bold transition">
                                     Download Template
                                 </a>
-                                <a href="{{ route('ketua.kelola-anggota.tambah') }}"
+                                <a href="{{ \App\Support\EkskulAktif::route('ketua.kelola-anggota.tambah') }}"
                                    class="inline-flex items-center gap-2 px-6 py-2.5 bg-white ring-1 ring-ink/20 text-inksoft hover:bg-bgsoft rounded-full text-sm font-bold transition">
                                     Kembali
                                 </a>

@@ -15,8 +15,17 @@ class LaporanKegiatanController extends Controller
      * GET /laporan-kegiatan
      * Ketua memilih bulan, lalu melihat pratinjau kegiatan pelatih bulan itu.
      */
-    public function index(Request $request): View
+    public function index(Request $request)
     {
+        // Admin: laporan dibuat per ekskul (ada penanda tangan pelatih/pembina), jadi wajib pilih ekskul dulu.
+        if (! $request->attributes->get('ekskul_ketua')) {
+            return \App\Support\EkskulAktif::halamanPilih(
+                'Laporan Kegiatan',
+                'Pilih ekskul dulu untuk melihat dan mencetak laporan kegiatan pelatihnya.',
+                'ketua.laporan-kegiatan'
+            );
+        }
+
         $data = $this->dataLaporan($request);
 
         return view('dashboard-ketua.laporan-kegiatan.index', $data);
@@ -26,8 +35,13 @@ class LaporanKegiatanController extends Controller
      * GET /laporan-kegiatan/cetak?bulan=2026-10
      * Halaman siap cetak (mengikuti TEMPLATE_LAPORAN_KEGIATAN_PELATIH.docx).
      */
-    public function cetak(Request $request): View
+    public function cetak(Request $request)
     {
+        if (! $request->attributes->get('ekskul_ketua')) {
+            return redirect()->route('ketua.laporan-kegiatan')
+                ->with('error', 'Pilih ekskul dulu untuk mencetak laporan kegiatan.');
+        }
+
         $data = $this->dataLaporan($request);
 
         return view('dashboard-ketua.laporan-kegiatan.cetak', $data);

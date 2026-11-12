@@ -29,19 +29,24 @@ class RiwayatAbsensiController extends Controller
      */
     public function index(Request $request): View
     {
-        // Ekskul yang dipimpin ketua yang login (diset middleware 'ketua.ekskul').
-        $idEkskul = $request->attributes->get('ekskul_ketua')->id_ekskul;
+        // Ketua: ekskul yang dipimpin. Admin: ekskul yang dipilih (?ekskul=) atau SEMUA ekskul.
+        // 'ekskul_ids' & 'ekskul_ketua' diset middleware 'ketua.ekskul'.
+        $ekskulIds = $request->attributes->get('ekskul_ids');
+        $ekskulModel = $request->attributes->get('ekskul_ketua'); // null = Admin melihat semua ekskul
+        $tampilEkskul = $ekskulModel === null;                    // tampilkan nama ekskul di tiap baris
 
         [$bulan, $awal, $akhir] = $this->periode($request);
 
-        $riwayatPeserta = $this->absensiPeserta($idEkskul, $awal, $akhir);
+        $riwayatPeserta = $this->absensiPeserta($ekskulIds, $awal, $akhir);
 
-        // Dikelompokkan per tanggal (pertemuan), pertemuan terbaru di atas.
+        // Dikelompokkan per tanggal + ekskul (pertemuan), pertemuan terbaru di atas.
+        // (Ekskul ikut jadi kunci supaya pertemuan ekskul berbeda di tanggal yang sama tidak tercampur.)
         $pertemuan = $riwayatPeserta
-            ->groupBy(fn ($a) => $a->tanggal_absensi->toDateString())
+            ->groupBy(fn ($a) => $a->tanggal_absensi->toDateString() . '|' . ($a->peserta->id_ekskul ?? 0))
             ->sortKeysDesc()
-            ->map(fn (Collection $baris, string $tanggal) => [
-                'tanggal'  => Carbon::parse($tanggal),
+            ->map(fn (Collection $baris, string $kunci) => [
+                'tanggal'  => Carbon::parse(Str::before($kunci, '|')),
+                'ekskul'   => optional(optional($baris->first()->peserta)->ekskul)->nama_ekskul,
                 'kegiatan' => $baris->pluck('deskripsi_kegiatan')->filter()->first(),
                 'baris'    => $baris->sortBy(fn ($a) => mb_strtolower($a->peserta->nama ?? ''))->values(),
                 'hadir'    => $baris->where('status_kehadiran', 'hadir')->count(),
@@ -52,7 +57,7 @@ class RiwayatAbsensiController extends Controller
 
         // Pilihan bulan: semua bulan yang punya absensi + bulan yang sedang dipilih.
         $daftarBulan = AbsensiPeserta::query()
-            ->whereHas('peserta', fn ($q) => $q->where('id_ekskul', $idEkskul))
+            ->whereHas('peserta', fn ($q) => $q->whereIn('id_ekskul', $ekskulIds))
             ->select('tanggal_absensi')
             ->distinct()
             ->get()
@@ -65,13 +70,31 @@ class RiwayatAbsensiController extends Controller
 
         // Satu ekskul dilatih oleh satu pelatih (lihat relasi Ekskul::pelatih()); bila tidak ada,
         // baris yang diunggah pembina sebagai pengganti pelatih tetap ditampilkan.
-        $ekskulModel = $request->attributes->get('ekskul_ketua');
+        $ekskulDilihat = $ekskulModel ? collect([$ekskulModel]) : Ekskul::whereIn('id_ekskul', $ekskulIds)->get();
 
         $riwayatPelatih = AbsensiPelatih::with(['pelatih', 'pembina'])
-            ->untukEkskul($ekskulModel)
+            ->where(function ($q) use ($ekskulDilihat) {
+                foreach ($ekskulDilihat as $e) {
+                    $q->orWhere(fn ($w) => $w->untukEkskul($e));
+                }
+                // Tidak ada ekskul sama sekali -> jangan tampilkan apa pun
+                if ($ekskulDilihat->isEmpty()) {
+                    $q->whereRaw('1 = 0');
+                }
+            })
             ->orderByDesc('tanggal_absensi')
             ->orderByDesc('id_absensi')
             ->get();
+
+        // Nama ekskul tiap baris absensi pelatih (dipakai saat Admin melihat semua ekskul).
+        $ekskulPerPelatih = $ekskulDilihat->whereNotNull('id_pelatih')->groupBy('id_pelatih');
+        $namaEkskulPelatih = $riwayatPelatih->mapWithKeys(function ($a) use ($ekskulPerPelatih, $ekskulDilihat) {
+            $daftar = $a->id_pelatih
+                ? $ekskulPerPelatih->get($a->id_pelatih, collect())
+                : $ekskulDilihat->where('id_ekskul', $a->id_ekskul);
+
+            return [$a->id_absensi => $daftar->pluck('nama_ekskul')->implode(', ') ?: '-'];
+        });
 
         return view('dashboard-ketua.riwayat-absensi', [
             'riwayatPeserta' => $riwayatPeserta,
@@ -80,6 +103,9 @@ class RiwayatAbsensiController extends Controller
             'bulan'          => $bulan,
             'labelBulan'     => $this->labelBulan($bulan),
             'daftarBulan'    => $daftarBulan,
+            'tampilEkskul'   => $tampilEkskul,
+            'namaEkskulPelatih' => $namaEkskulPelatih,
+            'adaEkskulDipilih' => $ekskulModel !== null,
         ]);
     }
 
@@ -94,11 +120,18 @@ class RiwayatAbsensiController extends Controller
     public function exportPdf(Request $request)
     {
         $ekskul = $request->attributes->get('ekskul_ketua');
+
+        // Admin: PDF rekap berisi identitas & tanda tangan SATU ekskul, jadi ekskul wajib dipilih.
+        if (! $ekskul) {
+            return redirect()->route('ketua.riwayat-absensi', ['bulan' => $request->query('bulan')])
+                ->with('error', 'Pilih satu ekskul dulu untuk membuat PDF rekap absensi.');
+        }
+
         $ekskul->loadMissing('pelatih');
 
         [$bulan, $awal, $akhir] = $this->periode($request);
 
-        $absensi = $this->absensiPeserta($ekskul->id_ekskul, $awal, $akhir)
+        $absensi = $this->absensiPeserta(collect([$ekskul->id_ekskul]), $awal, $akhir)
             ->sortBy([
                 fn ($a, $b) => $a->tanggal_absensi <=> $b->tanggal_absensi,
                 fn ($a, $b) => mb_strtolower($a->peserta->nama ?? '') <=> mb_strtolower($b->peserta->nama ?? ''),
@@ -187,10 +220,10 @@ class RiwayatAbsensiController extends Controller
     /**
      * Seluruh absensi peserta ekskul ini pada rentang tanggal tertentu.
      */
-    private function absensiPeserta(int $idEkskul, Carbon $awal, Carbon $akhir): Collection
+    private function absensiPeserta(Collection $ekskulIds, Carbon $awal, Carbon $akhir): Collection
     {
-        return AbsensiPeserta::with('peserta.siswa')
-            ->whereHas('peserta', fn ($q) => $q->where('id_ekskul', $idEkskul))
+        return AbsensiPeserta::with('peserta.siswa', 'peserta.ekskul')
+            ->whereHas('peserta', fn ($q) => $q->whereIn('id_ekskul', $ekskulIds))
             ->whereBetween('tanggal_absensi', [$awal->toDateString(), $akhir->toDateString()])
             ->orderBy('tanggal_absensi')
             ->orderBy('id_absensi')

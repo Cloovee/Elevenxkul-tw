@@ -10,8 +10,8 @@
       Halaman di belakangnya di-blur lewat .ekk-sidebar-backdrop.
     - Mobile (< lg)      : bar di bawah layar. Ketuk avatar / tombol grup untuk membuka panel,
                            lalu pilih tab Admin / Pembina / Ketua.
-    - Admin TIDAK dibatasi ekskul di halaman Pembina. Di halaman Ketua, ekskul yang dikelola
-      dipilih lewat dropdown "Ekskul aktif" di kolom Ketua.
+    - Admin TIDAK dibatasi ekskul. Ekskul dipilih/difilter di dalam tiap halaman Pembina & Ketua
+      (parameter ?ekskul=), bukan dari sidebar.
 
     Parameter opsional saat di-include:
       insetY / insetX : jarak rail dari tepi layar (harus sama dengan padding wrapper halaman).
@@ -95,8 +95,6 @@
         }
     }
 
-    $ekskulPilihan = \App\Models\Ekskul::orderBy('nama_ekskul')->get(['id_ekskul', 'nama_ekskul']);
-    $ekskulAktifId = \App\Support\EkskulAktif::id(auth()->user());
     $namaAdmin = auth()->user()->name ?? 'Admin';
 @endphp
 
@@ -136,9 +134,6 @@
     .ekk-col .ekk-btn { height: 2.375rem; padding-right: .5rem; }
     .ekk-col .ekk-ico { width: 2.375rem; height: 2.375rem; }
     .ekk-col .ekk-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .85rem; font-weight: 600; }
-    .ekk-pilih { padding: .125rem .25rem .375rem; }
-    .ekk-pilih label { display: block; color: rgba(255,255,255,.75); font-size: .65rem; font-weight: 600; margin-bottom: .25rem; padding-left: .25rem; }
-    .ekk-pilih select { width: 100%; border: 0; border-radius: .75rem; padding: .4rem .5rem; font-size: .8rem; font-weight: 600; background: rgba(255,255,255,.95); color: #10316B; }
 
     @media (min-width: 1024px) {
         .ekk-sidebar-rail {
@@ -286,21 +281,6 @@
                 @foreach($groups as $kunci => $g)
                     <div class="ekk-col {{ $grupAktif === $kunci ? 'is-tab' : '' }}" data-col="{{ $kunci }}">
                         <div class="ekk-col-title">{{ $g['title'] }}@if($kunci === 'pembina') · semua ekskul @endif</div>
-
-                        @if($kunci === 'ketua')
-                            {{-- Halaman Ketua bekerja per-ekskul: Admin memilih ekskul yang dikelola --}}
-                            <form method="POST" action="{{ route('admin.ekskul-aktif') }}" class="ekk-pilih">
-                                @csrf
-                                <label for="ekk-ekskul-aktif">Ekskul aktif</label>
-                                <select name="id_ekskul" id="ekk-ekskul-aktif" onchange="this.form.submit()" @disabled($ekskulPilihan->isEmpty())>
-                                    @forelse($ekskulPilihan as $e)
-                                        <option value="{{ $e->id_ekskul }}" {{ (int) $ekskulAktifId === (int) $e->id_ekskul ? 'selected' : '' }}>{{ $e->nama_ekskul }}</option>
-                                    @empty
-                                        <option>Belum ada ekskul</option>
-                                    @endforelse
-                                </select>
-                            </form>
-                        @endif
 
                         @foreach($g['items'] as $item)
                             @php

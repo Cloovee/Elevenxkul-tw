@@ -29,6 +29,8 @@
                         <p class="text-sm text-gray-500 mt-1">Catat apakah pelatih ekskulmu hadir/melatih. Laporan akan divalidasi oleh pembina ekskul terkait.</p>
                     </div>
 
+                    @include('dashboard-ketua.partials.filter-ekskul', ['mode' => 'pilih'])
+
                     @if (session('success'))
                         <div class="bg-emerald-50 text-emerald-700 text-sm font-semibold px-4 py-3 rounded-2xl">
                             {{ session('success') }}
@@ -51,7 +53,7 @@
                         </div>
                     @endif
 
-                    <form method="POST" action="{{ route('ketua.absensi-pelatih.store') }}" enctype="multipart/form-data"
+                    <form method="POST" action="{{ \App\Support\EkskulAktif::route('ketua.absensi-pelatih.store') }}" enctype="multipart/form-data"
                           class="grid grid-cols-1 lg:grid-cols-2 gap-6" x-data="{ preview: null }">
                         @csrf
 

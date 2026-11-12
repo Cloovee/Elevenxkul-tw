@@ -32,6 +32,8 @@
                         </p>
                     </div>
 
+                    @include('dashboard-ketua.partials.filter-ekskul', ['mode' => 'pilih'])
+
                     @if (! $pelatih)
                         <div class="bg-amber-50 text-amber-700 text-sm font-medium px-4 py-3 rounded-2xl">
                             Ekskul <span class="font-semibold">{{ $ekskul->nama_ekskul }}</span> belum punya pelatih.
@@ -49,6 +51,7 @@
                     <!-- Pilih bulan -->
                     <div class="bg-white rounded-3xl shadow-xl shadow-periwinkle/10 ring-1 ring-black/5 p-6">
                         <form method="GET" action="{{ route('ketua.laporan-kegiatan') }}" class="flex flex-col sm:flex-row sm:items-end gap-4">
+                            {!! \App\Support\EkskulAktif::hiddenInput() !!}
                             <div class="flex-1 max-w-xs">
                                 <label for="bulan" class="block text-sm font-medium text-ink mb-1.5">Bulan</label>
                                 <input type="month" id="bulan" name="bulan" value="{{ $bulanInput }}" required
@@ -60,7 +63,7 @@
                                     Tampilkan
                                 </button>
                                 @if (! $pelatih || $kegiatan->isNotEmpty())
-                                    <a href="{{ route('ketua.laporan-kegiatan.cetak', ['bulan' => $bulanInput]) }}" target="_blank" rel="noopener"
+                                    <a href="{{ \App\Support\EkskulAktif::route('ketua.laporan-kegiatan.cetak', ['bulan' => $bulanInput]) }}" target="_blank" rel="noopener"
                                        class="px-5 py-2.5 rounded-xl bg-periwinkle text-white font-semibold text-sm shadow-md shadow-periwinkle/30 hover:opacity-90 transition">
                                         Cetak Laporan
                                     </a>

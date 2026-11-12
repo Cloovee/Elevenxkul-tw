@@ -33,6 +33,12 @@
                         </p>
                     </div>
 
+                    @include('dashboard-ketua.partials.filter-ekskul', ['mode' => 'semua'])
+
+                    @if (session('error'))
+                        <div class="bg-red-50 text-red-500 text-sm font-semibold px-4 py-3 rounded-2xl">{{ session('error') }}</div>
+                    @endif
+
                     <!-- Tab switcher -->
                     <div class="inline-flex bg-white rounded-2xl p-1.5 shadow-sm ring-1 ring-black/5">
                         <button
@@ -67,6 +73,7 @@
                             <div class="flex flex-wrap items-center gap-2">
                                 {{-- Filter bulan: dipakai juga oleh tombol Export PDF --}}
                                 <form method="GET" action="{{ route('ketua.riwayat-absensi') }}">
+                                    {!! \App\Support\EkskulAktif::hiddenInput() !!}
                                     <select
                                         name="bulan"
                                         onchange="this.form.submit()"
@@ -79,6 +86,7 @@
                                     </select>
                                 </form>
 
+                                @if ($adaEkskulDipilih)
                                 <button
                                     type="button"
                                     @click="preview = true"
@@ -92,7 +100,7 @@
                                 </button>
 
                                 <a
-                                    href="{{ route('ketua.riwayat-absensi.export-pdf', ['bulan' => $bulan]) }}"
+                                    href="{{ \App\Support\EkskulAktif::route('ketua.riwayat-absensi.export-pdf', ['bulan' => $bulan]) }}"
                                     class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-periwinkle text-white text-sm font-semibold shadow-md shadow-periwinkle/30 hover:opacity-90 transition"
                                 >
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
@@ -100,6 +108,9 @@
                                     </svg>
                                     Export PDF
                                 </a>
+                                @else
+                                    <span class="text-xs text-amber-600 font-medium">Pilih satu ekskul untuk Preview / Export PDF.</span>
+                                @endif
                             </div>
                         </div>
 
@@ -128,6 +139,9 @@
                                                     <span class="font-semibold text-ink">
                                                         {{ $sesi['tanggal']->locale('id')->translatedFormat('l, d F Y') }}
                                                     </span>
+                                                    @if ($tampilEkskul && $sesi['ekskul'])
+                                                        <span class="ml-1 inline-block px-2.5 py-0.5 rounded-full bg-periwinkle/10 text-periwinkle text-xs font-semibold">{{ $sesi['ekskul'] }}</span>
+                                                    @endif
                                                     @if ($sesi['kegiatan'])
                                                         <span class="text-gray-500"> &mdash; {{ $sesi['kegiatan'] }}</span>
                                                     @endif
@@ -198,7 +212,7 @@
                                 </div>
                                 <div class="flex items-center gap-2">
                                     <a
-                                        href="{{ route('ketua.riwayat-absensi.export-pdf', ['bulan' => $bulan]) }}"
+                                        href="{{ \App\Support\EkskulAktif::route('ketua.riwayat-absensi.export-pdf', ['bulan' => $bulan]) }}"
                                         class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-periwinkle text-white text-sm font-semibold shadow-md shadow-periwinkle/30 hover:opacity-90 transition"
                                     >
                                         Download PDF
@@ -215,7 +229,7 @@
 
                             {{-- src baru diisi saat modal dibuka, jadi PDF tidak dirender kalau tidak dipakai. --}}
                             <iframe
-                                :src="preview ? '{{ route('ketua.riwayat-absensi.export-pdf', ['bulan' => $bulan, 'preview' => 1]) }}' : 'about:blank'"
+                                :src="preview ? '{{ \App\Support\EkskulAktif::route('ketua.riwayat-absensi.export-pdf', ['bulan' => $bulan, 'preview' => 1]) }}' : 'about:blank'"
                                 class="flex-1 w-full bg-gray-100"
                                 title="Preview PDF"
                             ></iframe>
@@ -238,6 +252,9 @@
                                     <thead>
                                         <tr class="text-left text-xs uppercase tracking-wide text-gray-400 border-b border-gray-100">
                                             <th class="py-2.5 px-2">Tanggal</th>
+                                            @if ($tampilEkskul)
+                                                <th class="py-2.5 px-2">Ekskul</th>
+                                            @endif
                                             <th class="py-2.5 px-2">Nama Pelatih</th>
                                             <th class="py-2.5 px-2">Kegiatan</th>
                                             <th class="py-2.5 px-2">Kehadiran</th>
@@ -250,6 +267,11 @@
                                                 <td class="py-2.5 px-2 whitespace-nowrap">
                                                     {{ optional($absensi->tanggal_absensi)->translatedFormat('d M Y') }}
                                                 </td>
+                                                @if ($tampilEkskul)
+                                                    <td class="py-2.5 px-2 whitespace-nowrap">
+                                                        <span class="inline-block px-2.5 py-1 rounded-full bg-periwinkle/10 text-periwinkle text-xs font-semibold">{{ $namaEkskulPelatih[$absensi->id_absensi] ?? '-' }}</span>
+                                                    </td>
+                                                @endif
                                                 <td class="py-2.5 px-2 font-medium text-ink">
                                                     {{ $absensi->nama_petugas }}
                                                 </td>

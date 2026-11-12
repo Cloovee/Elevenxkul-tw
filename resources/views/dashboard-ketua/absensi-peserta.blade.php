@@ -24,7 +24,7 @@
                 <!-- Konten -->
                 <div class="flex-1 space-y-6"
                      x-data="scannerAbsensi({
-                         url: @js(route('ketua.absensi-peserta.scan')),
+                         url: @js(\App\Support\EkskulAktif::route('ketua.absensi-peserta.scan')),
                          csrf: @js(csrf_token()),
                          tanggal: @js($tanggal),
                          deskripsi: @js(old('deskripsi_kegiatan', $deskripsi)),
@@ -45,6 +45,8 @@
                         <h1 class="text-2xl font-extrabold text-ink">Absensi Peserta</h1>
                         <p class="text-sm text-gray-500 mt-1">Pilih kelas dulu. Kelas 10 bisa diabsen lewat scan QR kartu peserta atau tabel manual, kelas 11 dan 12 lewat tabel manual. Data langsung tampil di halaman Absensi Peserta milik pembina.</p>
                     </div>
+
+                    @include('dashboard-ketua.partials.filter-ekskul', ['mode' => 'pilih'])
 
                     @if (session('success'))
                         <div class="bg-emerald-50 text-emerald-700 text-sm font-semibold px-4 py-3 rounded-2xl">
@@ -69,6 +71,7 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             {{-- Ganti tanggal = muat ulang halaman, supaya daftar hadir ikut tanggal itu --}}
                             <form method="GET" action="{{ route('ketua.absensi-peserta') }}">
+                                {!! \App\Support\EkskulAktif::hiddenInput() !!}
                                 <input type="hidden" name="kelas" :value="kelas">
                                 <input type="hidden" name="cara" :value="cara">
                                 <label class="block text-sm font-medium text-ink mb-1.5">Tanggal Kegiatan</label>
@@ -197,7 +200,7 @@
 
                     <!-- ===== Tabel manual (kelas 10 cara manual, kelas 11, kelas 12) ===== -->
                     <div x-show="!modeQr" x-cloak>
-                        <form method="POST" action="{{ route('ketua.absensi-peserta.manual') }}"
+                        <form method="POST" action="{{ \App\Support\EkskulAktif::route('ketua.absensi-peserta.manual') }}"
                               class="bg-white rounded-3xl shadow-xl shadow-periwinkle/10 ring-1 ring-black/5 p-6 space-y-4">
                             @csrf
                             <input type="hidden" name="tanggal_absensi" value="{{ $tanggal }}">
@@ -278,7 +281,7 @@
                     <!-- ===== /Tabel manual ===== -->
 
                     <!-- Tutup absensi: yang tidak scan jadi Alpha -->
-                    <form method="POST" action="{{ route('ketua.absensi-peserta.selesai') }}"
+                    <form method="POST" action="{{ \App\Support\EkskulAktif::route('ketua.absensi-peserta.selesai') }}"
                           @submit="if (!confirm('Tutup absensi? Peserta yang belum scan akan dicatat Alpha.')) $event.preventDefault()">
                         @csrf
                         <input type="hidden" name="tanggal_absensi" value="{{ $tanggal }}">

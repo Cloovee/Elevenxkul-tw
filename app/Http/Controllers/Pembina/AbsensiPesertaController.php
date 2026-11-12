@@ -38,7 +38,7 @@ class AbsensiPesertaController extends Controller
      * ekskul tersebut, dan tiap tanggal bisa dibuka lagi untuk melihat detail
      * kehadiran per peserta.
      */
-    public function index()
+    public function index(Request $request)
     {
         $pembina = $this->pembinaAktif();
 
@@ -46,7 +46,17 @@ class AbsensiPesertaController extends Controller
             return $this->belumTerhubung();
         }
 
-        $ekskuls = $pembina->ekskuls()->get();
+        // Filter ekskul: hanya diterima kalau memang termasuk ekskul yang boleh dilihat
+        // (pembina: ekskul binaannya, admin: semua ekskul).
+        $ekskulList = $pembina->ekskuls()->orderBy('nama_ekskul')->get();
+        $filterEkskul = (int) $request->query('ekskul');
+        if (! $ekskulList->contains('id_ekskul', $filterEkskul)) {
+            $filterEkskul = null;
+        }
+
+        $ekskuls = $filterEkskul
+            ? $ekskulList->where('id_ekskul', $filterEkskul)->values()
+            : $ekskulList->values();
         $ekskulIds = $ekskuls->pluck('id_ekskul');
 
         $anggotaIds = Peserta::whereIn('id_ekskul', $ekskulIds)->pluck('id_anggota');
@@ -103,6 +113,8 @@ class AbsensiPesertaController extends Controller
             'riwayatPerEkskul' => $riwayatPerEkskul,
             'hadirBulanIni' => $hadirBulanIni,
             'totalBulanIni' => $totalBulanIni,
+            'ekskulList' => $ekskulList,
+            'filterEkskul' => $filterEkskul,
         ]);
     }
 

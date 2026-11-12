@@ -42,12 +42,12 @@
                         </div>
 
                         <div class="flex flex-wrap gap-2">
-                            <a href="{{ route('ketua.kelola-anggota.import.form') }}"
+                            <a href="{{ \App\Support\EkskulAktif::route('ketua.kelola-anggota.import.form') }}"
                                class="inline-flex items-center gap-2 px-4 py-2 bg-white ring-1 ring-black/5 shadow-sm hover:shadow-md text-ink rounded-full text-sm font-semibold transition">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M12 4v12m0 0l-4-4m4 4l4-4"/></svg>
                                 Import
                             </a>
-                            <a href="{{ route('ketua.kelola-anggota.export') }}"
+                            <a href="{{ \App\Support\EkskulAktif::route('ketua.kelola-anggota.export') }}"
                                class="inline-flex items-center gap-2 px-4 py-2 bg-white ring-1 ring-black/5 shadow-sm hover:shadow-md text-ink rounded-full text-sm font-semibold transition">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M12 16V4m0 0l-4 4m4-4l4 4"/></svg>
                                 Export
@@ -61,7 +61,7 @@
                             Data Anggota Baru
                         </h2>
 
-                        <form action="{{ route('ketua.kelola-anggota.store') }}" method="POST" class="space-y-5">
+                        <form action="{{ \App\Support\EkskulAktif::route('ketua.kelola-anggota.store') }}" method="POST" class="space-y-5">
 
                             @csrf
 
@@ -235,7 +235,7 @@
                             <div class="flex items-center justify-end gap-3 pt-3">
 
                                 <a
-                                    href="{{ route('ketua.kelola-anggota') }}"
+                                    href="{{ \App\Support\EkskulAktif::route('ketua.kelola-anggota') }}"
                                     class="px-5 py-2.5 rounded-xl border border-ink/15 text-inksoft hover:bg-bgsoft transition"
                                 >
                                     Batal

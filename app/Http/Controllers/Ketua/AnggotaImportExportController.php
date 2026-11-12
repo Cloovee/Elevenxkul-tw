@@ -24,6 +24,15 @@ class AnggotaImportExportController extends Controller
     {
         $ekskul = $request->attributes->get('ekskul_ketua');
 
+        // Admin: wajib pilih ekskul dulu (import masuk ke satu ekskul).
+        if (! $ekskul) {
+            return \App\Support\EkskulAktif::halamanPilih(
+                'Import Anggota',
+                'Pilih ekskul dulu, lalu unggah file Excel anggotanya.',
+                'ketua.kelola-anggota.import.form'
+            );
+        }
+
         return view('dashboard-ketua.kelola-anggota.import', compact('ekskul'));
     }
 
@@ -34,6 +43,12 @@ class AnggotaImportExportController extends Controller
         ]);
 
         $ekskul = $request->attributes->get('ekskul_ketua');
+
+        // Admin belum memilih ekskul -> aksi ini butuh satu ekskul.
+        if (! $ekskul) {
+            return redirect()->route('ketua.kelola-anggota.tambah')
+                ->with('error', 'Pilih ekskul dulu untuk import / export anggota.');
+        }
 
         // File disimpan dulu ke storage/app (bukan path temp upload PHP) supaya
         // aman di hosting dengan open_basedir -- sama seperti import siswa Admin.
@@ -76,6 +91,12 @@ class AnggotaImportExportController extends Controller
     {
         $ekskul = $request->attributes->get('ekskul_ketua');
 
+        // Admin belum memilih ekskul -> aksi ini butuh satu ekskul.
+        if (! $ekskul) {
+            return redirect()->route('ketua.kelola-anggota.tambah')
+                ->with('error', 'Pilih ekskul dulu untuk import / export anggota.');
+        }
+
         $nama = 'anggota_' . Str::slug($ekskul->nama_ekskul) . '_' . date('Y-m-d') . '.xlsx';
 
         return Excel::download(new AnggotaExport((int) $ekskul->id_ekskul), $nama);
@@ -84,6 +105,12 @@ class AnggotaImportExportController extends Controller
     public function downloadTemplate(Request $request)
     {
         $ekskul = $request->attributes->get('ekskul_ketua');
+
+        // Admin belum memilih ekskul -> aksi ini butuh satu ekskul.
+        if (! $ekskul) {
+            return redirect()->route('ketua.kelola-anggota.tambah')
+                ->with('error', 'Pilih ekskul dulu untuk import / export anggota.');
+        }
 
         // Contoh baris diambil dari siswa asli yang belum jadi anggota (kalau ada).
         $contoh = Siswa::with('kelas')

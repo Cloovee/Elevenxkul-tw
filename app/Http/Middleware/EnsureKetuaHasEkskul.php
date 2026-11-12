@@ -21,17 +21,33 @@ class EnsureKetuaHasEkskul
     {
         $user = $request->user();
         $siswa = $user?->siswa;
-        // Ketua: ekskul yang dipimpin. Admin: ekskul yang dipilih di sidebar (tanpa batasan).
+
+        // ADMIN: tidak dibatasi. Ekskul dipilih per halaman lewat ?ekskul=ID (boleh kosong).
+        // Controller yang butuh satu ekskul menampilkan halaman "pilih ekskul dulu";
+        // controller yang boleh "semua ekskul" memakai 'ekskul_ids'.
+        if ($user?->role === 'Admin') {
+            $ekskul = \App\Support\EkskulAktif::untuk($user);
+
+            $request->attributes->set('ekskul_ketua', $ekskul);      // Ekskul|null
+            $request->attributes->set('ekskul_ids', \App\Support\EkskulAktif::ids($user));
+            $request->attributes->set('ekskul_admin', true);
+
+            return $next($request);
+        }
+
+        // KETUA: hanya ekskul yang dia pimpin.
         $ekskul = \App\Support\EkskulAktif::untuk($user);
 
         if (! $ekskul) {
             return response()->view('dashboard-ketua.belum-ditugaskan', [
                 'punyaBiodata' => (bool) $siswa,
-                'adminTanpaEkskul' => $user?->role === 'Admin',
+                'adminTanpaEkskul' => false,
             ], 403);
         }
 
         $request->attributes->set('ekskul_ketua', $ekskul);
+        $request->attributes->set('ekskul_ids', collect([$ekskul->id_ekskul]));
+        $request->attributes->set('ekskul_admin', false);
 
         return $next($request);
     }

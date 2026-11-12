@@ -87,11 +87,25 @@
                 ];
             @endphp
             @foreach ($tabs as $value => $label)
-                <a href="{{ route('pembina.validasi.index', $value ? ['status' => $value] : []) }}"
+                <a href="{{ route('pembina.validasi.index', array_filter(['status' => $value, 'ekskul' => $filterEkskul])) }}"
                    class="text-xs font-semibold px-3.5 py-2 rounded-xl transition-colors {{ $statusAktif === $value ? 'bg-[#1E6FA8] text-white' : 'bg-white text-inksoft hover:bg-sky/40' }}">
                     {{ $label }}
                 </a>
             @endforeach
+
+            {{-- Filter ekskul (admin / pembina yang membina lebih dari satu ekskul) --}}
+            @if ($ekskulList->count() > 1 || auth()->user()->role === 'Admin')
+                <form method="GET" class="ml-auto flex items-center gap-2">
+                    @if ($statusAktif)
+                        <input type="hidden" name="status" value="{{ $statusAktif }}">
+                    @endif
+                    @include('pembina.partials.filter-ekskul')
+                    @if ($filterEkskul)
+                        <a href="{{ route('pembina.validasi.index', array_filter(['status' => $statusAktif])) }}"
+                           class="px-4 py-2 bg-bgsoft hover:bg-[#e9edfb] text-inksoft rounded-full text-sm font-bold transition-colors">Reset</a>
+                    @endif
+                </form>
+            @endif
         </div>
 
         {{-- TABLE --}}

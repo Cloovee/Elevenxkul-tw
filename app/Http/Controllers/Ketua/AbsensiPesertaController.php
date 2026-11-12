@@ -29,9 +29,20 @@ class AbsensiPesertaController extends Controller
      * Ekskul yang dipimpin ketua yang login (diset middleware 'ketua.ekskul',
      * jadi di sini pasti ada).
      */
-    private function idEkskul(Request $request): int
+    private function idEkskul(Request $request): ?int
     {
-        return $request->attributes->get('ekskul_ketua')->id_ekskul;
+        // Ketua: selalu ada. Admin: null kalau belum memilih ekskul (?ekskul=).
+        return optional($request->attributes->get('ekskul_ketua'))->id_ekskul;
+    }
+
+    /** Respons untuk Admin yang belum memilih ekskul (aksi tulis ditolak). */
+    private function belumPilih(bool $json = false)
+    {
+        $pesan = 'Pilih ekskul dulu sebelum mengabsen.';
+
+        return $json
+            ? response()->json(['message' => $pesan], 422)
+            : redirect()->route('ketua.absensi-peserta')->with('error', $pesan);
     }
 
     /**
@@ -61,9 +72,18 @@ class AbsensiPesertaController extends Controller
      * Di tabel manual (H / S / I), kolom Catatan hanya tampil kalau ada
      * peserta yang berstatus Izin.
      */
-    public function index(Request $request): View
+    public function index(Request $request)
     {
         $idEkskul = $this->idEkskul($request);
+
+        // Admin: wajib pilih ekskul dulu baru bisa absen.
+        if (! $idEkskul) {
+            return \App\Support\EkskulAktif::halamanPilih(
+                'Absensi Peserta',
+                'Pilih ekskul dulu, lalu catat kehadiran peserta ekskul tersebut.',
+                'ketua.absensi-peserta'
+            );
+        }
 
         $request->validate([
             'tanggal' => ['nullable', 'date', 'before_or_equal:today'],
@@ -149,6 +169,10 @@ class AbsensiPesertaController extends Controller
     {
         $idEkskul = $this->idEkskul($request);
 
+        if (! $idEkskul) {
+            return $this->belumPilih(true);
+        }
+
         $data = $request->validate([
             'nis'                => ['required', 'string', 'max:20'],
             'tanggal_absensi'    => ['required', 'date', 'before_or_equal:today'],
@@ -219,6 +243,10 @@ class AbsensiPesertaController extends Controller
     {
         $idEkskul = $this->idEkskul($request);
 
+        if (! $idEkskul) {
+            return $this->belumPilih();
+        }
+
         $data = $request->validate([
             'tanggal_absensi'    => ['required', 'date', 'before_or_equal:today'],
             'deskripsi_kegiatan' => ['nullable', 'string', 'max:1000'],
@@ -276,12 +304,11 @@ class AbsensiPesertaController extends Controller
             }
         });
 
-        return redirect()
-            ->route('ketua.absensi-peserta', [
+        return redirect(\App\Support\EkskulAktif::route('ketua.absensi-peserta', [
                 'tanggal' => $data['tanggal_absensi'],
                 'kelas'   => $data['kelas'] ?? null,
                 'cara'    => 'manual',
-            ])
+            ]))
             ->with('success', "Absensi manual tersimpan untuk {$tersimpan} peserta.");
     }
 
@@ -292,6 +319,10 @@ class AbsensiPesertaController extends Controller
     public function selesai(Request $request): RedirectResponse
     {
         $idEkskul = $this->idEkskul($request);
+
+        if (! $idEkskul) {
+            return $this->belumPilih();
+        }
 
         $data = $request->validate([
             'tanggal_absensi'    => ['required', 'date', 'before_or_equal:today'],
@@ -318,8 +349,7 @@ class AbsensiPesertaController extends Controller
             AbsensiPeserta::insert($rows);
         }
 
-        return redirect()
-            ->route('ketua.absensi-peserta', ['tanggal' => $data['tanggal_absensi']])
+        return redirect(\App\Support\EkskulAktif::route('ketua.absensi-peserta', ['tanggal' => $data['tanggal_absensi']]))
             ->with('success', count($rows) > 0
                 ? 'Absensi ditutup. ' . count($rows) . ' peserta yang tidak scan dicatat Alpha.'
                 : 'Absensi ditutup. Semua peserta aktif sudah tercatat.');
