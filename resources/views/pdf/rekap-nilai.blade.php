@@ -83,7 +83,7 @@
     <table class="info">
         <tr><td class="label">Ekskul</td><td class="titik">:</td><td>{{ $labelEkskul }}</td></tr>
         <tr><td class="label">Pembina</td><td class="titik">:</td><td>{{ $namaPembina ?: '-' }}</td></tr>
-        <tr><td class="label">Jumlah Peserta</td><td class="titik">:</td><td>{{ $baris->count() }} orang ({{ $baris->where('dinilai', true)->count() }} sudah dinilai)</td></tr>
+        <tr><td class="label">Jumlah Peserta</td><td class="titik">:</td><td>{{ $baris->count() }} orang ({{ $baris->where('dinilai', true)->count() }} sudah dinilai{{ ($tanpaHadir = $baris->where('status', 'tanpa_hadir')->count()) ? ', '.$tanpaHadir.' tidak pernah hadir' : '' }})</td></tr>
     </table>
 
     {{-- ===================== TABEL GRADE ===================== --}}
@@ -122,6 +122,10 @@
                         <td class="tengah">{{ rtrim(rtrim(number_format($b['nilai_keaktifan'], 2, ',', ''), '0'), ',') }}</td>
                         <td class="grade">{{ $b['grade_keaktifan'] }}</td>
                         <td class="grade">{{ $b['grade_akhir'] }}</td>
+                    @elseif (($b['status'] ?? '') === 'tanpa_hadir')
+                        <td class="tengah">{{ $b['hadir'] }} / {{ $b['pertemuan'] }}</td>
+                        <td class="tengah">{{ rtrim(rtrim(number_format((float) $b['persen'], 2, ',', ''), '0'), ',') ?: '0' }}%</td>
+                        <td colspan="4" class="tengah kosong-nilai">Tidak pernah hadir (tanpa grade)</td>
                     @else
                         <td colspan="6" class="tengah kosong-nilai">Belum dinilai</td>
                     @endif
@@ -132,7 +136,7 @@
 
     <div class="catatan">
         Keterangan: Grade A = nilai {{ $batas['A'] }} ke atas, B = {{ $batas['B'] }}–{{ $batas['A'] - 1 }}, C = {{ $batas['C'] }}–{{ $batas['B'] - 1 }}
-        (nilai {{ $batas['C'] }} adalah yang terendah). Grade kehadiran dihitung dari persentase kehadiran pada semester ini,
+        (nilai {{ $batas['C'] }} adalah yang terendah). Peserta yang tidak pernah hadir pada semester ini tidak diberi nilai (tanpa grade). Grade kehadiran dihitung dari persentase kehadiran pada semester ini,
         grade keaktifan dari nilai yang diberikan pembina. Grade akhir adalah gabungan keduanya
         (kehadiran {{ $bobot['kehadiran'] }}% : keaktifan {{ $bobot['keaktifan'] }}%).
     </div>

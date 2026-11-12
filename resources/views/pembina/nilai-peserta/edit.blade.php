@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Nilai Peserta - ElevenXkul</title>
+    <title>Edit Nilai Peserta - Xkul11</title>
     @include('partials.favicon')
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -13,6 +13,9 @@
 @php
     $minimum = \App\Support\Penilaian::nilaiMinimum();
     $angka = fn ($v) => $v === null ? '' : rtrim(rtrim(number_format((float) $v, 2, '.', ''), '0'), '.');
+    // Tidak pernah hadir sama sekali pada semester ini -> tidak bisa diberi nilai/grade.
+    $pernahHadir = \App\Support\Penilaian::pernahHadir($kehadiran);
+    $tanpaHadir = $kehadiran['total'] > 0 && ! $pernahHadir;
 @endphp
 
 <div class="w-full max-w-lg">
@@ -35,7 +38,14 @@
         {{-- Kehadiran semester ini (acuan, dihitung otomatis) --}}
         <div class="rounded-2xl bg-bgsoft px-4 py-3 mb-5">
             <p class="text-[11px] font-bold uppercase tracking-wide text-inksoft mb-1.5">Kehadiran Semester {{ $nilaiPeserta->semester }} TA {{ $nilaiPeserta->tahun_ajaran }}</p>
-            @if($kehadiran['total'] > 0)
+            @if($tanpaHadir)
+                <div class="flex flex-wrap items-center gap-2">
+                    <span class="inline-flex items-center px-2.5 h-7 rounded-lg bg-red-50 text-red-600 text-[11px] font-bold">Tidak pernah hadir</span>
+                    <span class="font-semibold">{{ $angka($kehadiran['persen']) }}%</span>
+                    <span class="text-xs text-inksoft">Hadir {{ $kehadiran['hadir'] }}/{{ $kehadiran['total'] }} &middot; I {{ $kehadiran['izin'] }} &middot; S {{ $kehadiran['sakit'] }} &middot; A {{ $kehadiran['alpha'] }}</span>
+                </div>
+                <p class="text-xs text-red-600 font-semibold mt-2">Peserta ini tidak pernah hadir pada semester ini, jadi tidak diberi nilai maupun grade. Kalau nilai ini tidak seharusnya ada, hapus dari Riwayat Nilai.</p>
+            @elseif($kehadiran['total'] > 0)
                 <div class="flex items-center gap-2">
                     @include('pembina.nilai-peserta._grade', ['g' => $kehadiran['grade']])
                     <span class="font-semibold">{{ $angka($kehadiran['persen']) }}%</span>
@@ -80,7 +90,7 @@
 
             <div>
                 <label class="block text-xs font-bold text-inksoft uppercase tracking-wide mb-1.5">Nilai Keaktifan ({{ $minimum }}-100)</label>
-                <input type="number" name="nilai_keaktifan" min="{{ $minimum }}" max="100" step="0.01" required
+                <input type="number" name="nilai_keaktifan" min="{{ $minimum }}" max="100" step="0.01" required placeholder="{{ $minimum }}-100" @disabled($tanpaHadir)
                        value="{{ old('nilai_keaktifan', $angka($nilaiPeserta->nilai_keaktifan ?? $nilaiPeserta->nilai)) }}"
                        class="w-full px-3.5 py-2.5 rounded-xl border border-[#E7E7F4] text-sm focus:outline-none focus:border-lavender">
                 <p class="mt-1 text-xs text-inksoft">Sistem mengubah angka ini jadi grade keaktifan, lalu menggabungkannya dengan grade kehadiran.</p>
@@ -95,8 +105,8 @@
             <div class="flex gap-3 mt-2">
                 <a href="{{ route('pembina.nilai.index', ['tahun_ajaran' => $nilaiPeserta->tahun_ajaran, 'semester' => $nilaiPeserta->semester]) }}"
                    class="flex-1 text-center py-2.5 rounded-xl border border-[#E7E7F4] font-semibold text-sm text-inksoft hover:bg-bgsoft">Batal</a>
-                <button type="submit"
-                        class="flex-1 bg-lavender hover:bg-[#8385f0] text-white font-bold text-sm py-2.5 rounded-xl">
+                <button type="submit" @disabled($tanpaHadir)
+                        class="flex-1 bg-lavender hover:bg-[#8385f0] text-white font-bold text-sm py-2.5 rounded-xl disabled:opacity-40 disabled:cursor-not-allowed">
                     Simpan Perubahan
                 </button>
             </div>

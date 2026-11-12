@@ -4,31 +4,27 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
-        <title>{{ $attributes->get('title', 'Masuk') }} - ElevenXkul</title>
+        <title>{{ $attributes->get('title', 'Masuk') }} - Xkul11</title>
     @include('partials.favicon')
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans text-ink antialiased">
-        <div class="min-h-screen grid lg:grid-cols-2">
+    <body>
+        <div class="gl-page">
 
-            <!-- Panel kiri: foto SMKN 11 (khusus halaman login) -->
-            <div class="hidden lg:flex flex-col justify-between relative overflow-hidden bg-panelnight px-14 py-12 lg:rounded-r-[2.5rem] lg:shadow-2xl lg:shadow-ink/20">
+            <!-- Panel kiri: foto SMKN 11 (khusus halaman login, tampil di desktop) -->
+            <div class="gl-left">
 
                 {{--
                     ==== GANTI FOTO SMKN 11 DI SINI ====
-                    Timpa file public/images/smkn11foto.png dengan foto SMKN 11 milikmu.
-                    Kalau formatnya bukan .png, sesuaikan ekstensi di baris "src" di bawah.
-                    Foto akan otomatis memenuhi seluruh panel kiri (object-cover) dan diberi
-                    lapisan gelap tipis agar teks di atasnya tetap terbaca.
+                    Timpa file public/images/smkn11foto.jpg dengan foto SMKN 11 milikmu.
+                    Kalau formatnya bukan .jpg, sesuaikan ekstensi di baris "src" di bawah.
+                    Foto otomatis memenuhi panel kiri (object-fit: cover) dan diberi lapisan gelap
+                    tipis agar teks di atasnya tetap terbaca.
                 --}}
-                <img
-                    src="{{ asset('images/smkn11foto.jpg') }}"
-                    alt="Foto SMKN 11"
-                    class="absolute inset-0 w-full h-full object-cover"
-                />
-                <div class="absolute inset-0 bg-panelnight/70"></div>
+                <img src="{{ asset('images/smkn11foto.jpg') }}" alt="Foto SMKN 11" class="gl-bg" decoding="async" />
+                <div class="gl-overlay"></div>
                 {{-- ==== BATAS AREA FOTO ==== --}}
 
                 <div class="relative z-10 m-auto flex flex-col items-center text-center max-w-xs">
@@ -39,7 +35,7 @@
                     />
 
                     <h1 class="font-display font-bold text-white text-2xl mt-6">
-                        ElevenXkul
+                        Xkull11
                     </h1>
                     <p class="text-white font-semibold text-sm mt-1">
                         Ekskul Management
@@ -51,27 +47,22 @@
             </div>
 
             <!-- Panel kanan: form -->
-            <div class="relative flex items-center justify-center bg-bgsoft lg:bg-white px-6 py-12 sm:px-12 overflow-hidden">
+            <div class="gl-right">
 
-                {{-- ==== Foto SMKN 11 sebagai background penuh (khusus tampilan mobile) ==== --}}
-                <img
-                    src="{{ asset('images/smkn11foto.jpg') }}"
-                    alt="Foto SMKN 11"
-                    class="lg:hidden absolute inset-0 w-full h-full object-cover"
-                />
-                <div class="lg:hidden absolute inset-0 bg-panelnight/55"></div>
-                {{-- ==== BATAS AREA FOTO ==== --}}
+                {{-- Foto SMKN 11 sebagai background penuh (khusus tampilan mobile / tablet) --}}
+                <img src="{{ asset('images/smkn11foto.jpg') }}" alt="" aria-hidden="true" class="gl-right-bg" decoding="async" />
+                <div class="gl-right-overlay"></div>
 
                 <div class="relative z-10 w-full max-w-sm">
                     <div class="lg:hidden mb-8 flex items-center gap-3">
                         <img src="{{ asset('images/smkn11logo.png') }}" alt="Logo SMKN 11" class="w-11 h-11 object-contain shrink-0 drop-shadow-[0_4px_12px_rgba(0,0,0,0.35)]" />
                         <div class="leading-tight">
-                            <p class="font-display font-bold text-white text-sm">ElevenXkul</p>
+                            <p class="font-display font-bold text-white text-sm">Xkull11</p>
                             <p class="text-white/80 text-xs">Ekskul Management</p>
                         </div>
                     </div>
 
-                    <div class="bg-white/95 backdrop-blur-sm rounded-3xl p-5 sm:p-6 shadow-xl shadow-black/10 lg:bg-transparent lg:backdrop-blur-none lg:rounded-none lg:p-0 lg:shadow-none">
+                    <div class="gl-box">
                         {{ $slot }}
                     </div>
                 </div>

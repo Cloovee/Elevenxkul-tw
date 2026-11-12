@@ -9,7 +9,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <title>@yield('title', 'Beranda') - ElevenXkul</title>
+    <title>@yield('title', 'Beranda') - Xkul11</title>
     @include('partials.favicon')
     <meta name="description" content="Daftar ekstrakurikuler, pembina, galeri kegiatan, video, dan lokasi {{ $sekolah['nama'] }}.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -368,7 +368,7 @@
         <div class="hero-bg" data-speed="0.25" data-clamp aria-hidden="true"></div>
 
         <div class="hero-top">
-            <h1 class="rise" style="--d:0">Ayo kembangkan bakatmu di 11 melalui ElevenXkul</h1>
+            <h1 class="rise" style="--d:0">Ayo kembangkan bakatmu di 11 melalui Xkull11</h1>
             <p class="sub rise" style="--d:1">Klik foto atau tekan panah untuk menjelajahi ekstrakurikuler {{ $sekolah['nama'] }}.</p>
         </div>
 

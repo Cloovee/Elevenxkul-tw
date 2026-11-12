@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nilai Peserta - ElevenXkul</title>
+    <title>Nilai Peserta - Xkul11</title>
     @include('partials.favicon')
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -19,6 +19,10 @@
         'tahun_ajaran' => $tahunAjaran,
         'semester' => $semester,
     ]);
+    // Sedang mencari / menyaring jurusan?
+    $adaPencarian = $cari !== '' || $filterJurusan !== '';
+    // Link "Reset": hapus pencarian & jurusan, tetap di ekskul/semester yang sama.
+    $urlReset = route('pembina.nilai.index', $queryExport);
 @endphp
 
 <div class="flex flex-col lg:flex-row gap-5 p-5 min-h-screen">
@@ -57,7 +61,7 @@
             <div class="relative">
                 <p class="text-xs font-bold uppercase tracking-wide text-[#3F41B0]">Penilaian</p>
                 <h1 class="font-display text-2xl font-semibold mt-1">Grade Peserta</h1>
-                <p class="text-sm text-inksoft mt-1 max-w-xl">Grade dihitung dari <b>kehadiran</b> (otomatis dari absensi) dan <b>keaktifan</b> (kamu isi angkanya, sistem mengubahnya jadi grade).</p>
+                <p class="text-sm text-inksoft mt-1 max-w-xl">Grade dihitung dari <b>kehadiran</b> (otomatis dari absensi) dan <b>keaktifan</b> (kamu isi angkanya 0&ndash;100, sistem mengubahnya jadi grade). Peserta yang tidak pernah hadir tidak diberi nilai.</p>
             </div>
         </div>
 
@@ -66,6 +70,15 @@
             <form method="GET" action="{{ route('pembina.nilai.index') }}" class="flex flex-wrap items-center gap-3">
                 <span class="text-xs font-bold uppercase tracking-wide text-inksoft">Filter</span>
                 @include('pembina.partials.filter-ekskul')
+
+                {{-- Filter jurusan (program keahlian kelas siswa) --}}
+                <select name="jurusan" onchange="this.form.submit()" aria-label="Filter jurusan"
+                        class="py-2 pl-4 pr-9 bg-bgsoft border-none rounded-full text-sm font-semibold text-ink focus:ring-2 focus:ring-lavender cursor-pointer max-w-[200px]">
+                    <option value="">Semua Jurusan</option>
+                    @foreach ($opsiJurusan as $j)
+                        <option value="{{ $j }}" @selected($filterJurusan === $j)>{{ $j }}</option>
+                    @endforeach
+                </select>
 
                 <select name="tahun_ajaran" onchange="this.form.submit()" aria-label="Tahun ajaran"
                         class="py-2 pl-4 pr-9 bg-bgsoft border-none rounded-full text-sm font-semibold text-ink focus:ring-2 focus:ring-lavender cursor-pointer">
@@ -79,6 +92,17 @@
                     <option value="1" @selected($semester === 1)>Semester 1</option>
                     <option value="2" @selected($semester === 2)>Semester 2</option>
                 </select>
+
+                {{-- Cari peserta: nama / NIS / NISN --}}
+                <div class="relative">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" class="absolute left-4 top-1/2 -translate-y-1/2 text-inksoft pointer-events-none"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <input type="search" name="search" value="{{ $cari }}" placeholder="Cari nama / NIS / NISN" autocomplete="off"
+                           class="pl-10 pr-4 py-2 bg-bgsoft border-none rounded-full text-sm text-ink placeholder-inksoft focus:ring-2 focus:ring-lavender w-72 max-w-full">
+                </div>
+                <button type="submit" class="px-4 py-2 bg-bgsoft hover:bg-[#e9edfb] text-ink rounded-full text-sm font-bold transition-colors">Cari</button>
+                @if ($adaPencarian)
+                    <a href="{{ $urlReset }}" class="px-4 py-2 bg-bgsoft hover:bg-[#e9edfb] text-inksoft rounded-full text-sm font-bold transition-colors">Reset</a>
+                @endif
             </form>
 
             <div class="flex items-center gap-2">
@@ -96,6 +120,16 @@
             </div>
         </div>
 
+        {{-- NOTIFIKASI: tahun ajaran yang dipilih belum punya data anggota --}}
+        @if ($anggotaBelumTersedia)
+            <div class="flex items-start gap-3 bg-amber-50 text-amber-700 text-sm font-semibold px-4 py-3 rounded-2xl animate-fade-in-up">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="shrink-0 mt-0.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <span>
+                    Data anggota untuk TA {{ $tahunAjaran }} belum tersedia. Daftar di bawah masih menampilkan anggota TA {{ $tahunAjaranAnggota }} (tahun ajaran aktif saat ini).
+                </span>
+            </div>
+        @endif
+
         {{-- ATURAN SINGKAT --}}
         <div class="animate-fade-in-up animate-delay-1 rounded-2xl bg-white/70 px-5 py-3 text-xs text-inksoft leading-relaxed">
             <b class="text-ink">Cara hitung:</b>
@@ -103,12 +137,17 @@
             (nilai {{ $batas['C'] }} paling rendah).
             Kehadiran = persentase hadir pada semester ini.
             Grade akhir = gabungan grade kehadiran ({{ $bobot['kehadiran'] }}%) dan keaktifan ({{ $bobot['keaktifan'] }}%).
+            Peserta yang <b>tidak pernah hadir</b> pada semester ini <b>tidak diberi nilai</b> (tanpa grade).
         </div>
 
         {{-- FORM BERI NILAI --}}
-        <div class="animate-fade-in-up animate-delay-2 bg-white rounded-3xl p-6 shadow-[0_10px_30px_-18px_rgba(46,43,85,0.35)]">
+        <div id="beri-nilai" class="scroll-mt-5 animate-fade-in-up animate-delay-2 bg-white rounded-3xl p-6 shadow-[0_10px_30px_-18px_rgba(46,43,85,0.35)]">
             <h3 class="font-bold text-base mb-1">Beri Nilai &mdash; Semester {{ $semester }} TA {{ $tahunAjaran }}</h3>
-            <p class="text-xs text-inksoft mb-3">Isi nilai keaktifan ({{ $minimum }}–100). Menyimpan lagi untuk peserta yang sama memperbarui nilai semester ini.</p>
+            <p class="text-xs text-inksoft mb-3">Isi nilai keaktifan ({{ $minimum }}&ndash;100). Menyimpan lagi untuk peserta yang sama memperbarui nilai semester ini.
+                @if ($daftarPeserta->total() > 0)
+                    <span class="font-semibold text-ink">{{ $daftarPeserta->total() }} peserta{{ $adaPencarian ? ' ditemukan' : '' }}.</span>
+                @endif
+            </p>
             <div class="overflow-x-auto -mx-2 px-2">
             <table class="w-full text-sm border-collapse min-w-[860px]">
                 <thead>
@@ -127,10 +166,13 @@
                             $k = $kehadiran[$p->id_anggota];
                             $n = $nilaiSemester->get($p->id_anggota);
                             $adaAbsensi = $k['total'] > 0;
+                            // Tidak pernah hadir sama sekali -> tidak dinilai (tanpa grade).
+                            $pernahHadir = \App\Support\Penilaian::pernahHadir($k);
+                            $tanpaHadir = $adaAbsensi && ! $pernahHadir;
                             $formId = 'form-nilai-'.$p->id_anggota;
                         @endphp
                         <tr class="js-baris border-b border-[#F5F5FA] last:border-none hover:bg-bgsoft/60 transition-colors"
-                            data-grade-kehadiran="{{ $k['grade'] }}">
+                            data-grade-kehadiran="{{ $pernahHadir ? $k['grade'] : '' }}">
                             <td class="py-2.5 px-2">
                                 <form id="{{ $formId }}" method="POST" action="{{ route('pembina.nilai.simpan', $p) }}" class="hidden">
                                     @csrf
@@ -139,6 +181,16 @@
                                     @endif
                                     <input type="hidden" name="tahun_ajaran" value="{{ $tahunAjaran }}">
                                     <input type="hidden" name="semester" value="{{ $semester }}">
+                                    {{-- Supaya setelah menyimpan tetap di pencarian, jurusan, dan halaman yang sama --}}
+                                    @if($cari !== '')
+                                        <input type="hidden" name="search" value="{{ $cari }}">
+                                    @endif
+                                    @if($filterJurusan !== '')
+                                        <input type="hidden" name="jurusan" value="{{ $filterJurusan }}">
+                                    @endif
+                                    @if($daftarPeserta->currentPage() > 1)
+                                        <input type="hidden" name="page" value="{{ $daftarPeserta->currentPage() }}">
+                                    @endif
                                 </form>
                                 <div class="flex items-center gap-2.5 font-semibold">
                                     <div class="w-[30px] h-[30px] rounded-lg bg-periwinkle text-white text-xs font-bold flex items-center justify-center">
@@ -146,12 +198,22 @@
                                     </div>
                                     <div>
                                         <div>{{ $p->nama }}</div>
-                                        <div class="text-[11px] font-normal text-inksoft">{{ $p->ekskul->nama_ekskul ?? '-' }}</div>
+                                        <div class="text-[11px] font-normal text-inksoft">{{ $p->ekskul->nama_ekskul ?? '-' }}@if($p->kelas) &middot; {{ $p->kelas }}@endif</div>
                                     </div>
                                 </div>
                             </td>
                             <td class="py-2.5 px-2">
-                                @if($adaAbsensi)
+                                @if($tanpaHadir)
+                                    {{-- Ada absensi tapi tidak pernah hadir: tanpa grade --}}
+                                    <div class="flex items-center gap-2">
+                                        <span class="inline-flex items-center px-2.5 h-7 rounded-lg bg-red-50 text-red-600 text-[11px] font-bold">Tidak pernah hadir</span>
+                                        <span class="font-semibold">{{ $angka($k['persen']) }}%</span>
+                                    </div>
+                                    <div class="text-[11px] text-inksoft mt-0.5">
+                                        Hadir {{ $k['hadir'] }}/{{ $k['total'] }}
+                                        &middot; I {{ $k['izin'] }} &middot; S {{ $k['sakit'] }} &middot; A {{ $k['alpha'] }}
+                                    </div>
+                                @elseif($adaAbsensi)
                                     <div class="flex items-center gap-2">
                                         @include('pembina.nilai-peserta._grade', ['g' => $k['grade']])
                                         <span class="font-semibold">{{ $angka($k['persen']) }}%</span>
@@ -167,14 +229,16 @@
                             <td class="py-2.5 px-2">
                                 <input type="number" form="{{ $formId }}" name="nilai_keaktifan"
                                        min="{{ $minimum }}" max="100" step="0.01" required
-                                       placeholder="{{ $minimum }}-100"
-                                       value="{{ $angka($n?->nilai_keaktifan) }}"
-                                       @disabled(! $adaAbsensi)
+                                       placeholder="{{ $pernahHadir ? $minimum.'-100' : '—' }}"
+                                       value="{{ $pernahHadir ? $angka($n?->nilai_keaktifan) : '' }}"
+                                       @disabled(! $pernahHadir)
                                        class="js-keaktifan w-24 text-center px-2.5 py-1.5 rounded-lg border border-[#E7E7F4] focus:outline-none focus:border-lavender disabled:bg-bgsoft disabled:cursor-not-allowed">
                             </td>
                             <td class="py-2.5 px-2">
                                 <div class="js-hasil flex items-center gap-1.5">
-                                    @if($n && $n->grade_akhir)
+                                    @if(! $pernahHadir)
+                                        <span class="text-xs font-semibold text-inksoft">Tanpa grade</span>
+                                    @elseif($n && $n->grade_akhir)
                                         @include('pembina.nilai-peserta._grade', ['g' => $n->grade_akhir])
                                         <span class="text-[11px] text-inksoft">Keaktifan {{ $n->grade_keaktifan }}</span>
                                     @else
@@ -184,14 +248,15 @@
                             </td>
                             <td class="py-2.5 px-2">
                                 <input type="text" form="{{ $formId }}" name="catatan_pembina" maxlength="1000"
-                                       placeholder="Opsional" value="{{ $n?->catatan_pembina }}"
-                                       @disabled(! $adaAbsensi)
+                                       placeholder="Opsional" value="{{ $pernahHadir ? $n?->catatan_pembina : '' }}"
+                                       @disabled(! $pernahHadir)
                                        class="w-40 px-2.5 py-1.5 rounded-lg border border-[#E7E7F4] text-xs focus:outline-none focus:border-lavender disabled:bg-bgsoft disabled:cursor-not-allowed">
                             </td>
                             <td class="py-2.5 px-2 text-right">
-                                <button type="submit" form="{{ $formId }}" @disabled(! $adaAbsensi)
+                                <button type="submit" form="{{ $formId }}" @disabled(! $pernahHadir)
+                                        @if(! $pernahHadir) title="{{ $tanpaHadir ? 'Tidak pernah hadir: tidak diberi nilai' : 'Belum ada absensi semester ini' }}" @endif
                                         class="bg-lavender hover:bg-[#8385f0] text-white font-bold text-xs px-3.5 py-1.5 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed">
-                                    {{ $n ? 'Perbarui' : 'Simpan' }}
+                                    {{ ($n && $pernahHadir) ? 'Perbarui' : 'Simpan' }}
                                 </button>
                             </td>
                         </tr>
@@ -202,8 +267,14 @@
                                     <div class="w-14 h-14 rounded-2xl bg-lavender/30 text-[#3F41B0] flex items-center justify-center mb-1">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M15.5 13.5 17 22l-5-3-5 3 1.5-8.5"/></svg>
                                     </div>
-                                    <p class="text-sm font-semibold text-ink">Belum ada data peserta aktif</p>
-                                    <p class="text-xs text-inksoft max-w-xs">{{ $filterEkskul ? 'Belum ada peserta aktif di ekskul yang dipilih.' : 'Peserta aktif di ekskul yang kamu bina akan tampil di sini.' }}</p>
+                                    @if($adaPencarian)
+                                        <p class="text-sm font-semibold text-ink">Peserta tidak ditemukan</p>
+                                        <p class="text-xs text-inksoft max-w-xs">Tidak ada peserta yang cocok dengan pencarian{{ $cari !== '' ? ' "'.$cari.'"' : '' }}{{ $filterJurusan !== '' ? ' di jurusan '.$filterJurusan : '' }}.</p>
+                                        <a href="{{ $urlReset }}" class="mt-1 px-4 py-2 bg-bgsoft hover:bg-[#e9edfb] text-ink rounded-full text-xs font-bold transition-colors">Reset pencarian</a>
+                                    @else
+                                        <p class="text-sm font-semibold text-ink">Belum ada data peserta aktif</p>
+                                        <p class="text-xs text-inksoft max-w-xs">{{ $filterEkskul ? 'Belum ada peserta aktif di ekskul yang dipilih.' : 'Peserta aktif di ekskul yang kamu bina akan tampil di sini.' }}</p>
+                                    @endif
                                 </div>
                             </td>
                         </tr>
@@ -211,10 +282,12 @@
                 </tbody>
             </table>
             </div>
+
+            {{ $daftarPeserta->links('vendor.pagination.tema', ['satuan' => 'peserta']) }}
         </div>
 
         {{-- RIWAYAT --}}
-        <div class="animate-fade-in-up animate-delay-3 bg-white rounded-3xl p-6 shadow-[0_10px_30px_-18px_rgba(46,43,85,0.35)]">
+        <div id="riwayat" class="scroll-mt-5 animate-fade-in-up animate-delay-3 bg-white rounded-3xl p-6 shadow-[0_10px_30px_-18px_rgba(46,43,85,0.35)]">
             <h3 class="font-bold text-base mb-3">Riwayat Nilai</h3>
             <div class="overflow-x-auto -mx-2 px-2">
             <table class="w-full text-sm border-collapse min-w-[760px]">
@@ -299,9 +372,7 @@
             </table>
             </div>
 
-            <div class="mt-4">
-                {{ $riwayatNilai->links() }}
-            </div>
+            {{ $riwayatNilai->links('vendor.pagination.tema', ['satuan' => 'riwayat']) }}
         </div>
 
     </main>
